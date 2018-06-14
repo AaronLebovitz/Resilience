@@ -10,7 +10,7 @@ namespace ResilienceClasses
             SaleStatement, ProfitStatement
         }
 
-        public static string strDocumentPath = "/Users/aaronlebovitz/Documents/Professional/Resilience/tblDocument.csv";
+        public static string strDocumentPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocument.csv";
         public static int NameColumn = 1;
         public static int PropertyColumn = 2;
         public static int TypeColumn = 3;

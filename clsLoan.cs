@@ -7,7 +7,7 @@ namespace ResilienceClasses
 {
     public class clsLoan
     {
-        public static string strLoanPath = "/Users/aaronlebovitz/Documents/Professional/Resilience/tblLoan.csv";
+        public static string strLoanPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
         public static int IndexColumn = 0;
         public static int PropertyColumn = 1;
         public static int TitleHolderColumn = 2;
@@ -449,6 +449,11 @@ namespace ResilienceClasses
 
         public double FirstRehabEstimate()
         {
+            DateTime dtFirstRecording = DateTime.MaxValue;
+            foreach (clsCashflow cf in this.cfCashflows)
+            {
+                if (cf.RecordDate() < dtFirstRecording) dtFirstRecording = cf.RecordDate();
+            }
             clsLoan l = this.LoanAsOf(this.dtOrigination);
             return l.RehabSpent() + l.RehabRemain();
         }
@@ -494,6 +499,8 @@ namespace ResilienceClasses
             dPrevIRR = 0.05;
             dCurrentIRR = 0.20;
 
+            if (this.cfCashflows.Count == 0) { return double.NaN; }
+
             if (!original)
             {
                 // GOTTA CHECK FOR WHETHER IT"S BEEN SOLD ALREADY
@@ -534,6 +541,7 @@ namespace ResilienceClasses
         public double Return(bool original)
         {
             // just (HardInt + AddlInt) / (Balance)
+            if (this.cfCashflows.Count == 0) { return double.NaN; }
             clsLoan l;
             DateTime dtAsOf;
             DateTime dtBalanceDate = DateTime.MinValue;  // the day before the principal is repaid
@@ -541,7 +549,8 @@ namespace ResilienceClasses
             if (original)
             {
                 bDisp = true;
-                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, true).AddDays(-1);
+                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, false);
+                dtBalanceDate = this.FindDate(clsCashflow.Type.NetDispositionProj, true, true).AddDays(-1);
                 l = this.LoanAsOf(dtAsOf);
             }
             else
@@ -554,19 +563,24 @@ namespace ResilienceClasses
                 else
                 {
                     dtAsOf = FindDate(clsCashflow.Type.Principal, false, true);
-                    dtBalanceDate = dtAsOf.AddDays(-1);
-                    if (FindDate(clsCashflow.Type.InterestAdditional, false, true) > dtAsOf)
+                    if (dtAsOf == DateTime.MinValue)
                     {
-                        dtAsOf = FindDate(clsCashflow.Type.InterestAdditional, false, true);
+                        return double.NaN;
+                    }
+                    else
+                    {
+                        dtBalanceDate = dtAsOf.AddDays(-1);
+                        if (FindDate(clsCashflow.Type.InterestAdditional, false, true) > dtAsOf)
+                        {
+                            dtAsOf = FindDate(clsCashflow.Type.InterestAdditional, false, true);
+                        }
                     }
                 }
                 l = this.LoanAsOf(dtAsOf);
             }
             if (bDisp) 
             {
-                Console.WriteLine(l.DispositionAmount(false, false));
-                Console.WriteLine(l.TotalInvestment());
-                return (l.DispositionAmount(false, false)) / l.TotalInvestment() - 1; 
+                return (l.DispositionAmount(false, false)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1; 
             }
             else
             {
@@ -576,6 +590,8 @@ namespace ResilienceClasses
 
         public double GrossReturn(bool original)
         {
+            // NEEDS CLEANUP
+            if (this.cfCashflows.Count == 0) { return double.NaN; }
             clsLoan l;
             DateTime dtAsOf;
             bool bDisp;
@@ -649,8 +665,8 @@ namespace ResilienceClasses
             double dRetVal = 0;
             double dMonths;
             DateTime dtSale = FindDate(clsCashflow.Type.Principal, false, true);
-            if (dtSale.Year == DateTime.MaxValue.Year) { dtSale = FindDate(clsCashflow.Type.NetDispositionProj, false, true); }
-            if (dtSale.Year == DateTime.MaxValue.Year) { return double.NaN; }
+            if (dtSale == DateTime.MinValue) { dtSale = FindDate(clsCashflow.Type.NetDispositionProj, false, true); }
+            if (dtSale == DateTime.MinValue) { return double.NaN; }
             foreach (clsCashflow cf in this.cfCashflows)
             {
                 if (cf.DeleteDate().Year == DateTime.MaxValue.Year)

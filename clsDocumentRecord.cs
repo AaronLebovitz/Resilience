@@ -13,7 +13,7 @@ namespace ResilienceClasses
             Unknown, Electronic, Fax, Mail
         }
 
-        public static string strDocumentRecordPath = "/Users/aaronlebovitz/Documents/Professional/Resilience/tblDocumentRecord.csv";
+        public static string strDocumentRecordPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocumentRecord.csv";
         public static int DocumentColumn = 1;
         public static int ActionDateColumn = 2;
         public static int RecordDateColumn = 3;

@@ -13,7 +13,7 @@ namespace ResilienceClasses
             InitialExpenseDraw
         }
 
-        public static string strCashflowPath = "/Users/aaronlebovitz/Documents/Professional/Resilience/tblCashflow.csv";
+        public static string strCashflowPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblCashflow.csv";
         public static int LoanColumn = 1;
         public static int TransactionDateColumn = 2;
         public static int AmountColumn = 3;

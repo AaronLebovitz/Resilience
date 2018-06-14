@@ -3,7 +3,7 @@ namespace ResilienceClasses
 {
     public class clsEntity
     {
-        public static string strEntityPath = "/Users/aaronlebovitz/Documents/Professional/Resilience/tblEntity.csv";
+        public static string strEntityPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblEntity.csv";
         public static int NameColumn = 1;
         public static int AddressColumn = 2;
         public static int TownColumn = 3;
