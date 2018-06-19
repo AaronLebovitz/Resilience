@@ -236,8 +236,8 @@ namespace ResilienceClasses
                     {
                         dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).TotalDays / 360;
                         dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360;
+                        if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
                     }
-                    if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
                 }
                 if (bSold) { dAccrued = 0D; }
                 return -dAccrued;
@@ -319,6 +319,13 @@ namespace ResilienceClasses
 
         public double HardInterestPaid()
         { return this.HardInterestPaid(System.DateTime.Today); }
+
+        public DateTime SaleDate()
+        {
+            DateTime dt = this.FindDate(clsCashflow.Type.Principal, false, true);
+            if (dt == DateTime.MinValue) { dt = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true); }
+            return dt;
+        }
 
         public DateTime FindDate(clsCashflow.Type cashflowType, bool firstFound, bool paydate)
         {
@@ -422,16 +429,13 @@ namespace ResilienceClasses
                 }
                 else //!current , i.e. original estimate
                 {
-                    clsLoan l = this.LoanAsOf(this.dtOrigination);
+                    DateTime dtFirstDispRecord = this.FindDate(clsCashflow.Type.NetDispositionProj, true, false);
+                    clsLoan l = this.LoanAsOf(dtFirstDispRecord);
                     foreach (clsCashflow cf in l.cfCashflows)
                     {
-                        if ((cf.PayDate() > this.dtOrigination) &&
-                           ((cf.TypeID() == clsCashflow.Type.Principal) ||
-                            (cf.TypeID() == clsCashflow.Type.InterestHard) ||
-                            (cf.TypeID() == clsCashflow.Type.InterestAdditional) ||
-                            (cf.TypeID() == clsCashflow.Type.NetDispositionProj)))
+                        if (cf.TypeID() == clsCashflow.Type.NetDispositionProj)
                         {
-                            dCost += cf.Amount();
+                            dCost = cf.Amount();
                         }
                     }
                 }
@@ -449,13 +453,11 @@ namespace ResilienceClasses
 
         public double FirstRehabEstimate()
         {
-            DateTime dtFirstRecording = DateTime.MaxValue;
-            foreach (clsCashflow cf in this.cfCashflows)
-            {
-                if (cf.RecordDate() < dtFirstRecording) dtFirstRecording = cf.RecordDate();
-            }
-            clsLoan l = this.LoanAsOf(this.dtOrigination);
-            return l.RehabSpent() + l.RehabRemain();
+            DateTime dtFirstRecording = this.FindDate(clsCashflow.Type.RehabDraw, true, false);
+            if (dtFirstRecording == DateTime.MaxValue)  
+                return 0; 
+            else 
+                return this.LoanAsOf(dtFirstRecording).RehabRemain(dtFirstRecording);
         }
 
         public double ProjectedHardInterest()
@@ -476,6 +478,9 @@ namespace ResilienceClasses
             }
         }
 
+        public double ProjectedAdditionalInterest()
+        { return this.ImpliedAdditionalInterest() + this.ScheduledAdditionalInterest(); }
+
         public double ImpliedAdditionalInterest()
         {
             DateTime dtProjDisp = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
@@ -485,6 +490,14 @@ namespace ResilienceClasses
                 clsLoan l = this.LoanAsOf(dtProjDisp);
                 return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
             }
+        }
+
+        public double ScheduledAdditionalInterest()
+        { return this.ScheduledAdditionalInterest(System.DateTime.Today); }
+
+        public double ScheduledAdditionalInterest(DateTime dt)
+        {
+            return this._ProjectedToBePaid(dt, clsCashflow.Type.InterestAdditional);
         }
 
         public double IRR(bool original)
@@ -520,7 +533,7 @@ namespace ResilienceClasses
             }
             else
             {
-                clsLoan l = this.LoanAsOf(this.FindDate(clsCashflow.Type.AcquisitionPrice, true, true));
+                clsLoan l = this.LoanAsOf(this.FindDate(clsCashflow.Type.NetDispositionProj, true, false));
                 dPrevValue = l._NPV(dPrevIRR);
                 dCurrentValue = l._NPV(dCurrentIRR);
                 while ((i < iMaxIterations) && (Math.Abs(dPrevIRR - dCurrentIRR) > dTolerance))
@@ -559,6 +572,7 @@ namespace ResilienceClasses
                 if (bDisp = (dtAsOf != DateTime.MinValue))
                 {
                     dtAsOf = dtAsOf.AddDays(-1);
+                    dtBalanceDate = dtAsOf;
                 }
                 else
                 {
@@ -580,7 +594,7 @@ namespace ResilienceClasses
             }
             if (bDisp) 
             {
-                return (l.DispositionAmount(false, false)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1; 
+                return (l.DispositionAmount(false, !original)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1; 
             }
             else
             {
@@ -590,31 +604,52 @@ namespace ResilienceClasses
 
         public double GrossReturn(bool original)
         {
-            // NEEDS CLEANUP
             if (this.cfCashflows.Count == 0) { return double.NaN; }
             clsLoan l;
             DateTime dtAsOf;
             bool bDisp;
+            DateTime dtBalanceDate = DateTime.MaxValue;
             if (original)
             {
-                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, true);
+                // find the record date of the first projected disposition amount, take the loan as of that date
+                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, false);
                 bDisp = true;
                 l = this.LoanAsOf(dtAsOf);
             }
             else
             {
+                // find the pay date of the last disposition date, or projected principal payment
                 dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
-                bDisp = (dtAsOf != DateTime.MaxValue);
-                if (!bDisp) { dtAsOf = this.FindDate(clsCashflow.Type.Principal, false, true); }
+                if (bDisp = (dtAsOf != DateTime.MinValue))
+                {
+                    dtAsOf = dtAsOf.AddDays(-1);
+                    dtBalanceDate = dtAsOf;
+                }
+                else
+                {
+                    dtAsOf = FindDate(clsCashflow.Type.Principal, false, true);
+                    if (dtAsOf == DateTime.MinValue)
+                    {
+                        return double.NaN;
+                    }
+                    else
+                    {
+                        dtBalanceDate = dtAsOf.AddDays(-1);
+                        if (FindDate(clsCashflow.Type.InterestAdditional, false, true) > dtAsOf)
+                        {
+                            dtAsOf = FindDate(clsCashflow.Type.InterestAdditional, false, true);
+                        }
+                    }
+                }
                 l = this.LoanAsOf(dtAsOf);
             }
             if (bDisp) 
             { 
-                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.TotalInvestment() - 1; 
+                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.TotalInvestment() - 1D; 
             }
             else 
             { 
-                return (l.AccruedInterest(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtAsOf); 
+                return (l.InterestPaid(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtBalanceDate); 
             }
         }
 
