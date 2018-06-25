@@ -20,6 +20,28 @@ namespace ResilienceClasses
 
         public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
 
+        // public static methods
+        public static int LoanID(string address)
+        {
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            clsCSVTable tblProperties = new clsCSVTable(clsProperty.strPropertyPath);
+            int propertyID = -1;
+            int loanID = -1;
+            // Find PropertyID from Address First
+            for (int i = 0; i < tblProperties.Length(); i++)
+            {
+                if (tblProperties.Value(i, clsProperty.AddressColumn) == address) propertyID = i;
+            }
+            if (propertyID == -1) throw new Exception("Address not found: " + address);
+            // Now match propertyID to the loan
+            for (int i = 0; i < tblLoans.Length(); i++)
+            {
+                if (tblLoans.Value(i, clsLoan.PropertyColumn) == propertyID.ToString()) loanID = i;
+            }
+            if (loanID == -1) throw new Exception("No Loan Found for property " + address);
+            return loanID;
+        }
+
         // properties
         private int iLoanID;
         private int iPropertyID;
@@ -136,11 +158,15 @@ namespace ResilienceClasses
         {
             clsCSVTable tbl = new clsCSVTable(path);
             this.cfCashflows = new List<clsCashflow>();
+            int iCFLoanID;
             for (int i = 0; i < tbl.Length(); i++)
             {
-                if (Int32.Parse(tbl.Value(i, clsCashflow.LoanColumn)) == this.iLoanID)
+                if (Int32.TryParse(tbl.Value(i, clsCashflow.LoanColumn), out iCFLoanID))
                 {
-                    this.cfCashflows.Add(new clsCashflow(i , tbl));
+                    if (iCFLoanID == this.iLoanID)
+                    {
+                        this.cfCashflows.Add(new clsCashflow(i, tbl));
+                    }
                 }
             }
         }
@@ -417,7 +443,7 @@ namespace ResilienceClasses
                 {
                     foreach (clsCashflow cf in this.cfCashflows)
                     {
-                        if ((cf.PayDate() > System.DateTime.Today) && (cf.DeleteDate().Year == DateTime.MaxValue.Year) &&
+                        if ((cf.DeleteDate().Year == DateTime.MaxValue.Year) &&
                            ((cf.TypeID() == clsCashflow.Type.Principal) ||
                             (cf.TypeID() == clsCashflow.Type.InterestHard) ||
                             (cf.TypeID() == clsCashflow.Type.InterestAdditional) ||
@@ -643,13 +669,13 @@ namespace ResilienceClasses
                 }
                 l = this.LoanAsOf(dtAsOf);
             }
-            if (bDisp) 
-            { 
-                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.TotalInvestment() - 1D; 
+            if (bDisp)
+            {
+                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.LoanAsOf(FindDate(clsCashflow.Type.NetDispositionProj,true,true).AddDays(-1)).TotalInvestment() - 1D;
             }
             else 
-            { 
-                return (l.InterestPaid(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtBalanceDate); 
+            {
+                return (l.HardInterestPaid(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtBalanceDate);
             }
         }
 

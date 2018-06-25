@@ -3,15 +3,12 @@ namespace ResilienceClasses
 {
     public class clsDocumentRecord
     {
-        public enum Status
-        {
-            Unkown, Preliminary, Revised, Executed, Notarized
-        }
-
-        public enum Transmission
-        {
-            Unknown, Electronic, Fax, Mail
-        }
+        public enum Status { Unkown, Preliminary, Revised, Executed, Notarized }
+        public enum StatusCode { U, I, R, X, N }
+        public enum StatusColor {Red, Gray, Cobalt, Black, Green}
+        public enum Transmission { Unknown, Electronic, Fax, Post }
+        public enum TransmissionCode {U, E, F, P}
+        public enum TransmissionColor {Red, Black, Purple, Blue}
 
         public static string strDocumentRecordPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocumentRecord.csv";
         public static int DocumentColumn = 1;

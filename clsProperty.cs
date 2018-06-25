@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Data;
+using System.Collections.Generic;
 
 namespace ResilienceClasses
 {
@@ -20,6 +21,34 @@ namespace ResilienceClasses
         private string strState;
         private double dBPO;
         private string strNickname;
+
+        public static List<string> AddressList()
+        {
+            List<string> returnValue = new List<string>();
+            clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
+            int streetNumber;
+            string streetName;
+
+            // compile list as [street name] [8 digit street number]
+            for (int i = 0; i < tbl.Length(); i++)
+            {
+                string s = tbl.Value(i, clsProperty.AddressColumn);
+                streetNumber = Int32.Parse(System.Text.RegularExpressions.Regex.Match(s, @"\d+").Value);
+                streetName = System.Text.RegularExpressions.Regex.Replace(s, streetNumber.ToString(), "").Trim();
+                returnValue.Add(streetName + " " + streetNumber.ToString("00000000"));
+            }
+            // sort list, so it's alphabetical by street name and then street number
+            returnValue.Sort();
+            // put list back to [street number] [street name]
+            for (int i = 0; i < returnValue.Count; i++)
+            {
+                streetNumber = Int32.Parse(returnValue[i].Substring(returnValue[i].Length - 8));
+                streetName = returnValue[i].Substring(0,returnValue[i].Length - 9);
+                returnValue[i] = streetNumber.ToString() + " " + streetName;
+            }
+
+            return returnValue;
+        }
 
         public clsProperty(int propertyID)
         {
