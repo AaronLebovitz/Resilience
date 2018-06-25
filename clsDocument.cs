@@ -3,6 +3,8 @@ namespace ResilienceClasses
 {
     public class clsDocument
     {
+
+        #region Enums and Static Values
         public enum Type
         {
             Mortgage, PurchaseStatement, EscrowInstructionLetter, ClosingProtectionLetter, TitleCommitment,
@@ -14,11 +16,16 @@ namespace ResilienceClasses
         public static int NameColumn = 1;
         public static int PropertyColumn = 2;
         public static int TypeColumn = 3;
+        #endregion
+
+        #region Properties
         private int iDocumentID;
         private string strName;
         private int iPropertyID;
         private clsDocument.Type tType;
+        #endregion
 
+        #region Constructors
         public clsDocument(int id)
         {
             this._Load(id);
@@ -31,12 +38,17 @@ namespace ResilienceClasses
             this.iPropertyID = propertyID;
             this.tType = type;
         }
+        #endregion
 
+        #region Property Accessors
+        public int ID() { return this.iDocumentID; }
         public string Name() { return this.strName; }
         public int PropertyID() { return this.iPropertyID; }
         public string PropertyAddress() { return new clsProperty(this.iPropertyID).Address(); }
         public clsDocument.Type DocumentType() { return this.tType; }
+        #endregion
 
+        #region DB Methods
         public bool Save()
         {
             return this.Save(clsDocument.strDocumentPath);
@@ -76,7 +88,9 @@ namespace ResilienceClasses
                 }
             }
         }
+        #endregion
 
+        #region Private Methods
         private int _NewDocumentID()
         {
             clsCSVTable tbl = new clsCSVTable(clsDocument.strDocumentPath);
@@ -99,5 +113,6 @@ namespace ResilienceClasses
                 return false;
             }
         }
+        #endregion
     }
 }

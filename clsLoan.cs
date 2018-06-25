@@ -7,6 +7,9 @@ namespace ResilienceClasses
 {
     public class clsLoan
     {
+        #region Enums and Static Values
+        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
+
         public static string strLoanPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
         public static int IndexColumn = 0;
         public static int PropertyColumn = 1;
@@ -17,10 +20,9 @@ namespace ResilienceClasses
         public static int MaturityDateCoumn = 6;
         public static int RateColumn = 7;
         public static int PenaltyRateColumn = 8;
+        #endregion
 
-        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
-
-        // public static methods
+        #region Static Methods
         public static int LoanID(string address)
         {
             clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
@@ -41,8 +43,9 @@ namespace ResilienceClasses
             if (loanID == -1) throw new Exception("No Loan Found for property " + address);
             return loanID;
         }
+        #endregion
 
-        // properties
+        #region Properties
         private int iLoanID;
         private int iPropertyID;
         private int iTitleHolderEntityID;
@@ -55,9 +58,9 @@ namespace ResilienceClasses
         private DateTime dtMaturity;
         private double dRate;
         private double dPenaltyRate;
+        #endregion
 
-        // Constructors and builders
-
+        #region Constructors
         public clsLoan(int loanID)
         {
             this._Load(loanID);
@@ -78,7 +81,9 @@ namespace ResilienceClasses
             this.pProperty = new clsProperty(propertyID);
             this.cfCashflows = new List<clsCashflow>();
         }
+        #endregion
 
+        #region Public Methods
         public clsLoan LoanAsOf(DateTime dt)
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
@@ -120,9 +125,9 @@ namespace ResilienceClasses
             }
             else return false;
         }
+        #endregion
 
-        // private constructor and builder support
-
+        #region Private Methods
         private bool _Load(int loanID)
         {
             return this._Load(loanID, clsLoan.strLoanPath);
@@ -170,8 +175,9 @@ namespace ResilienceClasses
                 }
             }
         }
+        #endregion
 
-        // Get Properties
+        #region Property Accessors
         public DateTime OriginationDate() { return this.dtOrigination; }
         public DateTime MaturityDate() { return this.dtMaturity; }
         public double Rate() { return this.dRate; }
@@ -183,9 +189,9 @@ namespace ResilienceClasses
         public int ID() { return this.iLoanID; }
         public clsProperty Property() { return this.pProperty; }
         public List<clsCashflow> Cashflows() { return this.cfCashflows; }
+        #endregion
 
-        // Calculations
-
+        #region Calculation Methods
         public clsLoan.State Status()
         {
             // takes the current status of a Loan - does not look forward or back
@@ -288,8 +294,8 @@ namespace ResilienceClasses
             {
                 foreach (clsCashflow cf in this.cfCashflows)
                 {
-                    if ((cf.PayDate() <= dt) && (cf.Actual()) && 
-                        (cf.TypeID() != clsCashflow.Type.InterestHard) && 
+                    if ((cf.PayDate() <= dt) && (cf.Actual()) &&
+                        (cf.TypeID() != clsCashflow.Type.InterestHard) &&
                         (cf.TypeID() != clsCashflow.Type.InterestAdditional))
                     {
                         dBalance += cf.Amount();
@@ -480,9 +486,9 @@ namespace ResilienceClasses
         public double FirstRehabEstimate()
         {
             DateTime dtFirstRecording = this.FindDate(clsCashflow.Type.RehabDraw, true, false);
-            if (dtFirstRecording == DateTime.MaxValue)  
-                return 0; 
-            else 
+            if (dtFirstRecording == DateTime.MaxValue)
+                return 0;
+            else
                 return this.LoanAsOf(dtFirstRecording).RehabRemain(dtFirstRecording);
         }
 
@@ -511,7 +517,7 @@ namespace ResilienceClasses
         {
             DateTime dtProjDisp = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
             if (dtProjDisp == DateTime.MinValue) { return 0; }
-            else 
+            else
             {
                 clsLoan l = this.LoanAsOf(dtProjDisp);
                 return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
@@ -532,7 +538,7 @@ namespace ResilienceClasses
             double dCurrentValue;
             double dPrevIRR;
             double dCurrentIRR;
-            int i=0;
+            int i = 0;
             double dTolerance = 0.0001;
             int iMaxIterations = 100;
             dPrevIRR = 0.05;
@@ -618,9 +624,9 @@ namespace ResilienceClasses
                 }
                 l = this.LoanAsOf(dtAsOf);
             }
-            if (bDisp) 
+            if (bDisp)
             {
-                return (l.DispositionAmount(false, !original)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1; 
+                return (l.DispositionAmount(false, !original)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1;
             }
             else
             {
@@ -671,16 +677,16 @@ namespace ResilienceClasses
             }
             if (bDisp)
             {
-                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.LoanAsOf(FindDate(clsCashflow.Type.NetDispositionProj,true,true).AddDays(-1)).TotalInvestment() - 1D;
+                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.LoanAsOf(FindDate(clsCashflow.Type.NetDispositionProj, true, true).AddDays(-1)).TotalInvestment() - 1D;
             }
-            else 
+            else
             {
                 return (l.HardInterestPaid(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtBalanceDate);
             }
         }
+        #endregion
 
-        // private calculation support
-
+        #region Private Calculations
         private double _Paid(DateTime dt, clsCashflow.Type t)
         {
             double dPaid = 0;
@@ -738,5 +744,6 @@ namespace ResilienceClasses
             }
             return dRetVal;
         }
+        #endregion
     }
 }

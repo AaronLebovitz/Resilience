@@ -3,12 +3,14 @@ namespace ResilienceClasses
 {
     public class clsDocumentRecord
     {
+
+        #region Enums and Static Values
         public enum Status { Unkown, Preliminary, Revised, Executed, Notarized }
         public enum StatusCode { U, I, R, X, N }
-        public enum StatusColor {Red, Gray, Cobalt, Black, Green}
+        public enum StatusColor { Red, Gray, Cobalt, Black, Green }
         public enum Transmission { Unknown, Electronic, Fax, Post }
-        public enum TransmissionCode {U, E, F, P}
-        public enum TransmissionColor {Red, Black, Purple, Blue}
+        public enum TransmissionCode { U, E, F, P }
+        public enum TransmissionColor { Red, Black, Purple, Blue }
 
         public static string strDocumentRecordPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocumentRecord.csv";
         public static int DocumentColumn = 1;
@@ -18,6 +20,9 @@ namespace ResilienceClasses
         public static int ReceiverColumn = 5;
         public static int StatusColumn = 6;
         public static int TransmissionColumn = 7;
+        #endregion
+
+        #region Properties
         private int iDocumentRecordID;
         private int iDocumentID;
         private DateTime dtRecord;
@@ -26,13 +31,15 @@ namespace ResilienceClasses
         private int iReceiverEntityID;
         private clsDocumentRecord.Status eStatus;
         private clsDocumentRecord.Transmission eTransmission;
+        #endregion
 
+        #region Constructors
         public clsDocumentRecord(int id)
         {
             this._Load(id);
         }
 
-        public clsDocumentRecord(int docID, DateTime recordDate, DateTime actionDate, int senderID, int receiverID, 
+        public clsDocumentRecord(int docID, DateTime recordDate, DateTime actionDate, int senderID, int receiverID,
                                  clsDocumentRecord.Status status, clsDocumentRecord.Transmission transmission)
         {
             this.iDocumentRecordID = this._NewDocumentRecordID();
@@ -44,7 +51,9 @@ namespace ResilienceClasses
             this.eStatus = status;
             this.eTransmission = transmission;
         }
+        #endregion
 
+        #region Property Accessors
         public int ID() { return this.iDocumentRecordID; }
         public int DocumentID() { return this.iDocumentID; }
         public int SenderID() { return this.iSenderEntityID; }
@@ -53,7 +62,9 @@ namespace ResilienceClasses
         public DateTime ActionDate() { return this.dtAction; }
         public clsDocumentRecord.Status StatusType() { return this.eStatus; }
         public clsDocumentRecord.Transmission TransmissionType() { return this.eTransmission; }
+        #endregion
 
+        #region DB Methods
         public bool Save()
         {
             return this.Save(clsDocumentRecord.strDocumentRecordPath);
@@ -101,7 +112,9 @@ namespace ResilienceClasses
                 }
             }
         }
+        #endregion
 
+        #region Private Methods
         private int _NewDocumentRecordID()
         {
             clsCSVTable tbl = new clsCSVTable(clsDocumentRecord.strDocumentRecordPath);
@@ -128,5 +141,6 @@ namespace ResilienceClasses
                 return false;
             }
         }
+        #endregion
     }
 }

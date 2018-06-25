@@ -7,6 +7,7 @@ namespace ResilienceClasses
 {
     public class clsProperty
     {
+        #region Enums and Static Values
         public static string strPropertyPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblProperty.csv";
         public static int TownColumn = 1;
         public static int CountyColumn = 2;
@@ -14,6 +15,9 @@ namespace ResilienceClasses
         public static int AddressColumn = 4;
         public static int BPOColumn = 5;
         public static int NickNameColumn = 6;
+        #endregion
+
+        #region Properties
         private int iPropertyID;
         private string strAddress;
         private string strTown;
@@ -21,7 +25,9 @@ namespace ResilienceClasses
         private string strState;
         private double dBPO;
         private string strNickname;
+        #endregion
 
+        #region Static Methods
         public static List<string> AddressList()
         {
             List<string> returnValue = new List<string>();
@@ -43,13 +49,15 @@ namespace ResilienceClasses
             for (int i = 0; i < returnValue.Count; i++)
             {
                 streetNumber = Int32.Parse(returnValue[i].Substring(returnValue[i].Length - 8));
-                streetName = returnValue[i].Substring(0,returnValue[i].Length - 9);
+                streetName = returnValue[i].Substring(0, returnValue[i].Length - 9);
                 returnValue[i] = streetNumber.ToString() + " " + streetName;
             }
 
             return returnValue;
         }
+        #endregion
 
+        #region Constructors
         public clsProperty(int propertyID)
         {
             this._Load(propertyID);
@@ -65,7 +73,10 @@ namespace ResilienceClasses
             this.dBPO = bpo;
             this.strNickname = nickname;
         }
+        #endregion
 
+        #region Property Accessors
+        public int ID() { return this.iPropertyID; }
         public int PropertyID()
         { return this.iPropertyID; }
 
@@ -86,19 +97,21 @@ namespace ResilienceClasses
 
         public string Name()
         { return this.strNickname; }
+        #endregion
 
+        #region DB Methods
         private bool _Load(int propertyID)
         {
             clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
             if (propertyID < tbl.Length())
             {
                 this.iPropertyID = propertyID;
-                this.strAddress = tbl.Value(propertyID,clsProperty.AddressColumn);
+                this.strAddress = tbl.Value(propertyID, clsProperty.AddressColumn);
                 this.strTown = tbl.Value(propertyID, clsProperty.TownColumn);
                 this.strCounty = tbl.Value(propertyID, clsProperty.CountyColumn);
                 this.strState = tbl.Value(propertyID, clsProperty.StateColumn);
                 if (!double.TryParse(tbl.Value(propertyID, clsProperty.BPOColumn), out this.dBPO)) { this.dBPO = 0; }
-//                this.dBPO = Double.Parse(tbl.Value(propertyID, clsProperty.BPOColumn));
+                //                this.dBPO = Double.Parse(tbl.Value(propertyID, clsProperty.BPOColumn));
                 this.strNickname = tbl.Value(propertyID, clsProperty.NickNameColumn);
                 return true;
             }
@@ -118,13 +131,13 @@ namespace ResilienceClasses
             clsCSVTable tbl = new clsCSVTable(path);
             if (this.iPropertyID == (tbl.Length() + 1))
             {
-                string[] strValues = new string[tbl.Width()-1];
-                strValues[clsProperty.AddressColumn-1] = this.strAddress;
-                strValues[clsProperty.BPOColumn-1] = this.dBPO.ToString();
-                strValues[clsProperty.CountyColumn-1] = this.strCounty;
-                strValues[clsProperty.TownColumn-1] = this.strTown;
-                strValues[clsProperty.NickNameColumn-1] = this.strNickname;
-                strValues[clsProperty.StateColumn-1] = this.strState;
+                string[] strValues = new string[tbl.Width() - 1];
+                strValues[clsProperty.AddressColumn - 1] = this.strAddress;
+                strValues[clsProperty.BPOColumn - 1] = this.dBPO.ToString();
+                strValues[clsProperty.CountyColumn - 1] = this.strCounty;
+                strValues[clsProperty.TownColumn - 1] = this.strTown;
+                strValues[clsProperty.NickNameColumn - 1] = this.strNickname;
+                strValues[clsProperty.StateColumn - 1] = this.strState;
                 tbl.New(strValues);
                 return tbl.Save();
             }
@@ -159,6 +172,6 @@ namespace ResilienceClasses
             clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
             return tbl.Length() + 1;
         }
-
+        #endregion
     }
 }

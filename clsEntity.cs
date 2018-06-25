@@ -3,6 +3,8 @@ namespace ResilienceClasses
 {
     public class clsEntity
     {
+
+        #region Enums and Static Values
         public static string strEntityPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblEntity.csv";
         public static int NameColumn = 1;
         public static int AddressColumn = 2;
@@ -12,6 +14,9 @@ namespace ResilienceClasses
         public static int PhoneNumberColumn = 6;
         public static int ContactNameColumn = 7;
         public static int ContactEmailColumn = 8;
+        #endregion
+
+        #region Properties
         private int iEntityID;
         private string strName;
         private string strAddress;
@@ -21,7 +26,9 @@ namespace ResilienceClasses
         private string strPhone;
         private string strContactName;
         private string strEmail;
+        #endregion
 
+        #region Constructors
         public clsEntity(int id)
         {
             this._Load(id);
@@ -39,7 +46,9 @@ namespace ResilienceClasses
             this.strContactName = contact;
             this.strEmail = email;
         }
+        #endregion
 
+        #region PropertyAccessors
         public string Name() { return this.strName; }
         public int ID() { return this.iEntityID; }
         public string Address() { return this.strAddress; }
@@ -49,7 +58,9 @@ namespace ResilienceClasses
         public string Phone() { return this.strPhone; }
         public string ContactName() { return this.strContactName; }
         public string ContactEmail() { return this.strEmail; }
+        #endregion
 
+        #region DB Methods
         public bool Save()
         {
             return this.Save(clsEntity.strEntityPath);
@@ -99,7 +110,9 @@ namespace ResilienceClasses
                 }
             }
         }
+        #endregion
 
+        #region Private Methods
         private int _NewEntityID()
         {
             clsCSVTable tbl = new clsCSVTable(clsEntity.strEntityPath);
@@ -128,5 +141,6 @@ namespace ResilienceClasses
                 return false;
             }
         }
+        #endregion
     }
 }

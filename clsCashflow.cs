@@ -3,6 +3,8 @@ namespace ResilienceClasses
 {
     public class clsCashflow
     {
+
+        #region Enums and Static Value
         public enum Type
         {
             Unknown, AcquisitionPrice, AcquisitionConcession, AcquisitionProcessing, AcquisitionRecording, AcquisitionTaxes,
@@ -26,7 +28,9 @@ namespace ResilienceClasses
         public static int SaveFailedOnIO = -2;
         public static int SaveFailedOnDataInsertion = -3;
         public static int SaveFailedOnIndexOutOfOrder = -4;
+        #endregion
 
+        #region Properties
         private string strName = "";
         private string strComment;
         private DateTime dtPayDate;
@@ -37,7 +41,9 @@ namespace ResilienceClasses
         private bool bActual;
         private clsCashflow.Type eTypeID;
         private int iTransactionID;
+        #endregion
 
+        #region Constructors
         public clsCashflow(int transactionID)
         {
             this._Load(transactionID);
@@ -75,7 +81,9 @@ namespace ResilienceClasses
             this.strComment = comment;
             this.iTransactionID = -1; // unassigned, will be assigned if saved to DB
         }
+        #endregion
 
+        #region DB Methods
         private bool _Load(int transactionID, clsCSVTable tbl)
         {
             if (transactionID < tbl.Length())
@@ -168,7 +176,9 @@ namespace ResilienceClasses
                 return clsCashflow.SaveFailedOnIndexOutOfOrder;
             }
         }
+        #endregion
 
+        #region Property Accessors
         public string Name() { return this.strName; }
         public DateTime PayDate() { return this.dtPayDate; }
         public DateTime RecordDate() { return this.dtRecordDate; }
@@ -178,7 +188,9 @@ namespace ResilienceClasses
         public bool Actual() { return this.bActual; }
         public clsCashflow.Type TypeID() { return this.eTypeID; }
         public int TransactionID() { return this.iTransactionID; }
+        public int ID() { return this.iTransactionID; }
         public string Comment() { return this.strComment; }
+        #endregion
 
         public double AddAmount(double addAmount)
         {
