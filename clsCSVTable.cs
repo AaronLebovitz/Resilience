@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Data;
+using System.Collections.Generic;
 
 namespace ResilienceClasses
 {
@@ -9,7 +10,7 @@ namespace ResilienceClasses
         private string strPath;
         private bool bLoaded = false;
         private string[] Columns;
-        private System.Collections.Generic.List<string> Values = new System.Collections.Generic.List<string>();
+        private List<string> Values = new List<string>();
 
         public clsCSVTable(string path)
         {
@@ -111,6 +112,17 @@ namespace ResilienceClasses
         public int Width()
         {
             return Columns.Length;
+        }
+
+        public List<int> Matches(int column, string value)
+        {
+            // returns a list of the IDs for all records that have "value" in their record for the given column
+            List<int> matches = new List<int>();
+            for (int i = 0; i < this.Values.Count; i++)
+            {
+                if (this.Value(i, column) == value) matches.Add(i);
+            }
+            return matches;
         }
 
         public string Value(int row, int col)

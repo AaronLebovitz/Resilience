@@ -55,12 +55,28 @@ namespace ResilienceClasses
 
             return returnValue;
         }
+
+        public static int IDFromAddress(string address)
+        {
+            clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
+            int id = -1;
+            for (int i = 0; i < tbl.Length(); i++)
+            {
+                if (tbl.Value(i, clsProperty.AddressColumn) == address) id = i;
+            }
+            return id;
+        }
         #endregion
 
         #region Constructors
         public clsProperty(int propertyID)
         {
             this._Load(propertyID);
+        }
+
+        public clsProperty(string address)
+        {
+            this._Load(clsProperty.IDFromAddress(address));
         }
 
         public clsProperty(string address, string town, string county, string state, double bpo, string nickname)

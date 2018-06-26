@@ -52,6 +52,7 @@
     <Compile Include="clsDocumentRecord.cs" />
     <Compile Include="clsEntity.cs" />
     <Compile Include="clsCSVTable.cs" />
+    <Compile Include="ComboBoxStringListDataSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

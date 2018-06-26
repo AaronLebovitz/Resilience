@@ -26,15 +26,12 @@ namespace ResilienceClasses
         public static int LoanID(string address)
         {
             clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
-            clsCSVTable tblProperties = new clsCSVTable(clsProperty.strPropertyPath);
-            int propertyID = -1;
             int loanID = -1;
+
             // Find PropertyID from Address First
-            for (int i = 0; i < tblProperties.Length(); i++)
-            {
-                if (tblProperties.Value(i, clsProperty.AddressColumn) == address) propertyID = i;
-            }
+            int propertyID = clsProperty.IDFromAddress(address);
             if (propertyID == -1) throw new Exception("Address not found: " + address);
+
             // Now match propertyID to the loan
             for (int i = 0; i < tblLoans.Length(); i++)
             {

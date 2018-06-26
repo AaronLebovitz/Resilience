@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace ResilienceClasses
 {
     public class clsDocument
@@ -16,6 +17,26 @@ namespace ResilienceClasses
         public static int NameColumn = 1;
         public static int PropertyColumn = 2;
         public static int TypeColumn = 3;
+        #endregion
+
+        #region Static Methods
+        public static List<int> DocumentIDs(int propertyID)
+        {
+            clsCSVTable tbl = new clsCSVTable(clsDocument.strDocumentPath);
+            return tbl.Matches(clsDocument.PropertyColumn, propertyID.ToString());
+        }
+
+        public static List<clsDocument> Documents(int propertyID)
+        {
+            clsCSVTable tbl = new clsCSVTable(clsDocument.strDocumentPath);
+            List<int> docIDs = tbl.Matches(clsDocument.PropertyColumn, propertyID.ToString());
+            List<clsDocument> docList = new List<clsDocument>();
+            foreach (int id in docIDs)
+            {
+                docList.Add(new clsDocument(id));
+            }
+            return docList;
+        }
         #endregion
 
         #region Properties
