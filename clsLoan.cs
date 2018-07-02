@@ -260,11 +260,11 @@ namespace ResilienceClasses
             {
                 foreach (clsCashflow cf in this.cfCashflows)
                 {
-                    dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).TotalDays, (dt - cf.PayDate()).TotalDays));
+                    dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).Days, (dt - cf.PayDate()).Days));
                     if ((cf.PayDate() < dt) && (cf.Actual()))
                     {
-                        dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).TotalDays / 360;
-                        dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360;
+                        dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
+                        dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
                         if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
                     }
                 }
@@ -403,12 +403,12 @@ namespace ResilienceClasses
                 // take the loan as of the first record date
                 clsLoan l = this.LoanAsOf(this.FindDate(clsCashflow.Type.AcquisitionPrice, true, false));
                 // calc balance as of the first pay date for the as of loan
-                return -l.Balance(l.FindDate(clsCashflow.Type.AcquisitionPrice, true, true));
+                return l.Balance(l.FindDate(clsCashflow.Type.AcquisitionPrice, true, true));
             }
             else
             {
                 clsLoan l = this.LoanAsOf(this.dtOrigination);
-                return -l.Balance(this.dtOrigination);
+                return l.Balance(this.dtOrigination);
             }
         }
 
@@ -508,7 +508,10 @@ namespace ResilienceClasses
         }
 
         public double ProjectedAdditionalInterest()
-        { return this.ImpliedAdditionalInterest() + this.ScheduledAdditionalInterest(); }
+        { return this.ProjectedAdditionalInterest(System.DateTime.Today); }
+
+        public double ProjectedAdditionalInterest(DateTime dt)
+        { return this.ImpliedAdditionalInterest() + this.ScheduledAdditionalInterest(dt); }
 
         public double ImpliedAdditionalInterest()
         {
@@ -519,6 +522,29 @@ namespace ResilienceClasses
                 clsLoan l = this.LoanAsOf(dtProjDisp);
                 return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
             }
+        }
+
+        public double AccruedAdditionalInterest(DateTime dt)
+        {
+            // the idea here is that if principal had been repaid, but additional interest not yet received, 
+            // then we can accrue for it 
+            // we only count it if it's booked within 30 days of the sale, to filter out escrowed amounts (see property 21 e.g.)
+            double dReturnValue = 0;
+            if (this.LoanAsOf(dt).Status() == State.Sold)
+            {
+                DateTime dtSaleDate = this.SaleDate();
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    if ((cf.PayDate() > dt)
+                        && ((cf.PayDate() - dtSaleDate).Days <= 30)
+                        && (cf.TypeID() == clsCashflow.Type.InterestAdditional)
+                        && (cf.Actual()))
+                    {
+                        dReturnValue += cf.Amount();
+                    }
+                }
+            }
+            return dReturnValue;
         }
 
         public double ScheduledAdditionalInterest()
