@@ -20,6 +20,7 @@ namespace ResilienceClasses
         public static int MaturityDateCoumn = 6;
         public static int RateColumn = 7;
         public static int PenaltyRateColumn = 8;
+        public static int LenderColumn = 9;
         #endregion
 
         #region Static Methods
@@ -48,6 +49,7 @@ namespace ResilienceClasses
         private int iTitleHolderEntityID;
         private int iCoBorrowerEntityID;
         private int iAcquisitionTitleCompanyEntityID;
+        private int iLenderEntityID;
         private List<clsCashflow> cfCashflows;
         private string strName;
         private clsProperty pProperty;
@@ -63,7 +65,7 @@ namespace ResilienceClasses
             this._Load(loanID);
         }
 
-        public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID,
+        public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID,
                        DateTime orig, DateTime mature, double r, double pr, int loanID = -1)
         {
             if (loanID < 0) { this.iLoanID = this._NewLoanID(); }
@@ -72,6 +74,7 @@ namespace ResilienceClasses
             this.iTitleHolderEntityID = titleHolderID;
             this.iCoBorrowerEntityID = coBorrowerID;
             this.iAcquisitionTitleCompanyEntityID = titleCoID;
+            this.iLenderEntityID = lenderID;
             this.dtMaturity = mature;
 
             this.dtOrigination = orig;
@@ -86,7 +89,7 @@ namespace ResilienceClasses
         public clsLoan LoanAsOf(DateTime dt)
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
-                                          this.iAcquisitionTitleCompanyEntityID, this.dtOrigination, this.dtMaturity,
+                                          this.iAcquisitionTitleCompanyEntityID, this.iLenderEntityID, this.dtOrigination, this.dtMaturity,
                                           this.dRate, this.dPenaltyRate, this.iLoanID);
             if (this.cfCashflows.Count != 0)
             {
@@ -144,6 +147,7 @@ namespace ResilienceClasses
                 strValues[clsLoan.RateColumn - 1] = this.dRate.ToString();
                 strValues[clsLoan.TitleCompanyColumn - 1] = this.iAcquisitionTitleCompanyEntityID.ToString();
                 strValues[clsLoan.TitleHolderColumn - 1] = this.iTitleHolderEntityID.ToString();
+                strValues[clsLoan.LenderColumn - 1] = this.iLenderEntityID.ToString();
                 tbl.New(strValues);
                 if (tbl.Save())
                 {
@@ -172,6 +176,7 @@ namespace ResilienceClasses
                         tbl.Update(this.iLoanID, clsLoan.PropertyColumn, this.iPropertyID.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.RateColumn, this.dRate.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.TitleCompanyColumn, this.iAcquisitionTitleCompanyEntityID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.LenderColumn, this.iLenderEntityID.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.TitleHolderColumn, this.iTitleHolderEntityID.ToString()))
                     {
                         if (tbl.Save())
@@ -218,6 +223,7 @@ namespace ResilienceClasses
                 this.iTitleHolderEntityID = Int32.Parse(tbl.Value(loanID, clsLoan.TitleHolderColumn));
                 this.iCoBorrowerEntityID = Int32.Parse(tbl.Value(loanID, clsLoan.CoBorrowerColumn));
                 this.iAcquisitionTitleCompanyEntityID = Int32.Parse(tbl.Value(loanID, clsLoan.TitleCompanyColumn));
+                this.iLenderEntityID = Int32.Parse(tbl.Value(loanID, clsLoan.LenderColumn));
                 this.dtMaturity = DateTime.Parse(tbl.Value(loanID, clsLoan.MaturityDateCoumn));
                 this.dtOrigination = DateTime.Parse(tbl.Value(loanID, clsLoan.OGDateColumn));
                 this.dRate = Double.Parse(tbl.Value(loanID, clsLoan.RateColumn));
@@ -261,6 +267,7 @@ namespace ResilienceClasses
         public int CoBorrowerID() { return this.iCoBorrowerEntityID; }
         public int TitleCompanyID() { return this.iAcquisitionTitleCompanyEntityID; }
         public int PropertyID() { return this.iPropertyID; }
+        public int LenderID() { return this.iLenderEntityID; }
         public int ID() { return this.iLoanID; }
         public clsProperty Property() { return this.pProperty; }
         public List<clsCashflow> Cashflows() { return this.cfCashflows; }
