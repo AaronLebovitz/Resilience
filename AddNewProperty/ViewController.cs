@@ -235,7 +235,9 @@ namespace AddNewProperty
                 }
 
                 // write summary to text label (this.UpdateMessage.StringValue)
-
+                this.UpdateMessage.StringValue += String.Format("\n\nCompleted adding new loan ({0}), new cashflows, new property ({1}), and new docs ",
+                                                             newLoan.ID().ToString(), 
+                                                             newProperty.ID().ToString());
             }
         }
     }
