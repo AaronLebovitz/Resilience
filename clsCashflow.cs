@@ -125,14 +125,14 @@ namespace ResilienceClasses
             if (this.iTransactionID == -1) // new cashflow, unassigned id
             {
                 string[] strValues = new string[tbl.Width() - 1];
-                this.iTransactionID = tbl.Length() + 1;
-                strValues[clsCashflow.ActualColumn - 1] = this.bActual.ToString();
-                strValues[clsCashflow.TransactionTypeColumn - 1] = this.eTypeID.ToString();
+                this.iTransactionID = tbl.Length();
+                strValues[clsCashflow.ActualColumn - 1] = this.bActual.ToString().ToUpper();
+                strValues[clsCashflow.TransactionTypeColumn - 1] = ((int)this.eTypeID).ToString();
                 strValues[clsCashflow.LoanColumn - 1] = this.iLoanID.ToString();
                 strValues[clsCashflow.AmountColumn - 1] = this.dAmount.ToString();
-                strValues[clsCashflow.TransactionDateColumn - 1] = this.dtPayDate.ToString();
-                strValues[clsCashflow.RecordDateColumn - 1] = this.dtRecordDate.ToString();
-                strValues[clsCashflow.DeleteDateColumn - 1] = this.dtDeleteDate.ToString();
+                strValues[clsCashflow.TransactionDateColumn - 1] = this.dtPayDate.ToString("MM/dd/yyyy");
+                strValues[clsCashflow.RecordDateColumn - 1] = this.dtRecordDate.ToString("MM/dd/yyyy");
+                strValues[clsCashflow.DeleteDateColumn - 1] = this.dtDeleteDate.ToString("MM/dd/yyyy");
                 strValues[clsCashflow.CommentColumn - 1] = this.strComment;
                 tbl.New(strValues);
                 if (tbl.Save())
@@ -144,7 +144,7 @@ namespace ResilienceClasses
                     return clsCashflow.SaveFailedOnIO;
                 }
             }
-            else if (this.iTransactionID <= tbl.Length()) // existing cashflow
+            else if (this.iTransactionID < tbl.Length()) // existing cashflow
             {
                 if (
                     tbl.Update(this.iTransactionID, clsCashflow.ActualColumn, this.bActual.ToString()) &&

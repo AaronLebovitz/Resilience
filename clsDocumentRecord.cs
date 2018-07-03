@@ -73,7 +73,7 @@ namespace ResilienceClasses
         public bool Save(string path)
         {
             clsCSVTable tbl = new clsCSVTable(path);
-            if (this.iDocumentRecordID == tbl.Length() + 1)
+            if (this.iDocumentRecordID == tbl.Length())
             {
                 string[] strValues = new string[tbl.Width() - 1];
                 strValues[clsDocumentRecord.DocumentColumn - 1] = this.iDocumentID.ToString();
@@ -88,7 +88,7 @@ namespace ResilienceClasses
             }
             else
             {
-                if ((this.iDocumentRecordID <= tbl.Length()) && (this.iDocumentRecordID > 0))
+                if ((this.iDocumentRecordID < tbl.Length()) && (this.iDocumentRecordID >= 0))
                 {
                     if (
                         tbl.Update(this.iDocumentRecordID, clsDocumentRecord.ActionDateColumn, this.dtAction.ToString()) &&
@@ -118,7 +118,7 @@ namespace ResilienceClasses
         private int _NewDocumentRecordID()
         {
             clsCSVTable tbl = new clsCSVTable(clsDocumentRecord.strDocumentRecordPath);
-            return tbl.Length() + 1;
+            return tbl.Length();
         }
 
         private bool _Load(int id)

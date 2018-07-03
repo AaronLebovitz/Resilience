@@ -145,7 +145,7 @@ namespace ResilienceClasses
         public bool Save(string path)
         {
             clsCSVTable tbl = new clsCSVTable(path);
-            if (this.iPropertyID == (tbl.Length() + 1))
+            if (this.iPropertyID == tbl.Length())
             {
                 string[] strValues = new string[tbl.Width() - 1];
                 strValues[clsProperty.AddressColumn - 1] = this.strAddress;
@@ -159,7 +159,7 @@ namespace ResilienceClasses
             }
             else
             {
-                if ((this.iPropertyID <= tbl.Length()) && (this.iPropertyID > 0))
+                if ((this.iPropertyID < tbl.Length()) && (this.iPropertyID >= 0))
                 {
                     if (
                         tbl.Update(this.iPropertyID, clsProperty.AddressColumn, this.strAddress) &&
@@ -186,7 +186,7 @@ namespace ResilienceClasses
         private int _NewPropertyID()
         {
             clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
-            return tbl.Length() + 1;
+            return tbl.Length();
         }
         #endregion
     }

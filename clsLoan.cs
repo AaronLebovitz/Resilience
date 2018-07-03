@@ -64,14 +64,16 @@ namespace ResilienceClasses
         }
 
         public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID,
-                       DateTime orig, DateTime mature, double r, double pr, int loanID = 0)
+                       DateTime orig, DateTime mature, double r, double pr, int loanID = -1)
         {
-            this.iLoanID = loanID;
+            if (loanID < 0) { this.iLoanID = this._NewLoanID(); }
+            else { this.iLoanID = loanID; }
             this.iPropertyID = propertyID;
             this.iTitleHolderEntityID = titleHolderID;
             this.iCoBorrowerEntityID = coBorrowerID;
             this.iAcquisitionTitleCompanyEntityID = titleCoID;
             this.dtMaturity = mature;
+
             this.dtOrigination = orig;
             this.dRate = r;
             this.dPenaltyRate = pr;
@@ -121,6 +123,82 @@ namespace ResilienceClasses
                 return true;
             }
             else return false;
+        }
+
+        public bool Save() { return this.Save(clsLoan.strLoanPath, true, clsCashflow.strCashflowPath); }
+
+        public bool Save(string path, bool saveCashflows, string cfPath)
+        {
+            // FIX THIS
+
+            clsCSVTable tbl = new clsCSVTable(path);
+            if (this.iLoanID < 0) this.iLoanID = tbl.Length();
+            if (this.iLoanID == tbl.Length())
+            {
+                string[] strValues = new string[tbl.Width() - 1];
+                strValues[clsLoan.CoBorrowerColumn - 1] = this.iCoBorrowerEntityID.ToString();
+                strValues[clsLoan.MaturityDateCoumn - 1] = this.dtMaturity.ToShortDateString();
+                strValues[clsLoan.OGDateColumn - 1] = this.dtOrigination.ToShortDateString();
+                strValues[clsLoan.PenaltyRateColumn - 1] = this.dPenaltyRate.ToString();
+                strValues[clsLoan.PropertyColumn - 1] = this.iPropertyID.ToString();
+                strValues[clsLoan.RateColumn - 1] = this.dRate.ToString();
+                strValues[clsLoan.TitleCompanyColumn - 1] = this.iAcquisitionTitleCompanyEntityID.ToString();
+                strValues[clsLoan.TitleHolderColumn - 1] = this.iTitleHolderEntityID.ToString();
+                tbl.New(strValues);
+                if (tbl.Save())
+                {
+                    if (saveCashflows)
+                    {
+                        bool bCashflowsSaved = true;
+                        foreach (clsCashflow cf in this.cfCashflows)
+                        {
+                            if (cf.Save(cfPath) < 0) { bCashflowsSaved = false; }
+                        }
+                        return bCashflowsSaved;
+                    }
+                    else return true;
+                }
+                else return false;
+            }
+            else
+            {
+                if ((this.iLoanID < tbl.Length()) && (this.iLoanID >= 0))
+                {
+                    if (
+                        tbl.Update(this.iLoanID, clsLoan.CoBorrowerColumn, this.iCoBorrowerEntityID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.MaturityDateCoumn, this.dtMaturity.ToShortDateString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.OGDateColumn, this.dtOrigination.ToShortDateString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.PenaltyRateColumn, this.dPenaltyRate.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.PropertyColumn, this.iPropertyID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.RateColumn, this.dRate.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.TitleCompanyColumn, this.iAcquisitionTitleCompanyEntityID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.TitleHolderColumn, this.iTitleHolderEntityID.ToString()))
+                    {
+                        if (tbl.Save())
+                        {
+                            if (saveCashflows)
+                            {
+                                bool bCashflowsSaved = true;
+                                foreach (clsCashflow cf in this.cfCashflows)
+                                {
+                                    if (cf.Save(cfPath) < 0) { bCashflowsSaved = false; }
+                                }
+                                return bCashflowsSaved;
+                            }
+                            else return true;
+                        }
+                        else return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
         #endregion
 
@@ -766,6 +844,12 @@ namespace ResilienceClasses
                 }
             }
             return dRetVal;
+        }
+
+        private int _NewLoanID()
+        {
+            clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
+            return tbl.Length();
         }
         #endregion
     }

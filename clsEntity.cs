@@ -69,7 +69,7 @@ namespace ResilienceClasses
         public bool Save(string path)
         {
             clsCSVTable tbl = new clsCSVTable(path);
-            if (this.iEntityID == tbl.Length() + 1)
+            if (this.iEntityID == tbl.Length())
             {
                 string[] strValues = new string[tbl.Width() - 1];
                 strValues[clsEntity.NameColumn - 1] = this.strName;
@@ -85,7 +85,7 @@ namespace ResilienceClasses
             }
             else
             {
-                if ((this.iEntityID <= tbl.Length()) && (this.iEntityID > 0))
+                if ((this.iEntityID < tbl.Length()) && (this.iEntityID >= 0))
                 {
                     if (
                         tbl.Update(this.iEntityID, clsEntity.NameColumn, this.strName) &&
@@ -116,7 +116,7 @@ namespace ResilienceClasses
         private int _NewEntityID()
         {
             clsCSVTable tbl = new clsCSVTable(clsEntity.strEntityPath);
-            return tbl.Length() + 1;
+            return tbl.Length();
         }
 
         private bool _Load(int id)

@@ -90,7 +90,7 @@ namespace ResilienceClasses
             if (values.Length == this.Width() - 1)
             {
                 string strValues;
-                strValues = (this.Length()+1).ToString();
+                strValues = (this.Length()).ToString();
                 for (int i = 0; i < values.Length; i++)
                 {
                     strValues += "," + values[i];
