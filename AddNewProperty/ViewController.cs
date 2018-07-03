@@ -26,6 +26,9 @@ namespace AddNewProperty
                 this.LenderPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
             }
             this.PurchaseDatePicker.DateValue = (NSDate)System.DateTime.Today.AddMonths(1);
+            this.TitleHolderPopUp.SelectItem(6);
+            this.CoBorrowerPopUp.SelectItem(5);
+            this.LenderPopUp.SelectItem(4);
         }
 
         public override NSObject RepresentedObject
@@ -197,7 +200,7 @@ namespace AddNewProperty
                 clsProperty newProperty = new clsProperty(address, town, county, state, bpo, streetName);
                 newProperty.Save();
 
-                clsLoan newLoan = new clsLoan(newProperty.ID(), titleHolderID, coID, titleID, 
+                clsLoan newLoan = new clsLoan(newProperty.ID(), titleHolderID, coID, titleID, lenderID,
                                               acquisitionDate, acquisitionDate.AddMonths(9), loanRate, penaltyRate);
                 int newLoanID = newLoan.ID();
                 newLoan.AddCashflow(new clsCashflow(acquisitionDate, System.DateTime.Today, System.DateTime.MaxValue, newLoanID, 
