@@ -197,5 +197,12 @@ namespace ResilienceClasses
             this.dAmount += addAmount; 
             return this.dAmount;
         }
+
+        public void Delete(DateTime dt) { this.dtDeleteDate = dt; }
+        public bool MarkActual(DateTime dt)
+        {
+            if (this.dtDeleteDate > dt) { this.bActual = true; }
+            return this.bActual;
+        }
     }
 }

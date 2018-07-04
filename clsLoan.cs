@@ -118,6 +118,12 @@ namespace ResilienceClasses
             return newLoan;
         }
 
+        public void SetNewOriginationDate(DateTime dt, bool updateExpiration = true)
+        {
+            if (updateExpiration) { this.dtMaturity = this.dtMaturity + (dt - this.dtOrigination); }
+            this.dtOrigination = dt;
+        }
+
         public bool AddCashflow(clsCashflow cf)
         {
             if (cf.LoanID() == this.iLoanID)
