@@ -239,7 +239,9 @@ namespace LoanStatusReport
             {
                 if (loan.Status() == clsLoan.State.Sold)
                 {
-                    sw.Write(",,,,,,");
+                    sw.Write(",,,");
+                    if (loan.AccruedAdditionalInterest(dtAsOf) > 0D) sw.Write(loan.AccruedAdditionalInterest(dtAsOf));
+                    sw.Write(",,,");
                     sw.Write(loan.PrincipalPaid(dtAsOf).ToString() + ",");
                     sw.Write(loan.InterestPaid(dtAsOf).ToString() + ",");
                     sw.Write(loan.AdditionalInterestPaid(dtAsOf).ToString() + ",");
