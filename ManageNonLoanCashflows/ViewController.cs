@@ -54,7 +54,7 @@ namespace ManageNonLoanCashflows
             this.CashflowsTableView.TableColumns()[3].Title = "Amount";
             this.CashflowsTableView.TableColumns()[3].Width = 80;
             this.CashflowsTableView.TableColumns()[4].Title = "Type";
-            this.CashflowsTableView.TableColumns()[4].Width = 60;
+            this.CashflowsTableView.TableColumns()[4].Width = 80;
             this.CashflowsTableView.TableColumns()[5].Title = "Actual";
             this.CashflowsTableView.TableColumns()[5].Width = 40;
             this.CashflowsTableView.TableColumns()[6].Title = "DelDate";
@@ -108,16 +108,17 @@ namespace ManageNonLoanCashflows
                 if (dtPay <= System.DateTime.Today.Date) cashflow.MarkActual(System.DateTime.Today.Date);
                 // SAVE TO TABLE
                 cashflow.Save();
+                this.CashflowIDTextField.IntValue = cashflow.ID();
                 // UPDATE COMMENT BOX
                 this.CommentTextField.StringValue += "\nCASHFLOW SAVED.";
                 if ((cashflow.TypeID() == clsCashflow.Type.InterestAdditional) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "  Check Amount.  Additional Interest is usually >= 0.";
+                    this.CommentTextField.StringValue += "\nCheck Amount.  Additional Interest is usually >= 0.";
                 else if ((cashflow.TypeID() == clsCashflow.Type.CapitalCall) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "  Check Amount.  Capital Calls are usually >= 0.";
+                    this.CommentTextField.StringValue += "\nCheck Amount.  Capital Calls are usually >= 0.";
                 else if ((cashflow.TypeID() == clsCashflow.Type.CatchUp) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "  Check Amount.  Catchup Payments are usually >= 0.";
+                    this.CommentTextField.StringValue += "\nCheck Amount.  Catchup Payments are usually >= 0.";
                 else if (cashflow.Amount() > 0)
-                    this.CommentTextField.StringValue += "  Check Amount.  Expenses are normally <0.";
+                    this.CommentTextField.StringValue += "\nCheck Amount.  Expenses are normally <0.";
             }
         }
 

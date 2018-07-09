@@ -56,7 +56,10 @@ namespace ManageNonLoanCashflows
                     break;
 
                 case "Comment":
-                    text = this.Cashflows[irow].Comment();
+                    if (this.Cashflows[irow].Comment() != null)
+                        text = this.Cashflows[irow].Comment();
+                    else
+                        text = "";
                     break;
 
                 default:
