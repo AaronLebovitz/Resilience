@@ -1,7 +1,7 @@
 ﻿using System;
 namespace ResilienceClasses
 {
-    public class clsCashflow
+    public class clsCashflow:IComparable<clsCashflow>
     {
 
         #region Enums and Static Value
@@ -198,11 +198,37 @@ namespace ResilienceClasses
             return this.dAmount;
         }
 
-        public void Delete(DateTime dt) { this.dtDeleteDate = dt; }
+        public bool Delete(DateTime dt) 
+        {
+            if (this.Actual()) return false;
+            else
+            {
+                this.dtDeleteDate = dt;
+                return true;
+            }
+        }
+
         public bool MarkActual(DateTime dt)
         {
             if (this.dtDeleteDate > dt) { this.bActual = true; }
             return this.bActual;
+        }
+
+        public int CompareTo(clsCashflow other)
+        {
+            // if IDs match, they are equal
+            // otherwise, sort first by PayDate, then Amount, then Type, then ID
+
+            int iReturnValue = 0;
+            if (this.iLoanID == other.iLoanID) return 0;
+
+            iReturnValue = dtPayDate.CompareTo(other.dtPayDate);
+            if (iReturnValue == 0) iReturnValue = dAmount.CompareTo(other.dAmount);
+            if (iReturnValue == 0) iReturnValue = dtRecordDate.CompareTo(other.dtRecordDate);
+            if (iReturnValue == 0) iReturnValue = eTypeID.CompareTo(other.eTypeID);
+            if (iReturnValue == 0) iReturnValue = iTransactionID.CompareTo(other.iTransactionID);
+
+            return iReturnValue;
         }
     }
 }
