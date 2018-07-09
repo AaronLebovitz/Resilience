@@ -100,6 +100,7 @@ namespace ResilienceClasses
                 this.iLoanID = Int32.Parse(tbl.Value(transactionID, clsCashflow.LoanColumn));
                 this.eTypeID = (clsCashflow.Type)Int32.Parse(tbl.Value(transactionID, clsCashflow.TransactionTypeColumn));
                 this.bActual = Boolean.Parse(tbl.Value(transactionID, clsCashflow.ActualColumn));
+                this.strComment = tbl.Value(transactionID, clsCashflow.CommentColumn);
                 return true;
             }
             else
