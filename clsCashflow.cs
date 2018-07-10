@@ -221,7 +221,7 @@ namespace ResilienceClasses
             // otherwise, sort first by PayDate, then Amount, then Type, then ID
 
             int iReturnValue = 0;
-            if (this.iLoanID == other.iLoanID) return 0;
+            if (this.iTransactionID == other.iTransactionID) return 0;
 
             iReturnValue = dtPayDate.CompareTo(other.dtPayDate);
             if (iReturnValue == 0) iReturnValue = dAmount.CompareTo(other.dAmount);
