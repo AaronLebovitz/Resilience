@@ -121,6 +121,39 @@ namespace CashflowProjection
             this.RefreshTable();
         }
 
+        partial void SaveCSVPressed(NSButton sender)
+        {
+            string filePath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/CashflowProjection";
+            filePath += "_" + this.startDate.ToString("yyyyMMdd");
+            filePath += "_" + this.endDate.ToString("yyyyMMdd");
+            if (this.showAll) filePath += "_ALL";
+            else if (this.showExpensesOnly) filePath += "_ExpensesOnly";
+            else if (this.showScheduledOnly) filePath += "_ScheduledOnly";
+            filePath += ".csv";
+
+            System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(filePath);
+            for (int i = 0; i < this.dataSource.Cashflows.Count; i++)
+            {
+                streamWriter.Write(this.dataSource.Cashflows[i].ID());
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].LoanID());
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].PayDate().ToString("MM/dd/yyyy"));
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].Amount().ToString("#0.00"));
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].TypeID().ToString());
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].Actual().ToString());
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].Comment());
+                streamWriter.Write(",");
+                streamWriter.WriteLine(this.dataSource.Balances[i].ToString("#0.00"));
+            }
+            streamWriter.Flush();
+            streamWriter.Close();
+        }
+
         #endregion
 
         #region Private Methods

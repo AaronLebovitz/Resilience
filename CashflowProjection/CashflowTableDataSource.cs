@@ -42,6 +42,14 @@ namespace CashflowProjection
             }
         }
 
+        public List<double> Balances 
+        {
+            get
+            {
+                return this.balance;
+            }
+        }
+
         public List<clsCashflow> Cashflows 
         { 
             get 

@@ -1043,6 +1043,17 @@
                                     <action selector="OutflowsOnlyPressed:" target="XfG-lQ-9wD" id="AYH-68-y00"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzq-bT-sdk">
+                                <rect key="frame" x="678" y="720" width="99" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Save CSV" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="o5j-FQ-nXO">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="SaveCSVPressed:" target="XfG-lQ-9wD" id="0DS-0d-Cvv"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
