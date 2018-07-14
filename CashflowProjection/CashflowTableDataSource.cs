@@ -24,6 +24,14 @@ namespace CashflowProjection
                 this.addresses.Add((new clsLoan(i)).Property().Address());
         }
 
+        public string Address(int loanID)
+        {
+            if (loanID >= 0)
+                return this.addresses[loanID];
+            else
+                return "Fund Ops";
+        }
+
         public double StartingBalance
         {
             get

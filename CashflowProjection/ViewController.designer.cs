@@ -9,84 +9,98 @@ using System.CodeDom.Compiler;
 
 namespace CashflowProjection
 {
-    [Register ("ViewController")]
-    partial class ViewController
-    {
-        [Outlet]
-        AppKit.NSScrollView CashflowTable { get; set; }
+	[Register ("ViewController")]
+	partial class ViewController
+	{
+		[Outlet]
+		AppKit.NSScrollView CashflowTable { get; set; }
 
-        [Outlet]
-        AppKit.NSTableView CashflowTableView { get; set; }
+		[Outlet]
+		AppKit.NSTableView CashflowTableView { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker EndDatePicker { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker EndDatePicker { get; set; }
 
-        [Outlet]
-        AppKit.NSButton OutflowsOnlyButton { get; set; }
+		[Outlet]
+		AppKit.NSButton FullDetailCheckBox { get; set; }
 
-        [Outlet]
-        AppKit.NSButton ScenarioButton { get; set; }
+		[Outlet]
+		AppKit.NSButton OutflowsOnlyButton { get; set; }
 
-        [Outlet]
-        AppKit.NSButton ScheduledOnlyButton { get; set; }
+		[Outlet]
+		AppKit.NSButton ScenarioButton { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker StartDatePicker { get; set; }
+		[Outlet]
+		AppKit.NSButton ScheduledOnlyButton { get; set; }
 
-        [Action ("EndDatePicked:")]
-        partial void EndDatePicked (AppKit.NSDatePicker sender);
+		[Outlet]
+		AppKit.NSDatePicker StartDatePicker { get; set; }
 
-        [Action ("OutflowsOnlyPressed:")]
-        partial void OutflowsOnlyPressed (AppKit.NSButton sender);
+		[Action ("EndDatePicked:")]
+		partial void EndDatePicked (AppKit.NSDatePicker sender);
 
-        [Action ("SaveCSVPressed:")]
-        partial void SaveCSVPressed (AppKit.NSButton sender);
+		[Action ("FullDetailCheckBoxPressed:")]
+		partial void FullDetailCheckBoxPressed (AppKit.NSButton sender);
 
-        [Action ("ScenarioButtonPressed:")]
-        partial void ScenarioButtonPressed (AppKit.NSButton sender);
+		[Action ("NAVExportPressed:")]
+		partial void NAVExportPressed (AppKit.NSButton sender);
 
-        [Action ("ScheduledOnlyPressed:")]
-        partial void ScheduledOnlyPressed (AppKit.NSButton sender);
+		[Action ("OutflowsOnlyPressed:")]
+		partial void OutflowsOnlyPressed (AppKit.NSButton sender);
 
-        [Action ("StartDatePicked:")]
-        partial void StartDatePicked (AppKit.NSDatePicker sender);
-        
-        void ReleaseDesignerOutlets ()
-        {
-            if (CashflowTable != null) {
-                CashflowTable.Dispose ();
-                CashflowTable = null;
-            }
+		[Action ("SaveCSVPressed:")]
+		partial void SaveCSVPressed (AppKit.NSButton sender);
 
-            if (EndDatePicker != null) {
-                EndDatePicker.Dispose ();
-                EndDatePicker = null;
-            }
+		[Action ("ScenarioButtonPressed:")]
+		partial void ScenarioButtonPressed (AppKit.NSButton sender);
 
-            if (OutflowsOnlyButton != null) {
-                OutflowsOnlyButton.Dispose ();
-                OutflowsOnlyButton = null;
-            }
+		[Action ("ScheduledOnlyPressed:")]
+		partial void ScheduledOnlyPressed (AppKit.NSButton sender);
 
-            if (ScenarioButton != null) {
-                ScenarioButton.Dispose ();
-                ScenarioButton = null;
-            }
+		[Action ("StartDatePicked:")]
+		partial void StartDatePicked (AppKit.NSDatePicker sender);
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (CashflowTable != null) {
+				CashflowTable.Dispose ();
+				CashflowTable = null;
+			}
 
-            if (ScheduledOnlyButton != null) {
-                ScheduledOnlyButton.Dispose ();
-                ScheduledOnlyButton = null;
-            }
+			if (CashflowTableView != null) {
+				CashflowTableView.Dispose ();
+				CashflowTableView = null;
+			}
 
-            if (StartDatePicker != null) {
-                StartDatePicker.Dispose ();
-                StartDatePicker = null;
-            }
+			if (EndDatePicker != null) {
+				EndDatePicker.Dispose ();
+				EndDatePicker = null;
+			}
 
-            if (CashflowTableView != null) {
-                CashflowTableView.Dispose ();
-                CashflowTableView = null;
-            }
-        }
-    }
+			if (OutflowsOnlyButton != null) {
+				OutflowsOnlyButton.Dispose ();
+				OutflowsOnlyButton = null;
+			}
+
+			if (ScenarioButton != null) {
+				ScenarioButton.Dispose ();
+				ScenarioButton = null;
+			}
+
+			if (ScheduledOnlyButton != null) {
+				ScheduledOnlyButton.Dispose ();
+				ScheduledOnlyButton = null;
+			}
+
+			if (StartDatePicker != null) {
+				StartDatePicker.Dispose ();
+				StartDatePicker = null;
+			}
+
+			if (FullDetailCheckBox != null) {
+				FullDetailCheckBox.Dispose ();
+				FullDetailCheckBox = null;
+			}
+		}
+	}
 }

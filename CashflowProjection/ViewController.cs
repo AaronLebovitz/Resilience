@@ -19,6 +19,7 @@ namespace CashflowProjection
         private bool showExpensesOnly;
         private CashflowTableDataSource dataSource;
         private CashflowTableDataSourceDelegate dataSourceDelegate;
+        private bool showFullDetail = true;
 
         #endregion
 
@@ -126,9 +127,14 @@ namespace CashflowProjection
             string filePath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/CashflowProjection";
             filePath += "_" + this.startDate.ToString("yyyyMMdd");
             filePath += "_" + this.endDate.ToString("yyyyMMdd");
+
             if (this.showAll) filePath += "_ALL";
             else if (this.showExpensesOnly) filePath += "_ExpensesOnly";
             else if (this.showScheduledOnly) filePath += "_ScheduledOnly";
+
+            if (this.showFullDetail) filePath += "_full";
+            else filePath += "_rollup";
+
             filePath += ".csv";
 
             System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(filePath);
@@ -137,6 +143,8 @@ namespace CashflowProjection
                 streamWriter.Write(this.dataSource.Cashflows[i].ID());
                 streamWriter.Write(",");
                 streamWriter.Write(this.dataSource.Cashflows[i].LoanID());
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Address(this.dataSource.Cashflows[i].LoanID()));
                 streamWriter.Write(",");
                 streamWriter.Write(this.dataSource.Cashflows[i].PayDate().ToString("MM/dd/yyyy"));
                 streamWriter.Write(",");
@@ -154,6 +162,72 @@ namespace CashflowProjection
             streamWriter.Close();
         }
 
+        partial void NAVExportPressed(NSButton sender)
+        {
+            string filePath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/CashflowReportNAV";
+            filePath += "_" + this.startDate.ToString("yyyyMMdd");
+            filePath += "_" + this.endDate.ToString("yyyyMMdd");
+            filePath += ".csv";
+
+            this.showAll = true;
+            this.ScenarioButton.State = NSCellStateValue.On;
+            this.OutflowsOnlyButton.State = NSCellStateValue.Off;
+            this.ScheduledOnlyButton.State = NSCellStateValue.Off;
+            this.showFullDetail = false;
+            this.FullDetailCheckBox.State = NSCellStateValue.Off;
+            this.RefreshTable();
+
+            System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(filePath);
+
+            // titles
+            streamWriter.WriteLine("Date,Amount,Type,Description");
+
+            // data
+            for (int i = 0; i < this.dataSource.Cashflows.Count; i++)
+            {
+                int loanID = this.dataSource.Cashflows[i].LoanID();
+                streamWriter.Write(this.dataSource.Cashflows[i].PayDate().ToString("MM/dd/yyyy"));
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].Amount().ToString("#0.00"));
+                streamWriter.Write(",");
+                streamWriter.Write(this.dataSource.Cashflows[i].TypeID().ToString());
+                streamWriter.Write(",");
+                if (loanID >= 0)
+                    streamWriter.Write(new clsLoan(loanID).Property().Address());
+                else 
+                {
+                    switch (this.dataSource.Cashflows[i].TypeID())
+                    {
+                        case clsCashflow.Type.AccountingFees:
+                            streamWriter.Write("RSM");
+                            break;
+                        case clsCashflow.Type.BankFees:
+                            streamWriter.Write("Huntington");
+                            break;
+                        case clsCashflow.Type.LegalFees:
+                            streamWriter.Write("Dykema");
+                            break;
+                        case clsCashflow.Type.ManagementFee:
+                        case clsCashflow.Type.PromoteFee:
+                            streamWriter.Write("Adaptation");
+                            break;
+                        default:
+                            streamWriter.Write("N/A");
+                            break;
+                    }
+                }
+                streamWriter.WriteLine();
+                streamWriter.Flush();
+            }
+            streamWriter.Close();
+        }
+
+        partial void FullDetailCheckBoxPressed(NSButton sender)
+        {
+            this.showFullDetail = !this.showFullDetail;
+            this.RefreshTable();
+        }
+
         #endregion
 
         #region Private Methods
@@ -161,10 +235,33 @@ namespace CashflowProjection
         private void RefreshTable()
         {
             // rebuild data source based on radio selection, date range
+            Dictionary<string, bool> rollUpDict = new Dictionary<string, bool>();
+            string hashCashflow;
             double dStartingBalance = 0D;
             List<clsCashflow> includedCashflows = new List<clsCashflow>();
+            List<clsCashflow> rollupCashflowsList = new List<clsCashflow>();
+            Dictionary<string, clsCashflow> rollupCashflowsDict = new Dictionary<string, clsCashflow>();
             foreach (clsCashflow cf in this.activeCashflows)
             {
+                // Rollup Tracking
+                if (cf.AcquisitionType)
+                {
+                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Acquisition).ToString("00");
+                }
+                else if (cf.RepaymentType)
+                {
+                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Repayment).ToString("00");
+                                    }
+                else
+                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)cf.TypeID()).ToString("00");
+                if (!this.showFullDetail) // roll up
+                {
+                    if (rollUpDict.ContainsKey(hashCashflow))
+                        rollUpDict[hashCashflow] = true;
+                    else
+                        rollUpDict.Add(hashCashflow, false);
+                }
+                // Create shortened Cashflow List
                 if ((cf.PayDate() >= this.startDate) && (cf.PayDate() <= this.endDate))
                 {
                     if (this.showAll)
@@ -177,6 +274,47 @@ namespace CashflowProjection
                 else if (cf.PayDate() < this.startDate)
                     dStartingBalance += cf.Amount();
             }
+
+            // Roll up cashflows if necessary
+            if (!this.showFullDetail)
+            {
+                foreach (clsCashflow cf in includedCashflows)
+                {
+                    clsCashflow.Type rollupType;
+                    if (cf.AcquisitionType)
+                    {
+                        rollupType = clsCashflow.Type.Acquisition;
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Acquisition).ToString("00");
+                    }
+                    else if (cf.RepaymentType)
+                    {
+                        rollupType = clsCashflow.Type.Repayment;
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Repayment).ToString("00");
+                    }
+                    else
+                    {
+                        rollupType = cf.TypeID();
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)cf.TypeID()).ToString("00");
+                    }
+                    if (rollUpDict[hashCashflow])
+                    {
+                        if (rollupCashflowsDict.ContainsKey(hashCashflow))
+                        {
+                            rollupCashflowsDict[hashCashflow].AddAmount(cf.Amount());
+                        }
+                        else
+                        {
+                            rollupCashflowsDict.Add(hashCashflow, new clsCashflow(cf.PayDate(), cf.RecordDate(), cf.DeleteDate(), cf.LoanID(),
+                                                                              cf.Amount(), cf.Actual(), rollupType));
+                        }
+                    }
+                    else
+                        rollupCashflowsList.Add(cf);
+                }
+                foreach (clsCashflow cf in rollupCashflowsDict.Values) rollupCashflowsList.Add(cf);
+                includedCashflows = rollupCashflowsList;
+            }
+
             includedCashflows.Sort();
             this.dataSource.StartingBalance = dStartingBalance;
             this.dataSource.Cashflows = includedCashflows;

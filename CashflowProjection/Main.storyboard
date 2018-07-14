@@ -974,7 +974,7 @@
                                     </subviews>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.86486486486486491" horizontal="YES" id="XJj-r4-1pF">
-                                    <rect key="frame" x="1" y="682" width="838" height="16"/>
+                                    <rect key="frame" x="1" y="7" width="0.0" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="jVA-gE-YWn">
@@ -1044,7 +1044,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzq-bT-sdk">
-                                <rect key="frame" x="678" y="720" width="99" height="32"/>
+                                <rect key="frame" x="767" y="720" width="99" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Save CSV" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="o5j-FQ-nXO">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1054,12 +1054,35 @@
                                     <action selector="SaveCSVPressed:" target="XfG-lQ-9wD" id="0DS-0d-Cvv"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fkk-pd-Reu">
+                                <rect key="frame" x="285" y="749" width="82" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Full Detail" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="l7p-6e-66w">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="FullDetailCheckBoxPressed:" target="XfG-lQ-9wD" id="kWI-ia-gh2"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cun-8T-8QX">
+                                <rect key="frame" x="658" y="720" width="110" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="NAV Export" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PxA-3o-8Cb">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="NAVExportPressed:" target="XfG-lQ-9wD" id="kuh-rl-zPJ"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="CashflowTable" destination="1B3-hI-0dw" id="cUd-wN-DhE"/>
                         <outlet property="CashflowTableView" destination="hSr-sf-WZ8" id="ABE-CK-f0N"/>
                         <outlet property="EndDatePicker" destination="dnl-5R-TYb" id="ExY-P5-ezP"/>
+                        <outlet property="FullDetailCheckBox" destination="fkk-pd-Reu" id="Bm9-oI-Kpy"/>
                         <outlet property="OutflowsOnlyButton" destination="cas-77-Ova" id="NVH-Sl-IBx"/>
                         <outlet property="ScenarioButton" destination="rsZ-Zj-my3" id="KqJ-zk-TNK"/>
                         <outlet property="ScheduledOnlyButton" destination="0hi-4r-OgG" id="Hvt-R4-IVn"/>
