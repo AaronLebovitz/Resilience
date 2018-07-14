@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace ResilienceClasses
 {
     public class clsCashflow:IComparable<clsCashflow>
@@ -12,7 +13,7 @@ namespace ResilienceClasses
             DispositionPrice, DispositionConcession, DispositionProcessing, DispositionRecording, DispositionTaxes,
             PromoteFee, BankFees, LegalFees, AccountingFees, CapitalCall, BrokersFee, Misc,
             NetDispositionProj, CatchUp, Principal, InterestHard, InterestAdditional, EstimatedTotalCosts, Distribution,
-            InitialExpenseDraw
+            InitialExpenseDraw, Acquisition, Repayment
         }
 
         public static string strCashflowPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblCashflow.csv";
@@ -152,9 +153,9 @@ namespace ResilienceClasses
                     tbl.Update(this.iTransactionID, clsCashflow.TransactionTypeColumn, ((int)this.eTypeID).ToString()) &&
                     tbl.Update(this.iTransactionID, clsCashflow.LoanColumn, this.iLoanID.ToString()) &&
                     tbl.Update(this.iTransactionID, clsCashflow.AmountColumn, this.dAmount.ToString()) &&
-                    tbl.Update(this.iTransactionID, clsCashflow.TransactionDateColumn, this.dtPayDate.ToString()) &&
-                    tbl.Update(this.iTransactionID, clsCashflow.RecordDateColumn, this.dtRecordDate.ToString()) &&
-                    tbl.Update(this.iTransactionID, clsCashflow.DeleteDateColumn, this.dtDeleteDate.ToString()) &&
+                    tbl.Update(this.iTransactionID, clsCashflow.TransactionDateColumn, this.dtPayDate.ToString("MM/dd/yyyy")) &&
+                    tbl.Update(this.iTransactionID, clsCashflow.RecordDateColumn, this.dtRecordDate.ToString("MM/dd/yyyy")) &&
+                    tbl.Update(this.iTransactionID, clsCashflow.DeleteDateColumn, this.dtDeleteDate.ToString("MM/dd/yyyy")) &&
                     tbl.Update(this.iTransactionID, clsCashflow.CommentColumn, this.strComment)
                 )
                 {
@@ -191,6 +192,33 @@ namespace ResilienceClasses
         public int TransactionID() { return this.iTransactionID; }
         public int ID() { return this.iTransactionID; }
         public string Comment() { return this.strComment; }
+        public bool AcquisitionType
+        { 
+            get 
+            {
+                return ((this.eTypeID == clsCashflow.Type.PropertyTax) ||
+                        (this.eTypeID == clsCashflow.Type.AcquisitionPrice) ||
+                        (this.eTypeID == clsCashflow.Type.AcquisitionTaxes) ||
+                        (this.eTypeID == clsCashflow.Type.AcquisitionRecording) ||
+                        (this.eTypeID == clsCashflow.Type.AcquisitionConcession) ||
+                        (this.eTypeID == clsCashflow.Type.AcquisitionProcessing) ||
+                        (this.eTypeID == clsCashflow.Type.HomeownersInsurance) ||
+                        (this.eTypeID == clsCashflow.Type.TitlePolicy) ||
+                        (this.eTypeID == clsCashflow.Type.InitialExpenseDraw) ||
+                        (this.eTypeID == clsCashflow.Type.Acquisition));
+            }
+        }
+        public bool RepaymentType
+        {
+            get
+            {
+                return ((this.eTypeID == clsCashflow.Type.Principal) ||
+                        (this.eTypeID == clsCashflow.Type.InterestHard) ||
+                        (this.eTypeID == clsCashflow.Type.InterestAdditional) ||
+                        (this.eTypeID == clsCashflow.Type.NetDispositionProj) ||
+                        (this.eTypeID == clsCashflow.Type.Repayment));
+            }
+        }
         #endregion
 
         public double AddAmount(double addAmount)
@@ -221,7 +249,7 @@ namespace ResilienceClasses
             // otherwise, sort first by PayDate, then Amount, then Type, then ID
 
             int iReturnValue = 0;
-            if (this.iTransactionID == other.iTransactionID) return 0;
+            if ((this.iTransactionID == other.iTransactionID) && (this.iTransactionID >= 0)) return 0;
 
             iReturnValue = dtPayDate.CompareTo(other.dtPayDate);
             if (iReturnValue == 0) iReturnValue = dAmount.CompareTo(other.dAmount);

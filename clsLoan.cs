@@ -31,14 +31,13 @@ namespace ResilienceClasses
 
             // Find PropertyID from Address First
             int propertyID = clsProperty.IDFromAddress(address);
-            if (propertyID == -1) throw new Exception("Address not found: " + address);
+            if (propertyID == -1) return -1;
 
             // Now match propertyID to the loan
             for (int i = 0; i < tblLoans.Length(); i++)
             {
                 if (tblLoans.Value(i, clsLoan.PropertyColumn) == propertyID.ToString()) loanID = i;
             }
-            if (loanID == -1) throw new Exception("No Loan Found for property " + address);
             return loanID;
         }
         #endregion
