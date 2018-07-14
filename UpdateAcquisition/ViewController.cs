@@ -119,88 +119,123 @@ namespace UpdateAcquisition
             }
         }
 
-        partial void UpdateButtonPushed(AppKit.NSButton sender)
+        partial void MarkActualPressed(NSButton sender)
         {
             this.SummaryMessageField.StringValue = "";
-            // only validaton is:  are any cashflows ACTUAL
-            bool bAnyActuals = false;
-            double oldAcqCost = this.loanToUpdate.AcquisitionCost(false);
-            foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
+            if (this.loanToUpdate == null)
             {
-                if (cf.Actual()) bAnyActuals = true;
-            }
-            if (bAnyActuals)
-            {
-                this.SummaryMessageField.StringValue = "Can't update - some cashflows are marked Actual";
+                this.SummaryMessageField.StringValue = "No loan selected.  No updates made.";
             }
             else
             {
-                int delayDays = ((DateTime)this.ClosingDatePicker.DateValue - this.loanToUpdate.OriginationDate()).Days;
-                List<clsCashflow> newCashflows = new List<clsCashflow>();
-                // delete all existing scheduled cashflows
-                foreach (clsCashflow cf in this.loanToUpdate.Cashflows()) 
+                double dTotalCost = 0D;
+                foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
                 {
-                    if (cf.DeleteDate() > System.DateTime.Today.AddYears(50))
+                    if ((cf.DeleteDate() > System.DateTime.Today.AddYears(100)) && (cf.PayDate() <= System.DateTime.Today))
                     {
-                        if ((cf.TypeID() == clsCashflow.Type.NetDispositionProj) || 
-                            (cf.TypeID() == clsCashflow.Type.RehabDraw))
+                        if (cf.MarkActual(System.DateTime.Today))
                         {
-                            newCashflows.Add(new clsCashflow(cf.PayDate().AddDays(delayDays),
-                                             System.DateTime.Today, System.DateTime.MaxValue,
-                                             this.loanToUpdate.ID(), cf.Amount(), false, cf.TypeID()));
+                            this.SummaryMessageField.StringValue += "Marked actual " + cf.TypeID().ToString() +
+                                " (" + cf.TransactionID().ToString("#") + ")";
+                            dTotalCost += cf.Amount();
                         }
-                        cf.Delete(System.DateTime.Today);
+                        else
+                            this.SummaryMessageField.StringValue += "FAILED to mark actual " + cf.TypeID().ToString() +
+                                " (" + cf.TransactionID().ToString("#") + ")";
                     }
                 }
-                // create all the new cashflows
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.PriceField.DoubleValue,
-                                                              false, clsCashflow.Type.AcquisitionPrice));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), this.ConcessionField.DoubleValue,
-                                                              false, clsCashflow.Type.AcquisitionConcession));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.HOIField.DoubleValue,
-                                                              false, clsCashflow.Type.HomeownersInsurance));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.AcqTaxField.DoubleValue,
-                                                              false, clsCashflow.Type.AcquisitionTaxes));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.RecordingField.DoubleValue,
-                                                              false, clsCashflow.Type.AcquisitionRecording));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.ProcessingField.DoubleValue,
-                                                              false, clsCashflow.Type.AcquisitionProcessing));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.TitlePolicyField.DoubleValue,
-                                                              false, clsCashflow.Type.TitlePolicy));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.InitialDrawField.DoubleValue,
-                                                              false, clsCashflow.Type.InitialExpenseDraw));
-                this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
-                                                              System.DateTime.Now, System.DateTime.MaxValue,
-                                                              this.loanToUpdate.ID(), -this.PropertyTaxField.DoubleValue,
-                                                              false, clsCashflow.Type.PropertyTax));
-                foreach (clsCashflow cf in newCashflows) { this.loanToUpdate.AddCashflow(cf); }
-                // Update origination Date and Save
-                this.loanToUpdate.SetNewOriginationDate((DateTime)this.ClosingDatePicker.DateValue);
-                if (this.loanToUpdate.Save())
+                this.SummaryMessageField.StringValue += "TOTAL Marked Actual = " + dTotalCost.ToString("#,##0.00");
+                this.SummaryMessageField.StringValue += "Loan Save to Files " + this.loanToUpdate.Save().ToString().ToUpper();
+            }
+        }
+
+        partial void UpdateButtonPushed(AppKit.NSButton sender)
+        {
+            this.SummaryMessageField.StringValue = "";
+            if (this.loanToUpdate == null)
+                this.SummaryMessageField.StringValue = "No loan selected.  No updates made.";
+            else
+            {
+                // only validaton is:  are any cashflows ACTUAL
+                bool bAnyActuals = false;
+                double oldAcqCost = this.loanToUpdate.AcquisitionCost(false);
+                foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
                 {
-                    this.SummaryMessageField.StringValue += "\nSave successful.  Old / New Acquisition Cost = ";
-                    this.SummaryMessageField.StringValue += oldAcqCost.ToString("#,##0.00") + " / ";
-                    this.SummaryMessageField.StringValue += this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
+                    if (cf.Actual()) bAnyActuals = true;
+                }
+                if (bAnyActuals)
+                {
+                    this.SummaryMessageField.StringValue = "Can't update - some cashflows are marked Actual";
                 }
                 else
                 {
-                    this.SummaryMessageField.StringValue += "\nSave Failed.";
+                    int delayDays = ((DateTime)this.ClosingDatePicker.DateValue - this.loanToUpdate.OriginationDate()).Days;
+                    List<clsCashflow> newCashflows = new List<clsCashflow>();
+                    // delete all existing scheduled cashflows
+                    foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
+                    {
+                        if (cf.DeleteDate() > System.DateTime.Today.AddYears(50))
+                        {
+                            if ((cf.TypeID() == clsCashflow.Type.NetDispositionProj) ||
+                                (cf.TypeID() == clsCashflow.Type.RehabDraw))
+                            {
+                                newCashflows.Add(new clsCashflow(cf.PayDate().AddDays(delayDays),
+                                                 System.DateTime.Today, System.DateTime.MaxValue,
+                                                 this.loanToUpdate.ID(), cf.Amount(), false, cf.TypeID()));
+                            }
+                            cf.Delete(System.DateTime.Today);
+                        }
+                    }
+                    // create all the new cashflows
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.PriceField.DoubleValue,
+                                                                  false, clsCashflow.Type.AcquisitionPrice));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), this.ConcessionField.DoubleValue,
+                                                                  false, clsCashflow.Type.AcquisitionConcession));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.HOIField.DoubleValue,
+                                                                  false, clsCashflow.Type.HomeownersInsurance));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.AcqTaxField.DoubleValue,
+                                                                  false, clsCashflow.Type.AcquisitionTaxes));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.RecordingField.DoubleValue,
+                                                                  false, clsCashflow.Type.AcquisitionRecording));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.ProcessingField.DoubleValue,
+                                                                  false, clsCashflow.Type.AcquisitionProcessing));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.TitlePolicyField.DoubleValue,
+                                                                  false, clsCashflow.Type.TitlePolicy));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.InitialDrawField.DoubleValue,
+                                                                  false, clsCashflow.Type.InitialExpenseDraw));
+                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  System.DateTime.Now, System.DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), -this.PropertyTaxField.DoubleValue,
+                                                                  false, clsCashflow.Type.PropertyTax));
+                    foreach (clsCashflow cf in newCashflows) { this.loanToUpdate.AddCashflow(cf); }
+                    // Update origination Date and Save
+                    this.loanToUpdate.SetNewOriginationDate((DateTime)this.ClosingDatePicker.DateValue);
+                    if (this.loanToUpdate.Save())
+                    {
+                        this.SummaryMessageField.StringValue += "\nSave successful.  Old / New Acquisition Cost = ";
+                        this.SummaryMessageField.StringValue += oldAcqCost.ToString("#,##0.00") + " / ";
+                        this.SummaryMessageField.StringValue += this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
+                    }
+                    else
+                    {
+                        this.SummaryMessageField.StringValue += "\nSave Failed.";
+                    }
                 }
             }
         }

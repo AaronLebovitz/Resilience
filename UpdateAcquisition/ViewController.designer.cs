@@ -81,6 +81,9 @@ namespace UpdateAcquisition
         [Outlet]
         AppKit.NSButton UpdateAcquisitionButton { get; set; }
 
+        [Action ("MarkActualPressed:")]
+        partial void MarkActualPressed (AppKit.NSButton sender);
+
         [Action ("PropertyChosen:")]
         partial void PropertyChosen (AppKit.NSComboBox sender);
 
@@ -89,6 +92,16 @@ namespace UpdateAcquisition
         
         void ReleaseDesignerOutlets ()
         {
+            if (AcqTaxField != null) {
+                AcqTaxField.Dispose ();
+                AcqTaxField = null;
+            }
+
+            if (AcqTaxLabel != null) {
+                AcqTaxLabel.Dispose ();
+                AcqTaxLabel = null;
+            }
+
             if (AddressComboBox != null) {
                 AddressComboBox.Dispose ();
                 AddressComboBox = null;
@@ -99,59 +112,9 @@ namespace UpdateAcquisition
                 ClosingDateLabel = null;
             }
 
-            if (PriceLabel != null) {
-                PriceLabel.Dispose ();
-                PriceLabel = null;
-            }
-
-            if (ConcessionLabel != null) {
-                ConcessionLabel.Dispose ();
-                ConcessionLabel = null;
-            }
-
-            if (ProcessingLabel != null) {
-                ProcessingLabel.Dispose ();
-                ProcessingLabel = null;
-            }
-
-            if (RecordingLabel != null) {
-                RecordingLabel.Dispose ();
-                RecordingLabel = null;
-            }
-
-            if (AcqTaxLabel != null) {
-                AcqTaxLabel.Dispose ();
-                AcqTaxLabel = null;
-            }
-
-            if (TitlePolicyLabel != null) {
-                TitlePolicyLabel.Dispose ();
-                TitlePolicyLabel = null;
-            }
-
-            if (HOILabel != null) {
-                HOILabel.Dispose ();
-                HOILabel = null;
-            }
-
-            if (InitialDrawLabel != null) {
-                InitialDrawLabel.Dispose ();
-                InitialDrawLabel = null;
-            }
-
-            if (PropertyTaxLabel != null) {
-                PropertyTaxLabel.Dispose ();
-                PropertyTaxLabel = null;
-            }
-
             if (ClosingDatePicker != null) {
                 ClosingDatePicker.Dispose ();
                 ClosingDatePicker = null;
-            }
-
-            if (PriceField != null) {
-                PriceField.Dispose ();
-                PriceField = null;
             }
 
             if (ConcessionField != null) {
@@ -159,24 +122,9 @@ namespace UpdateAcquisition
                 ConcessionField = null;
             }
 
-            if (ProcessingField != null) {
-                ProcessingField.Dispose ();
-                ProcessingField = null;
-            }
-
-            if (RecordingField != null) {
-                RecordingField.Dispose ();
-                RecordingField = null;
-            }
-
-            if (AcqTaxField != null) {
-                AcqTaxField.Dispose ();
-                AcqTaxField = null;
-            }
-
-            if (TitlePolicyField != null) {
-                TitlePolicyField.Dispose ();
-                TitlePolicyField = null;
+            if (ConcessionLabel != null) {
+                ConcessionLabel.Dispose ();
+                ConcessionLabel = null;
             }
 
             if (HOIField != null) {
@@ -184,9 +132,39 @@ namespace UpdateAcquisition
                 HOIField = null;
             }
 
+            if (HOILabel != null) {
+                HOILabel.Dispose ();
+                HOILabel = null;
+            }
+
             if (InitialDrawField != null) {
                 InitialDrawField.Dispose ();
                 InitialDrawField = null;
+            }
+
+            if (InitialDrawLabel != null) {
+                InitialDrawLabel.Dispose ();
+                InitialDrawLabel = null;
+            }
+
+            if (PriceField != null) {
+                PriceField.Dispose ();
+                PriceField = null;
+            }
+
+            if (PriceLabel != null) {
+                PriceLabel.Dispose ();
+                PriceLabel = null;
+            }
+
+            if (ProcessingField != null) {
+                ProcessingField.Dispose ();
+                ProcessingField = null;
+            }
+
+            if (ProcessingLabel != null) {
+                ProcessingLabel.Dispose ();
+                ProcessingLabel = null;
             }
 
             if (PropertyTaxField != null) {
@@ -194,14 +172,39 @@ namespace UpdateAcquisition
                 PropertyTaxField = null;
             }
 
-            if (UpdateAcquisitionButton != null) {
-                UpdateAcquisitionButton.Dispose ();
-                UpdateAcquisitionButton = null;
+            if (PropertyTaxLabel != null) {
+                PropertyTaxLabel.Dispose ();
+                PropertyTaxLabel = null;
+            }
+
+            if (RecordingField != null) {
+                RecordingField.Dispose ();
+                RecordingField = null;
+            }
+
+            if (RecordingLabel != null) {
+                RecordingLabel.Dispose ();
+                RecordingLabel = null;
             }
 
             if (SummaryMessageField != null) {
                 SummaryMessageField.Dispose ();
                 SummaryMessageField = null;
+            }
+
+            if (TitlePolicyField != null) {
+                TitlePolicyField.Dispose ();
+                TitlePolicyField = null;
+            }
+
+            if (TitlePolicyLabel != null) {
+                TitlePolicyLabel.Dispose ();
+                TitlePolicyLabel = null;
+            }
+
+            if (UpdateAcquisitionButton != null) {
+                UpdateAcquisitionButton.Dispose ();
+                UpdateAcquisitionButton = null;
             }
         }
     }

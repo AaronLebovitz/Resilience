@@ -999,6 +999,17 @@
                                     <action selector="UpdateButtonPushed:" target="XfG-lQ-9wD" id="BW1-bU-88z"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eh2-Yp-FsV">
+                                <rect key="frame" x="22" y="8" width="104" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="roundTextured" title="Mark as Actual" bezelStyle="texturedRounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eCi-R3-t46">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="MarkActualPressed:" target="XfG-lQ-9wD" id="mmx-3A-DuU"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
