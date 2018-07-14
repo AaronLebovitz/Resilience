@@ -413,6 +413,7 @@ namespace ManageSales
                 this.loan.AddCashflow(new clsCashflow(this.loan.SaleDate(), System.DateTime.Today, System.DateTime.MaxValue,
                                                      this.loan.ID(), dAdditionalInterestPaidAtClosing, true, clsCashflow.Type.InterestAdditional));
             }
+            this.StatusMessageTextField.StringValue += "\nLoan Save to File : " + this.loan.Save().ToString().ToUpper();
         }
     }
 }
