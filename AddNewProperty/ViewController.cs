@@ -225,6 +225,7 @@ namespace AddNewProperty
                 // disposition cashflow
                 newLoan.AddCashflow(new clsCashflow(acquisitionDate.AddMonths((int)months), System.DateTime.Today, System.DateTime.MaxValue,
                                                     newLoanID, dispostion, false, clsCashflow.Type.NetDispositionProj));
+                newLoan.SetNewOriginationDate(acquisitionDate);
                 newLoan.Save();
 
                 // Create Documents
