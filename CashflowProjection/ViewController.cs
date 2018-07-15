@@ -228,6 +228,18 @@ namespace CashflowProjection
             this.RefreshTable();
         }
 
+        partial void PastDueButtonPressed(NSButton sender)
+        {
+            List<clsCashflow> includedCashflows = new List<clsCashflow>();
+            foreach (clsCashflow cf in this.activeCashflows)
+            {
+                if ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today))
+                    includedCashflows.Add(cf);
+            }
+            this.dataSource.Cashflows = includedCashflows;
+            this.CashflowTableView.ReloadData();
+        }
+
         #endregion
 
         #region Private Methods

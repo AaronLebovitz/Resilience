@@ -48,6 +48,9 @@ namespace CashflowProjection
 		[Action ("OutflowsOnlyPressed:")]
 		partial void OutflowsOnlyPressed (AppKit.NSButton sender);
 
+		[Action ("PastDueButtonPressed:")]
+		partial void PastDueButtonPressed (AppKit.NSButton sender);
+
 		[Action ("SaveCSVPressed:")]
 		partial void SaveCSVPressed (AppKit.NSButton sender);
 
@@ -77,6 +80,11 @@ namespace CashflowProjection
 				EndDatePicker = null;
 			}
 
+			if (FullDetailCheckBox != null) {
+				FullDetailCheckBox.Dispose ();
+				FullDetailCheckBox = null;
+			}
+
 			if (OutflowsOnlyButton != null) {
 				OutflowsOnlyButton.Dispose ();
 				OutflowsOnlyButton = null;
@@ -95,11 +103,6 @@ namespace CashflowProjection
 			if (StartDatePicker != null) {
 				StartDatePicker.Dispose ();
 				StartDatePicker = null;
-			}
-
-			if (FullDetailCheckBox != null) {
-				FullDetailCheckBox.Dispose ();
-				FullDetailCheckBox = null;
 			}
 		}
 	}
