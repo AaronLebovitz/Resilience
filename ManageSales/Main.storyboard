@@ -651,7 +651,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Manage Sales : Add, Cancel, Reschedule, Mark Actual" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="880" height="320"/>
@@ -833,13 +833,39 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bLL-iL-nZV">
+                                <rect key="frame" x="439" y="44" width="142" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Contract Received" bezelStyle="regularSquare" imagePosition="left" inset="2" id="UVv-ZL-4Gy">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="ContractReceivedToggled:" target="XfG-lQ-9wD" id="Cmh-FB-f8C"/>
+                                </connections>
+                            </button>
+                            <datePicker verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GmG-C7-PIH">
+                                <rect key="frame" x="610" y="42" width="171" height="27"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="6Ja-PO-lcU">
+                                    <font key="font" metaFont="system"/>
+                                    <date key="date" timeIntervalSinceReferenceDate="-595929600">
+                                        <!--1982-02-12 16:00:00 +0000-->
+                                    </date>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <datePickerElements key="datePickerElements" year="YES" month="YES" day="YES" hour="YES" minute="YES"/>
+                                </datePickerCell>
+                            </datePicker>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="AddressComboBox" destination="CrU-LA-RaC" id="emZ-1U-SBR"/>
                         <outlet property="ChooseActionPopUp" destination="IZN-CC-GQX" id="Ynt-hd-bJ3"/>
+                        <outlet property="ConractReceivedCheckBox" destination="bLL-iL-nZV" id="RlQ-LH-Ugm"/>
                         <outlet property="ExpectedAdditionalInterestTextField" destination="Gfb-qM-Her" id="JMH-Yr-MMd"/>
                         <outlet property="ExpectedSalePriceTextField" destination="Y3B-Ct-YIC" id="rpl-wN-f11"/>
+                        <outlet property="RecordDatePicker" destination="GmG-C7-PIH" id="17Y-u2-Q4b"/>
                         <outlet property="RepaymentAmountTextField" destination="Hqf-bp-sUQ" id="kau-jL-bxx"/>
                         <outlet property="SaleDatePicker" destination="Ecv-ac-mhS" id="QiT-U0-RfS"/>
                         <outlet property="StatusMessageTextField" destination="dch-QK-Bmr" id="2j7-7o-S3A"/>

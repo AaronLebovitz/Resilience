@@ -10,6 +10,7 @@ namespace ManageSales
     {
 
         private clsLoan loan;
+        private bool bRecordSaleContract = false;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -74,6 +75,11 @@ namespace ManageSales
                 }
             }
             this.UpdateChosenAddress(false);
+        }
+
+        partial void ContractReceivedToggled(NSButton sender)
+        {
+            this.bRecordSaleContract = !this.bRecordSaleContract;
         }
 
         private void UpdateChosenAddress(bool clearMessageText = true)
@@ -290,6 +296,25 @@ namespace ManageSales
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.AddDays(7).ToString("MM/dd/yyyy");
                 this.StatusMessageTextField.StringValue += "\nPrev    AddlInt: " + dImpliedAdditional.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "\nSave = " + this.loan.Save().ToString();
+
+                // Record Sale Contract
+                if (this.bRecordSaleContract)
+                {
+                    clsDocument saleContract = new clsDocument(clsDocument.DocumentID(this.loan.PropertyID(), clsDocument.Type.SaleContract));
+                    clsDocumentRecord saleContractRecord = new clsDocumentRecord(saleContract.ID(),
+                                                                                 System.DateTime.Now,
+                                                                                (DateTime)this.RecordDatePicker.DateValue,
+                                                                                 this.loan.CoBorrowerID(),
+                                                                                 this.loan.LenderID(),
+                                                                                 clsDocumentRecord.Status.Preliminary,
+                                                                                 clsDocumentRecord.Transmission.Electronic);
+                    if (saleContractRecord.Save())
+                        this.StatusMessageTextField.StringValue += "\nSale Contract Recorded";
+                    else
+                        this.StatusMessageTextField.StringValue += "\nSale Contract FAILED TO RECORD";
+                }
+                else
+                    this.StatusMessageTextField.StringValue += "\nSale Contract NOT RECORDED";
             }
         }
 
