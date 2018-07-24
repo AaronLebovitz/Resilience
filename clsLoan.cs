@@ -153,7 +153,6 @@ namespace ResilienceClasses
 
         public bool Save(string path, bool saveCashflows, string cfPath)
         {
-            // FIX THIS
 
             clsCSVTable tbl = new clsCSVTable(path);
             if (this.iLoanID < 0) this.iLoanID = tbl.Length();

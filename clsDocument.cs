@@ -37,6 +37,16 @@ namespace ResilienceClasses
             }
             return docList;
         }
+
+        public static int DocumentID(int propertyID, clsDocument.Type type)
+        {
+            int id = -1;
+            foreach (clsDocument doc in clsDocument.Documents(propertyID))
+            {
+                if (doc.tType == type) id = doc.iDocumentID;
+            }
+            return id;
+        }
         #endregion
 
         #region Properties
