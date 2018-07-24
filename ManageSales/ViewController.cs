@@ -189,10 +189,11 @@ namespace ManageSales
                 this.StatusMessageTextField.StringValue += "\nPrincipal Added: " + dPrincipalRepay.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.ToString("MM/dd/yyyy");
                 // schedule hard interest
-                double dHardInterst = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+                dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+                double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
                 this.loan.AddCashflow(new clsCashflow(scheduledSale, System.DateTime.Today, System.DateTime.MaxValue,
-                                                      this.loan.ID(), dHardInterst, false, clsCashflow.Type.InterestHard));
-                this.StatusMessageTextField.StringValue += "\nInterest  Added: " + dHardInterst.ToString("000,000.00");
+                                                      this.loan.ID(), dHardInterest, false, clsCashflow.Type.InterestHard));
+                this.StatusMessageTextField.StringValue += "\nInterest  Added: " + dHardInterest.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.ToString("MM/dd/yyyy");
                 // schedule additional interest
                 double dPrevAdditional = dAdditionalInterest;
@@ -203,6 +204,8 @@ namespace ManageSales
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.AddDays(7).ToString("MM/dd/yyyy");
                 this.StatusMessageTextField.StringValue += "\nPrev    AddlInt: " + dPrevAdditional.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "\nSave = " + this.loan.Save().ToString();
+
+                this.ShowLoanPayoffLetterInfo(dPrincipalRepay, dHardInterest, perdiem);
             }
         }
 
@@ -283,10 +286,11 @@ namespace ManageSales
                 this.StatusMessageTextField.StringValue += "\nPrincipal Added: " + dPrincipalRepay.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.ToString("MM/dd/yyyy");
                 // schedule hard interest
-                double dHardInterst = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+                double dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+                double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
                 this.loan.AddCashflow(new clsCashflow(scheduledSale, System.DateTime.Today, System.DateTime.MaxValue,
-                                                      this.loan.ID(), dHardInterst, false, clsCashflow.Type.InterestHard));
-                this.StatusMessageTextField.StringValue += "\nInterest  Added: " + dHardInterst.ToString("000,000.00");
+                                                      this.loan.ID(), dHardInterest, false, clsCashflow.Type.InterestHard));
+                this.StatusMessageTextField.StringValue += "\nInterest  Added: " + dHardInterest.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.ToString("MM/dd/yyyy");
                 // schedule additional interest
                 double dAdditionalInterest = this.ExpectedAdditionalInterestTextField.DoubleValue;
@@ -296,6 +300,8 @@ namespace ManageSales
                 this.StatusMessageTextField.StringValue += "," + scheduledSale.AddDays(7).ToString("MM/dd/yyyy");
                 this.StatusMessageTextField.StringValue += "\nPrev    AddlInt: " + dImpliedAdditional.ToString("000,000.00");
                 this.StatusMessageTextField.StringValue += "\nSave = " + this.loan.Save().ToString();
+
+                this.ShowLoanPayoffLetterInfo(dPrincipalRepay, dHardInterest, perdiem);
 
                 // Record Sale Contract
                 if (this.bRecordSaleContract)
@@ -439,6 +445,14 @@ namespace ManageSales
                                                      this.loan.ID(), dAdditionalInterestPaidAtClosing, true, clsCashflow.Type.InterestAdditional));
             }
             this.StatusMessageTextField.StringValue += "\nLoan Save to File : " + this.loan.Save().ToString().ToUpper();
+        }
+
+        private void ShowLoanPayoffLetterInfo(double principal, double interest, double perDiem)
+        {
+            this.StatusMessageTextField.StringValue += "\nPrincipal: " + principal.ToString("#,##0.00");
+            this.StatusMessageTextField.StringValue += "\nInterest : " + interest.ToString("#,##0.00");
+            this.StatusMessageTextField.StringValue += "\nTotal    : " + (principal + interest).ToString("#,##0.00");
+            this.StatusMessageTextField.StringValue += "\nPer Diem : " + perDiem.ToString("#,##0.00");
         }
     }
 }
