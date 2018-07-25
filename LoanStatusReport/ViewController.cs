@@ -2,6 +2,7 @@
 using AppKit;
 using Foundation;
 using ResilienceClasses;
+using System.Collections.Generic;
 
 namespace LoanStatusReport
 {
@@ -48,8 +49,10 @@ namespace LoanStatusReport
                 dt2 = dt1;
                 dt1 = (DateTime)ReportDatePicker2.DateValue;
             }
-            this.RunLoanStatusReport(dt1);
-            this.RunLoanStatusReport(dt2);
+            //this.RunLoanStatusReport(dt1);
+            //this.RunLoanStatusReport(dt2);
+            this.RunLoanStatusReportHTML(dt1);
+            this.RunLoanStatusReportHTML(dt2);
             this.CalculateAggregates(dt1, dt2);
             this.UpdateLabel.StringValue = "Completed.";
         }
@@ -66,7 +69,8 @@ namespace LoanStatusReport
         partial void RunReportButtonPushed(AppKit.NSButton sender)
         {
             this.UpdateLabel.StringValue = "Working...";
-            this.RunLoanStatusReport((DateTime)(this.ReportDatePicker.DateValue));
+            //this.RunLoanStatusReport((DateTime)(this.ReportDatePicker.DateValue));
+            this.RunLoanStatusReportHTML((DateTime)(this.ReportDatePicker.DateValue));
             this.UpdateLabel.StringValue = "Completed.";
         }
 
@@ -283,5 +287,215 @@ namespace LoanStatusReport
 
         }
 
+        private void RunLoanStatusReportHTML(DateTime dtReport)
+        {
+            // create report file
+            List<double> totals = new List<double>();
+            for (int i = 0; i < 13; i++)
+                totals.Add(0D);
+            string fileName = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/LoanStatus";
+            fileName += dtReport.ToString("yyyyMMdd");
+            fileName += ".htm";
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName);
+
+            // write beginning tags and header
+            sw.WriteLine("<!DOCTYPE html><html>");
+            sw.WriteLine("<head>");
+            sw.WriteLine("<style>");
+            sw.WriteLine("th {text-decoration:underline;}");
+            sw.WriteLine("tr {background-color:WhiteSmoke;}");
+            sw.WriteLine("tr#ROW2 {background-color:LightGray;}");
+            sw.WriteLine("tr#HEADER {background-color:White;}");
+            sw.WriteLine("</style>");
+            sw.WriteLine("</head>");
+
+            // html body
+            sw.WriteLine("<body>");
+            sw.WriteLine("<h1>Loan Status Report  " + dtReport.ToString("MM/dd/yyyy") + "</h1>");
+            sw.WriteLine("<table style=\"width:auto\">");
+            WriteHTMLHeaderRow(sw);
+            // loop through loans
+            clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tbl.Length(); i++)
+            {
+                string rowID = "";
+                if ((i % 3) == 2) rowID = "ROW2";
+                this.WriteLoanHTML(i, dtReport, sw, totals, rowID);
+//                if ((i % 30) == 29) WriteHTMLHeaderRow(sw);
+            }
+
+            // end of doc tags
+            sw.WriteLine("<tr><td>TOTALS</td></tr>");
+            sw.Write("<tr text-decoration:underline><td></td><td></td>");
+            foreach (double d in totals)
+                sw.Write("<td align=\"right\"><b><u>" +d.ToString("#,##0.00") +"</u></b></td>");
+            sw.WriteLine("</tr></table></html></body>");
+            sw.Close();
+        }
+
+        private void WriteLoanHTML(int loanID, DateTime dtAsOf, System.IO.StreamWriter sw, List<double> totals, string rowIDName)
+        {
+            clsEntity titleHolder;
+            clsEntity coBorrower;
+            clsEntity titleCompany;
+            int totalsIndex = 0;
+            double value;
+
+            clsLoan loan = new clsLoan(loanID).LoanAsOf(dtAsOf);
+            titleHolder = new clsEntity(loan.TitleHolderID());
+            titleCompany = new clsEntity(loan.TitleCompanyID());
+            coBorrower = new clsEntity(loan.CoBorrowerID());
+            clsLoan.State eStatus = loan.Status();
+
+            sw.WriteLine("<tr ID=" + rowIDName + ">");
+
+            sw.Write("<td align=\"left\">" + loan.Property().Address() + "</td>");
+            sw.Write("<td align=\"left\">" + eStatus.ToString().ToUpper() + "</td>");
+
+            if (eStatus == clsLoan.State.Cancelled)
+            {
+                for (int i = 0; i < 16; i++)
+                {
+                    sw.Write("<td></td>");
+                    totalsIndex++;
+                }
+            }
+            else
+            {
+                if (loan.Status() == clsLoan.State.Sold)
+                {
+                    sw.Write("<td></td><td></td><td></td>");
+                    totalsIndex += 3;
+                    if (loan.AccruedAdditionalInterest(dtAsOf) > 0D)
+                    {
+                        value = loan.AccruedAdditionalInterest(dtAsOf);
+                        totals[totalsIndex] += value;
+                        sw.Write("<td align=\"right\">" + value + "</td>");
+                    }
+                    sw.Write("<td></td><td></td><td></td>");
+                    totalsIndex += 3;
+                    value = loan.PrincipalPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.InterestPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.AdditionalInterestPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.Return(false);
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.IRR(false);
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                }
+                else
+                {
+                    value = loan.Balance(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.AccruedInterest(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.ProjectedHardInterest();
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.ProjectedAdditionalInterest(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.Return(false);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    value = loan.IRR(false);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    sw.Write("<td></td><td></td><td></td><td></td><td></td>");
+                    totalsIndex += 5;
+                }
+                value = loan.RehabRemain(dtAsOf);
+                totals[totalsIndex] += value;
+                totalsIndex++;
+                sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                value = loan.RehabSpent(dtAsOf);
+                totals[totalsIndex] += value;
+                totalsIndex++;
+                sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                sw.Write("<td align=\"right\">" + loan.SaleDate().ToShortDateString() + "</td>");
+                sw.Write("<td align=\"right\">" + loan.OriginationDate().ToShortDateString() + "</td>");
+                sw.Write("<td align=\"right\">" + (loan.SaleDate() - loan.OriginationDate()).TotalDays.ToString() + "</td>");
+            }
+
+            sw.Write("<td>" + titleHolder.Name() + "</td>");
+            sw.Write("<td>" + coBorrower.Name() + "</td>");
+            sw.Write("<td>" + titleCompany.Name() + "</td>");
+            sw.Write("<td>" + loan.Rate().ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.PenaltyRate().ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.OriginationDate().ToShortDateString() + "</td>");
+            sw.Write("<td>" + loan.MaturityDate().ToShortDateString() + "</td>");
+            sw.Write("<td>" + loan.GrossReturn(false).ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.GrossReturn(true).ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.Return(true).ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.IRR(true).ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.FirstRehabEstimate().ToString("#,##0.00") + "</td>");
+            sw.WriteLine();
+
+            sw.WriteLine("</tr>");
+            sw.Flush();
+        }
+
+        private void WriteHTMLHeaderRow(System.IO.StreamWriter sw)
+        {
+            string title;
+            sw.WriteLine("<tr id=HEADER>");
+            title = "Property";
+            sw.WriteLine("<th align=\"left\">" + title + "</th>");
+            title = "State";
+            sw.WriteLine("<th align=\"left\">" + title + "</th>");
+            title = "Principal Balance";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Accrued Interest";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Proj Hard Int";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Proj Addl Int";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Proj Return";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Proj IRR";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Principal Paid";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Interest Paid";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Addl Int Paid";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Act Return";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Act IRR";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Rehab Remain";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Rehab Spent";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Sale Date";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Purchase Date";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Days";
+            sw.WriteLine("<th>" + title + "</th>");
+            sw.WriteLine("</tr>");
+        }
     }
 }
