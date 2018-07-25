@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateAcquisition", "UpdateAcquisition\UpdateAcquisition.csproj", "{9A159AAA-8D58-4FEA-A179-72CF2E8FF437}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResilienceClasses", "..\ResilienceClasses\ResilienceClasses\ResilienceClasses.csproj", "{0D6DC509-1CD9-44F5-9B17-336E2783E96A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResilienceClasses", "..\ResilienceClasses\ResilienceClasses.csproj", "{0D6DC509-1CD9-44F5-9B17-336E2783E96A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
