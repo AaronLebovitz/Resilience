@@ -26,6 +26,7 @@ namespace ManageSales
             foreach (string address in addressList) { this.AddressComboBox.Add((NSString)address); }
             this.SaleDatePicker.DateValue = (NSDate)System.DateTime.Today.Date;
             this.ChooseActionPopUp.RemoveAllItems();
+            this.RecordDatePicker.DateValue = (NSDate)System.DateTime.Today.Date;
         }
 
         public override NSObject RepresentedObject
@@ -441,8 +442,15 @@ namespace ManageSales
                 }
                 // if an extra days of interest were paid, add this cashflow as Additional Interest paid on the closing date
                 //    don't adjust scheduled additional interest, this will be updated soon after closing
-                this.loan.AddCashflow(new clsCashflow(this.loan.SaleDate(), System.DateTime.Today, System.DateTime.MaxValue,
-                                                     this.loan.ID(), dAdditionalInterestPaidAtClosing, true, clsCashflow.Type.InterestAdditional));
+                if (dAdditionalInterestPaidAtClosing > 0)
+                {
+                    this.loan.AddCashflow(new clsCashflow(this.loan.SaleDate(), System.DateTime.Today, System.DateTime.MaxValue,
+                                                         this.loan.ID(), dAdditionalInterestPaidAtClosing, true, clsCashflow.Type.InterestAdditional));
+                    this.StatusMessageTextField.StringValue += "\nAddl Interest Paid at Closing added: ";
+                    this.StatusMessageTextField.StringValue += dAdditionalInterestPaidAtClosing.ToString("#,##0.00");
+                }
+                else
+                    this.StatusMessageTextField.StringValue += "\nNO Additional Interest Paid at Closing.";
             }
             this.StatusMessageTextField.StringValue += "\nLoan Save to File : " + this.loan.Save().ToString().ToUpper();
         }
