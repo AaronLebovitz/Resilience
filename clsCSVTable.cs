@@ -28,7 +28,7 @@ namespace ResilienceClasses
                 // load columns
                 if ((line = file.ReadLine()) != null)
                 {
-                    this.Columns = System.Text.RegularExpressions.Regex.Split(line, ",");
+                    this.Columns = System.Text.RegularExpressions.Regex.Split(line.Trim(','), ",");
                 }
                 else
                 {
