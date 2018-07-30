@@ -40,6 +40,17 @@ namespace ResilienceClasses
             }
             return loanID;
         }
+
+        public static Dictionary<string, int> LoanIDsByAddress()
+        {
+            Dictionary<string, int> dict = new Dictionary<string, int>();
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tblLoans.Length(); i++)
+            {
+                dict.Add((new clsLoan(i)).Property().Address(), i);
+            }
+            return dict;
+        }
         #endregion
 
         #region Properties
