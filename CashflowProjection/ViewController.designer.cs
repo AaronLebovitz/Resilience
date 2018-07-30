@@ -13,10 +13,19 @@ namespace CashflowProjection
 	partial class ViewController
 	{
 		[Outlet]
+		AppKit.NSComboBox ActualFilterComboxBox { get; set; }
+
+		[Outlet]
+		AppKit.NSComboBox AddressFilterComboBox { get; set; }
+
+		[Outlet]
 		AppKit.NSScrollView CashflowTable { get; set; }
 
 		[Outlet]
 		AppKit.NSTableView CashflowTableView { get; set; }
+
+		[Outlet]
+		AppKit.NSDatePicker DateFilterDatePicker { get; set; }
 
 		[Outlet]
 		AppKit.NSDatePicker EndDatePicker { get; set; }
@@ -35,6 +44,18 @@ namespace CashflowProjection
 
 		[Outlet]
 		AppKit.NSDatePicker StartDatePicker { get; set; }
+
+		[Outlet]
+		AppKit.NSComboBox TypeFilterComboBox { get; set; }
+
+		[Action ("ActualFilterSelected:")]
+		partial void ActualFilterSelected (AppKit.NSComboBox sender);
+
+		[Action ("AddressFilterSelected:")]
+		partial void AddressFilterSelected (AppKit.NSComboBox sender);
+
+		[Action ("DateFilterPicked:")]
+		partial void DateFilterPicked (AppKit.NSDatePicker sender);
 
 		[Action ("EndDatePicked:")]
 		partial void EndDatePicked (AppKit.NSDatePicker sender);
@@ -62,6 +83,9 @@ namespace CashflowProjection
 
 		[Action ("StartDatePicked:")]
 		partial void StartDatePicked (AppKit.NSDatePicker sender);
+
+		[Action ("TypeFilterSelected:")]
+		partial void TypeFilterSelected (AppKit.NSComboBox sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
@@ -103,6 +127,26 @@ namespace CashflowProjection
 			if (StartDatePicker != null) {
 				StartDatePicker.Dispose ();
 				StartDatePicker = null;
+			}
+
+			if (ActualFilterComboxBox != null) {
+				ActualFilterComboxBox.Dispose ();
+				ActualFilterComboxBox = null;
+			}
+
+			if (TypeFilterComboBox != null) {
+				TypeFilterComboBox.Dispose ();
+				TypeFilterComboBox = null;
+			}
+
+			if (DateFilterDatePicker != null) {
+				DateFilterDatePicker.Dispose ();
+				DateFilterDatePicker = null;
+			}
+
+			if (AddressFilterComboBox != null) {
+				AddressFilterComboBox.Dispose ();
+				AddressFilterComboBox = null;
 			}
 		}
 	}

@@ -12,6 +12,7 @@ namespace CashflowProjection
         #region Private Fields
 
         private List<clsCashflow> activeCashflows = new List<clsCashflow>();
+        private Dictionary<string, int> addressToLoanID = clsLoan.LoanIDsByAddress();
         private DateTime startDate;
         private DateTime endDate;
         private bool showAll;
@@ -20,6 +21,10 @@ namespace CashflowProjection
         private CashflowTableDataSource dataSource;
         private CashflowTableDataSourceDelegate dataSourceDelegate;
         private bool showFullDetail = true;
+        private bool includeActual = true;
+        private bool includeNonActual = true;
+        private string addressFilter = "All";
+        private clsCashflow.Type typeFilter = clsCashflow.Type.Unknown;
 
         #endregion
 
@@ -49,10 +54,31 @@ namespace CashflowProjection
                     this.activeCashflows.Add(new clsCashflow(i));
             }
 
+            this.DateFilterDatePicker.DateValue = (NSDate)System.DateTime.Today;
             this.startDate = System.DateTime.Today.AddYears(-10);
             this.StartDatePicker.DateValue = (NSDate)this.startDate;
             this.endDate = System.DateTime.Today.AddYears(10);
             this.EndDatePicker.DateValue = (NSDate)this.endDate;
+
+            this.ActualFilterComboxBox.RemoveAll();
+            this.ActualFilterComboxBox.Add((NSString)"All");
+            this.ActualFilterComboxBox.Add((NSString)"True");
+            this.ActualFilterComboxBox.Add((NSString)"False");
+            this.ActualFilterComboxBox.SelectItem(0);
+
+            this.AddressFilterComboBox.RemoveAll();
+            this.AddressFilterComboBox.Add((NSString)"All");
+            List<string> addresses = clsProperty.AddressList();
+            foreach (string s in addresses) this.AddressFilterComboBox.Add((NSString)s);
+            this.AddressFilterComboBox.SelectItem(0);
+
+            this.TypeFilterComboBox.RemoveAll();
+            this.TypeFilterComboBox.Add((NSString)"All");
+            foreach (clsCashflow.Type t in Enum.GetValues(typeof(clsCashflow.Type)))
+                this.TypeFilterComboBox.Add((NSString)t.ToString());
+            this.TypeFilterComboBox.Remove((NSString)"Unknown");
+            this.TypeFilterComboBox.SelectItem(0);
+
             this.dataSource = new CashflowTableDataSource();
             this.dataSourceDelegate = new CashflowTableDataSourceDelegate(this.dataSource);
             this.CashflowTableView.DataSource = this.dataSource;
@@ -240,6 +266,47 @@ namespace CashflowProjection
             this.CashflowTableView.ReloadData();
         }
 
+        partial void DateFilterPicked(NSDatePicker sender)
+        {
+            this.EndDatePicker.DateValue = this.DateFilterDatePicker.DateValue;
+            this.endDate = (DateTime)this.EndDatePicker.DateValue;
+            this.StartDatePicker.DateValue = this.DateFilterDatePicker.DateValue;
+            this.startDate = (DateTime)this.StartDatePicker.DateValue;
+            this.RefreshTable();
+        }
+
+        partial void ActualFilterSelected(NSComboBox sender)
+        {
+            if ((String)(NSString)ActualFilterComboxBox.SelectedValue == "All")
+            {
+                includeActual = true;
+                includeNonActual = true;
+            }
+            else if ((String)(NSString)ActualFilterComboxBox.SelectedValue == "True")
+            {
+                includeActual = true;
+                includeNonActual = false;
+            }
+            else
+            {
+                includeActual = false;
+                includeNonActual = true;
+            }
+            this.RefreshTable();
+        }
+
+        partial void AddressFilterSelected(NSComboBox sender)
+        {
+            this.addressFilter = (string)(NSString)this.AddressFilterComboBox.SelectedValue;
+            this.RefreshTable();
+        }
+
+        partial void TypeFilterSelected(NSComboBox sender)
+        {
+            this.typeFilter = (clsCashflow.Type)((int)this.TypeFilterComboBox.SelectedIndex);
+            this.RefreshTable();
+        }
+
         #endregion
 
         #region Private Methods
@@ -253,38 +320,48 @@ namespace CashflowProjection
             List<clsCashflow> includedCashflows = new List<clsCashflow>();
             List<clsCashflow> rollupCashflowsList = new List<clsCashflow>();
             Dictionary<string, clsCashflow> rollupCashflowsDict = new Dictionary<string, clsCashflow>();
+
+            // compile included cashflows
             foreach (clsCashflow cf in this.activeCashflows)
             {
-                // Rollup Tracking
-                if (cf.AcquisitionType)
+                bool bInclude = false;
+                bInclude = (((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual())));
+                if (bInclude)
+                    bInclude = ((this.addressFilter == "All") || (this.addressToLoanID[this.addressFilter] == cf.LoanID()));
+                if (bInclude) bInclude = ((this.typeFilter == clsCashflow.Type.Unknown) || (this.typeFilter == cf.TypeID()));
+                if (bInclude)
                 {
-                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Acquisition).ToString("00");
-                }
-                else if (cf.RepaymentType)
-                {
-                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Repayment).ToString("00");
-                                    }
-                else
-                    hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)cf.TypeID()).ToString("00");
-                if (!this.showFullDetail) // roll up
-                {
-                    if (rollUpDict.ContainsKey(hashCashflow))
-                        rollUpDict[hashCashflow] = true;
+                    // Rollup Tracking
+                    if (cf.AcquisitionType)
+                    {
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Acquisition).ToString("00");
+                    }
+                    else if (cf.RepaymentType)
+                    {
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)clsCashflow.Type.Repayment).ToString("00");
+                    }
                     else
-                        rollUpDict.Add(hashCashflow, false);
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)cf.TypeID()).ToString("00");
+                    if (!this.showFullDetail) // roll up
+                    {
+                        if (rollUpDict.ContainsKey(hashCashflow))
+                            rollUpDict[hashCashflow] = true;
+                        else
+                            rollUpDict.Add(hashCashflow, false);
+                    }
+                    // Create shortened Cashflow List
+                    if ((cf.PayDate() >= this.startDate.Date) && (cf.PayDate() <= this.endDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
+                    {
+                        if (this.showAll)
+                            includedCashflows.Add(cf);
+                        else if ((this.showScheduledOnly) && (cf.TypeID() != clsCashflow.Type.NetDispositionProj))
+                            includedCashflows.Add(cf);
+                        else if ((cf.Amount() < 0D) || (cf.Actual()) && (this.showExpensesOnly))
+                            includedCashflows.Add(cf);
+                    }
+                    else if (cf.PayDate() < this.startDate)
+                        dStartingBalance += cf.Amount();
                 }
-                // Create shortened Cashflow List
-                if ((cf.PayDate() >= this.startDate) && (cf.PayDate() <= this.endDate))
-                {
-                    if (this.showAll)
-                        includedCashflows.Add(cf);
-                    else if ((this.showScheduledOnly) && (cf.TypeID() != clsCashflow.Type.NetDispositionProj))
-                        includedCashflows.Add(cf);
-                    else if ((cf.Amount() < 0D) || (cf.Actual()) && (this.showExpensesOnly))
-                        includedCashflows.Add(cf);
-                }
-                else if (cf.PayDate() < this.startDate)
-                    dStartingBalance += cf.Amount();
             }
 
             // Roll up cashflows if necessary
