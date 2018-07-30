@@ -1111,7 +1111,7 @@
                                 </connections>
                             </comboBox>
                             <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QgR-Qr-Xby">
-                                <rect key="frame" x="392" y="693" width="91" height="26"/>
+                                <rect key="frame" x="392" y="693" width="91" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="5" id="rfo-Ij-Fqj">
                                     <font key="font" metaFont="miniSystem"/>
@@ -1128,7 +1128,7 @@
                                 </connections>
                             </comboBox>
                             <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0eN-1c-hig">
-                                <rect key="frame" x="494" y="692" width="61" height="26"/>
+                                <rect key="frame" x="494" y="692" width="61" height="23"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="5" id="eDl-M8-Z5e">
                                     <font key="font" metaFont="miniSystem"/>
@@ -1159,6 +1159,17 @@
                                     <action selector="DateFilterPicked:" target="XfG-lQ-9wD" id="FqM-VV-Ma5"/>
                                 </connections>
                             </datePicker>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v22-vX-nzp">
+                                <rect key="frame" x="14" y="689" width="82" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Reload" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Mpc-dD-zKv">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="ReloadButtonPushed:" target="XfG-lQ-9wD" id="AWh-EI-YTx"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>

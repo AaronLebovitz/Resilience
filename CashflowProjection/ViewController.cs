@@ -307,9 +307,26 @@ namespace CashflowProjection
             this.RefreshTable();
         }
 
+        partial void ReloadButtonPushed(NSButton sender)
+        {
+            this.ReloadCashflows();
+        }
+
         #endregion
 
         #region Private Methods
+
+        private void ReloadCashflows()
+        {
+            clsCSVTable cfTable = new clsCSVTable(clsCashflow.strCashflowPath);
+            this.activeCashflows.Clear();
+            for (int i = 0; i < cfTable.Length(); i++)
+            {
+                if (DateTime.Parse(cfTable.Value(i, clsCashflow.DeleteDateColumn)) > System.DateTime.Today.AddYears(50))
+                    this.activeCashflows.Add(new clsCashflow(i));
+            }
+            this.RefreshTable();
+        }
 
         private void RefreshTable()
         {

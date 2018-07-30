@@ -72,6 +72,9 @@ namespace CashflowProjection
 		[Action ("PastDueButtonPressed:")]
 		partial void PastDueButtonPressed (AppKit.NSButton sender);
 
+		[Action ("ReloadButtonPushed:")]
+		partial void ReloadButtonPushed (AppKit.NSButton sender);
+
 		[Action ("SaveCSVPressed:")]
 		partial void SaveCSVPressed (AppKit.NSButton sender);
 
@@ -89,6 +92,16 @@ namespace CashflowProjection
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (ActualFilterComboxBox != null) {
+				ActualFilterComboxBox.Dispose ();
+				ActualFilterComboxBox = null;
+			}
+
+			if (AddressFilterComboBox != null) {
+				AddressFilterComboBox.Dispose ();
+				AddressFilterComboBox = null;
+			}
+
 			if (CashflowTable != null) {
 				CashflowTable.Dispose ();
 				CashflowTable = null;
@@ -97,6 +110,11 @@ namespace CashflowProjection
 			if (CashflowTableView != null) {
 				CashflowTableView.Dispose ();
 				CashflowTableView = null;
+			}
+
+			if (DateFilterDatePicker != null) {
+				DateFilterDatePicker.Dispose ();
+				DateFilterDatePicker = null;
 			}
 
 			if (EndDatePicker != null) {
@@ -129,24 +147,9 @@ namespace CashflowProjection
 				StartDatePicker = null;
 			}
 
-			if (ActualFilterComboxBox != null) {
-				ActualFilterComboxBox.Dispose ();
-				ActualFilterComboxBox = null;
-			}
-
 			if (TypeFilterComboBox != null) {
 				TypeFilterComboBox.Dispose ();
 				TypeFilterComboBox = null;
-			}
-
-			if (DateFilterDatePicker != null) {
-				DateFilterDatePicker.Dispose ();
-				DateFilterDatePicker = null;
-			}
-
-			if (AddressFilterComboBox != null) {
-				AddressFilterComboBox.Dispose ();
-				AddressFilterComboBox = null;
 			}
 		}
 	}
