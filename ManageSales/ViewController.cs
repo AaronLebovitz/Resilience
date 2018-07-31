@@ -103,6 +103,14 @@ namespace ManageSales
                         this.SaleDatePicker.DateValue = (NSDate)this.loan.SaleDate().Date.ToUniversalTime();
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
                         this.ExpectedAdditionalInterestTextField.DoubleValue = this.loan.ScheduledAdditionalInterest(System.DateTime.Today.Date);
+
+                        DateTime scheduledSale = this.loan.SaleDate().Date;
+                        double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(-1)).Balance(scheduledSale.AddDays(-1));
+                        double dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+                        double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
+                        double dAdditionalInterest = this.ExpectedAdditionalInterestTextField.DoubleValue;
+                        this.ShowLoanPayoffLetterInfo(dPrincipalRepay, dHardInterest, perdiem);
+
                         break;
 
                     case clsLoan.State.Listed:
