@@ -9,113 +9,121 @@ using System.CodeDom.Compiler;
 
 namespace ConstructionHistory
 {
-    [Register ("ViewController")]
-    partial class ViewController
-    {
-        [Outlet]
-        AppKit.NSButton addButton { get; set; }
+	[Register ("ViewController")]
+	partial class ViewController
+	{
+		[Outlet]
+		AppKit.NSButton addButton { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField cashflowID { get; set; }
+		[Outlet]
+		AppKit.NSTextField cashflowID { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField constructionAmountNew { get; set; }
+		[Outlet]
+		AppKit.NSTextField constructionAmountNew { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker constructionDateNew { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker constructionDateNew { get; set; }
 
-        [Outlet]
-        AppKit.NSButton dateChangeButton { get; set; }
+		[Outlet]
+		AppKit.NSButton dateChangeButton { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker dateChanger { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker dateChanger { get; set; }
 
-        [Outlet]
-        AppKit.NSButton deleteButton { get; set; }
+		[Outlet]
+		AppKit.NSButton deleteButton { get; set; }
 
-        [Outlet]
-        AppKit.NSButton markTrueButton { get; set; }
+		[Outlet]
+		AppKit.NSTextField LoanStatusTextField { get; set; }
 
-        [Outlet]
-        AppKit.NSPopUpButton propertyMenu { get; set; }
+		[Outlet]
+		AppKit.NSButton markTrueButton { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField rehabDrawDisplayFalse { get; set; }
+		[Outlet]
+		AppKit.NSPopUpButton propertyMenu { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField rehabDrawDisplayTrue { get; set; }
+		[Outlet]
+		AppKit.NSTextField rehabDrawDisplayFalse { get; set; }
 
-        [Action ("addNewConstruction:")]
-        partial void addNewConstruction (AppKit.NSButton sender);
+		[Outlet]
+		AppKit.NSTextField rehabDrawDisplayTrue { get; set; }
 
-        [Action ("dateChangeClicked:")]
-        partial void dateChangeClicked (AppKit.NSButton sender);
+		[Action ("addNewConstruction:")]
+		partial void addNewConstruction (AppKit.NSButton sender);
 
-        [Action ("deleteButtonClicked:")]
-        partial void deleteButtonClicked (AppKit.NSButton sender);
+		[Action ("dateChangeClicked:")]
+		partial void dateChangeClicked (AppKit.NSButton sender);
 
-        [Action ("markTrueClicked:")]
-        partial void markTrueClicked (AppKit.NSButton sender);
+		[Action ("deleteButtonClicked:")]
+		partial void deleteButtonClicked (AppKit.NSButton sender);
 
-        [Action ("propertyMenuChosen:")]
-        partial void propertyMenuChosen (AppKit.NSPopUpButton sender);
-        
-        void ReleaseDesignerOutlets ()
-        {
-            if (addButton != null) {
-                addButton.Dispose ();
-                addButton = null;
-            }
+		[Action ("markTrueClicked:")]
+		partial void markTrueClicked (AppKit.NSButton sender);
 
-            if (constructionAmountNew != null) {
-                constructionAmountNew.Dispose ();
-                constructionAmountNew = null;
-            }
+		[Action ("propertyMenuChosen:")]
+		partial void propertyMenuChosen (AppKit.NSPopUpButton sender);
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (addButton != null) {
+				addButton.Dispose ();
+				addButton = null;
+			}
 
-            if (constructionDateNew != null) {
-                constructionDateNew.Dispose ();
-                constructionDateNew = null;
-            }
+			if (cashflowID != null) {
+				cashflowID.Dispose ();
+				cashflowID = null;
+			}
 
-            if (propertyMenu != null) {
-                propertyMenu.Dispose ();
-                propertyMenu = null;
-            }
+			if (constructionAmountNew != null) {
+				constructionAmountNew.Dispose ();
+				constructionAmountNew = null;
+			}
 
-            if (rehabDrawDisplayFalse != null) {
-                rehabDrawDisplayFalse.Dispose ();
-                rehabDrawDisplayFalse = null;
-            }
+			if (constructionDateNew != null) {
+				constructionDateNew.Dispose ();
+				constructionDateNew = null;
+			}
 
-            if (rehabDrawDisplayTrue != null) {
-                rehabDrawDisplayTrue.Dispose ();
-                rehabDrawDisplayTrue = null;
-            }
+			if (dateChangeButton != null) {
+				dateChangeButton.Dispose ();
+				dateChangeButton = null;
+			}
 
-            if (cashflowID != null) {
-                cashflowID.Dispose ();
-                cashflowID = null;
-            }
+			if (dateChanger != null) {
+				dateChanger.Dispose ();
+				dateChanger = null;
+			}
 
-            if (deleteButton != null) {
-                deleteButton.Dispose ();
-                deleteButton = null;
-            }
+			if (deleteButton != null) {
+				deleteButton.Dispose ();
+				deleteButton = null;
+			}
 
-            if (markTrueButton != null) {
-                markTrueButton.Dispose ();
-                markTrueButton = null;
-            }
+			if (markTrueButton != null) {
+				markTrueButton.Dispose ();
+				markTrueButton = null;
+			}
 
-            if (dateChanger != null) {
-                dateChanger.Dispose ();
-                dateChanger = null;
-            }
+			if (propertyMenu != null) {
+				propertyMenu.Dispose ();
+				propertyMenu = null;
+			}
 
-            if (dateChangeButton != null) {
-                dateChangeButton.Dispose ();
-                dateChangeButton = null;
-            }
-        }
-    }
+			if (rehabDrawDisplayFalse != null) {
+				rehabDrawDisplayFalse.Dispose ();
+				rehabDrawDisplayFalse = null;
+			}
+
+			if (rehabDrawDisplayTrue != null) {
+				rehabDrawDisplayTrue.Dispose ();
+				rehabDrawDisplayTrue = null;
+			}
+
+			if (LoanStatusTextField != null) {
+				LoanStatusTextField.Dispose ();
+				LoanStatusTextField = null;
+			}
+		}
+	}
 }

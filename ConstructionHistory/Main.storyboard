@@ -843,9 +843,19 @@
                                     <action selector="dateChangeClicked:" target="XfG-lQ-9wD" id="o4O-yG-hUb"/>
                                 </connections>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="edk-cc-w53">
+                                <rect key="frame" x="179" y="422" width="347" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Loan Status" id="KUv-uw-mHF">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="LoanStatusTextField" destination="edk-cc-w53" id="Bzh-aI-1f1"/>
                         <outlet property="addButton" destination="6el-jL-hHA" id="TOg-9p-ViI"/>
                         <outlet property="cashflowID" destination="LiE-aG-tUK" id="rln-zY-gxS"/>
                         <outlet property="constructionAmountNew" destination="F70-83-EEe" id="Xu3-eI-vTk"/>

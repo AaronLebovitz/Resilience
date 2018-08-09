@@ -131,6 +131,18 @@ namespace ConstructionHistory
         {
             chosenID = clsLoan.LoanID(propertyMenu.TitleOfSelectedItem);
             clsLoan l = new clsLoan(chosenID);
+            if ((l.Status() == clsLoan.State.PendingSale) || (l.Status() == clsLoan.State.Sold))
+            {
+                this.LoanStatusTextField.TextColor = NSColor.Red;
+                this.LoanStatusTextField.StringValue = l.Status().ToString().ToUpper();
+                if (l.Status() == clsLoan.State.PendingSale)
+                    this.LoanStatusTextField.StringValue += " *** CHECK PAYOFF LETTER";
+            }
+            else
+            {
+                this.LoanStatusTextField.TextColor = NSColor.Black;
+                this.LoanStatusTextField.StringValue = l.Status().ToString();
+            }
             rehabDrawDisplayTrue.StringValue = "Payed draws:" + "\n";
             rehabDrawDisplayFalse.StringValue = "Not payed draws:" + "\n";
 
