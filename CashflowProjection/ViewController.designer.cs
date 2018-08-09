@@ -34,6 +34,9 @@ namespace CashflowProjection
 		AppKit.NSButton FullDetailCheckBox { get; set; }
 
 		[Outlet]
+		AppKit.NSPopUpButton LenderPopUp { get; set; }
+
+		[Outlet]
 		AppKit.NSButton OutflowsOnlyButton { get; set; }
 
 		[Outlet]
@@ -62,6 +65,9 @@ namespace CashflowProjection
 
 		[Action ("FullDetailCheckBoxPressed:")]
 		partial void FullDetailCheckBoxPressed (AppKit.NSButton sender);
+
+		[Action ("LenderSelected:")]
+		partial void LenderSelected (AppKit.NSPopUpButton sender);
 
 		[Action ("NAVExportPressed:")]
 		partial void NAVExportPressed (AppKit.NSButton sender);
@@ -150,6 +156,11 @@ namespace CashflowProjection
 			if (TypeFilterComboBox != null) {
 				TypeFilterComboBox.Dispose ();
 				TypeFilterComboBox = null;
+			}
+
+			if (LenderPopUp != null) {
+				LenderPopUp.Dispose ();
+				LenderPopUp = null;
 			}
 		}
 	}

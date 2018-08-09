@@ -25,6 +25,9 @@ namespace CashflowProjection
         private bool includeNonActual = true;
         private string addressFilter = "All";
         private clsCashflow.Type typeFilter = clsCashflow.Type.Unknown;
+        private int lenderID = -1;
+        private List<int> lenderIndexToID = new List<int>();
+        private List<int> lenderLoanIDs = new List<int>();
 
         #endregion
 
@@ -83,6 +86,19 @@ namespace CashflowProjection
             this.dataSourceDelegate = new CashflowTableDataSourceDelegate(this.dataSource);
             this.CashflowTableView.DataSource = this.dataSource;
             this.CashflowTableView.Delegate = this.dataSourceDelegate;
+
+            this.LenderPopUp.RemoveItem("Item 2");
+            this.LenderPopUp.RemoveItem("Item 3");
+            clsCSVTable tblLenders = new clsCSVTable(clsEntity.strEntityPath);
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tblLenders.Length(); i++)
+            {
+                if (tblLoans.Matches(clsLoan.LenderColumn, i.ToString()).Count > 0)
+                {
+                    this.LenderPopUp.AddItem(tblLenders.Value(i, clsEntity.NameColumn));
+                    this.lenderIndexToID.Add(i);
+                }
+            }
         }
 
         public override NSObject RepresentedObject
@@ -312,6 +328,22 @@ namespace CashflowProjection
             this.ReloadCashflows();
         }
 
+        partial void LenderSelected(NSPopUpButton sender)
+        {
+            this.lenderLoanIDs.Clear();
+            if (this.LenderPopUp.IndexOfSelectedItem > 0)
+            {
+                this.lenderID = this.lenderIndexToID[(int)this.LenderPopUp.IndexOfSelectedItem - 1];
+                clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+                this.lenderLoanIDs = tblLoans.Matches(clsLoan.LenderColumn, this.lenderID.ToString());
+            }
+            else
+            {
+                this.lenderID = -1;
+            }
+            this.RefreshTable();
+        }
+
         #endregion
 
         #region Private Methods
@@ -341,10 +373,14 @@ namespace CashflowProjection
             // compile included cashflows
             foreach (clsCashflow cf in this.activeCashflows)
             {
-                bool bInclude = false;
-                bInclude = (((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual())));
+                // cashflow must be part of a loan that belongs to the selected Lender
+                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID());
+                // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
+                bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
+                // cashflow must belong to selected address OR no address must be selected ("All")
                 if (bInclude)
                     bInclude = ((this.addressFilter == "All") || (this.addressToLoanID[this.addressFilter] == cf.LoanID()));
+                // cashflow must be of type chosen, or no type must be chosen
                 if (bInclude) bInclude = ((this.typeFilter == clsCashflow.Type.Unknown) || (this.typeFilter == cf.TypeID()));
                 if (bInclude)
                 {

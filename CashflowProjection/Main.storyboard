@@ -1170,6 +1170,24 @@
                                     <action selector="ReloadButtonPushed:" target="XfG-lQ-9wD" id="AWh-EI-YTx"/>
                                 </connections>
                             </button>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wML-0g-sPh">
+                                <rect key="frame" x="681" y="692" width="182" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Lender" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="XHt-Zs-o4n" id="5er-Wg-v2x">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="zze-f3-iwy">
+                                        <items>
+                                            <menuItem title="Lender" state="on" id="XHt-Zs-o4n"/>
+                                            <menuItem title="Item 2" id="0v8-zC-MDj"/>
+                                            <menuItem title="Item 3" id="253-R0-sjn"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="LenderSelected:" target="XfG-lQ-9wD" id="h1x-jD-nze"/>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
@@ -1180,6 +1198,7 @@
                         <outlet property="DateFilterDatePicker" destination="vpq-Dt-Ppy" id="RNv-4i-Iuj"/>
                         <outlet property="EndDatePicker" destination="dnl-5R-TYb" id="ExY-P5-ezP"/>
                         <outlet property="FullDetailCheckBox" destination="fkk-pd-Reu" id="Bm9-oI-Kpy"/>
+                        <outlet property="LenderPopUp" destination="wML-0g-sPh" id="ECG-1m-qcy"/>
                         <outlet property="OutflowsOnlyButton" destination="cas-77-Ova" id="NVH-Sl-IBx"/>
                         <outlet property="ScenarioButton" destination="rsZ-Zj-my3" id="KqJ-zk-TNK"/>
                         <outlet property="ScheduledOnlyButton" destination="0hi-4r-OgG" id="Hvt-R4-IVn"/>
