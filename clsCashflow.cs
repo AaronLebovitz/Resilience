@@ -16,7 +16,8 @@ namespace ResilienceClasses
             InitialExpenseDraw, Acquisition, Repayment
         }
 
-        public static string strCashflowPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblCashflow.csv";
+        public static string strCashflowPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblCashflow.csv";
+            // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblCashflow.csv";
         public static int LoanColumn = 1;
         public static int TransactionDateColumn = 2;
         public static int AmountColumn = 3;

@@ -10,7 +10,8 @@ namespace ResilienceClasses
         #region Enums and Static Values
         public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
 
-        public static string strLoanPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
+        public static string strLoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
+            // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
         public static int IndexColumn = 0;
         public static int PropertyColumn = 1;
         public static int TitleHolderColumn = 2;
@@ -671,6 +672,14 @@ namespace ResilienceClasses
             return this._ProjectedToBePaid(dt, clsCashflow.Type.InterestAdditional);
         }
 
+        public double PastDueAdditionalInterest()
+        { return this.PastDueAdditionalInterest(System.DateTime.Today); }
+
+        public double PastDueAdditionalInterest(DateTime dt)
+        {
+            return this._PastDue(dt, clsCashflow.Type.InterestAdditional);
+        }
+
         public double IRR(bool original)
         {
             double dPrevValue;
@@ -848,7 +857,7 @@ namespace ResilienceClasses
 
         private double _ProjectedToBePaid(DateTime dt, clsCashflow.Type t)
         {
-            double dRemain = 0;
+            double dRemain = 0D;
             if (this.cfCashflows.Count == 0)
             {
                 return 0;
@@ -863,6 +872,22 @@ namespace ResilienceClasses
                     }
                 }
                 return dRemain;
+            }
+        }
+
+        private double _PastDue(DateTime dt, clsCashflow.Type t)
+        {
+            double dPastDue = 0D;
+            if (this.cfCashflows.Count == 0)
+                return 0;
+            else
+            {
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    if ((cf.PayDate() <= dt) && (cf.DeleteDate() > dt.AddYears(100)) && (cf.TypeID() == t) && (!cf.Actual()))
+                        dPastDue += cf.Amount();
+                }
+                return dPastDue;
             }
         }
 

@@ -8,7 +8,8 @@ namespace ResilienceClasses
     public class clsProperty
     {
         #region Enums and Static Values
-        public static string strPropertyPath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblProperty.csv";
+        public static string strPropertyPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblProperty.csv";
+            // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblProperty.csv";
         public static int TownColumn = 1;
         public static int CountyColumn = 2;
         public static int StateColumn = 3;
