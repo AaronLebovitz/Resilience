@@ -374,7 +374,7 @@ namespace CashflowProjection
             foreach (clsCashflow cf in this.activeCashflows)
             {
                 // cashflow must be part of a loan that belongs to the selected Lender
-                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID());
+                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() < 0);
                 // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
                 bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
                 // cashflow must belong to selected address OR no address must be selected ("All")
