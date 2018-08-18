@@ -70,9 +70,17 @@ namespace ManageSales
                 {
                     this.CancelScheduledSale();
                 }
-                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Mark Repaid")
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Mark Loan Repaid")
                 {
                     this.MarkRepaid();
+                }
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Mark Addl Int Actual")
+                {
+                    this.MarkAdditionalInterestActual();
+                }
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Update/Add")
+                {
+                    this.UpdateScheduledAdditionalInterest();
                 }
             }
             this.UpdateChosenAddress(false);
@@ -93,13 +101,14 @@ namespace ManageSales
                     this.StatusMessageTextField.StringValue = "";
                 this.StatusTextField.StringValue = this.loan.Status().ToString();
                 this.RepaymentAmountTextField.DoubleValue = 0D;
+                this.SetDefaultLabels();
 
                 switch (this.loan.Status())
                 {
                     case clsLoan.State.PendingSale:
                         this.ChooseActionPopUp.AddItem("Cancel");
                         this.ChooseActionPopUp.AddItem("Update");
-                        if (this.loan.SaleDate() <= System.DateTime.Today) this.ChooseActionPopUp.AddItem("Mark Repaid");
+                        if (this.loan.SaleDate() <= System.DateTime.Today) this.ChooseActionPopUp.AddItem("Mark Loan Repaid");
                         this.SaleDatePicker.DateValue = (NSDate)this.loan.SaleDate().Date.ToUniversalTime();
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
                         this.ExpectedAdditionalInterestTextField.DoubleValue = this.loan.ScheduledAdditionalInterest(System.DateTime.Today.Date);
@@ -133,9 +142,14 @@ namespace ManageSales
                     case clsLoan.State.Cancelled:
                     case clsLoan.State.Sold:
                     default:
+                        this.SetSoldLabels();
+                        this.ChooseActionPopUp.AddItem("Update/Add");
+                        this.ChooseActionPopUp.AddItem("Mark Addl Int Actual");
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
-                        this.ExpectedAdditionalInterestTextField.DoubleValue = 0D;
-                        this.SaleDatePicker.DateValue = (NSDate)System.DateTime.Today.Date;
+                        this.ExpectedAdditionalInterestTextField.DoubleValue = this.loan.ScheduledAdditionalInterest() 
+                                                                             + this.loan.PastDueAdditionalInterest();
+                        this.SaleDatePicker.DateValue = 
+                            (NSDate)this.loan.FindDate(clsCashflow.Type.InterestAdditional,false,true).ToUniversalTime();
                         break;
 
                 }
@@ -469,6 +483,74 @@ namespace ManageSales
             this.StatusMessageTextField.StringValue += "\nInterest : " + interest.ToString("#,##0.00");
             this.StatusMessageTextField.StringValue += "\nTotal    : " + (principal + interest).ToString("#,##0.00");
             this.StatusMessageTextField.StringValue += "\nPer Diem : " + perDiem.ToString("#,##0.00");
+        }
+
+        private void MarkAdditionalInterestActual()
+        {
+            double dAddlInterestReceived = 0D;
+            this.StatusMessageTextField.StringValue = "";
+            foreach (clsCashflow cf in this.loan.Cashflows())
+            {
+                if ((cf.TypeID() == clsCashflow.Type.InterestAdditional) 
+                    && (cf.PayDate() <= System.DateTime.Today) 
+                    && (!cf.Actual())
+                    && (cf.DeleteDate() > System.DateTime.Today))
+                {
+                    if (cf.MarkActual(System.DateTime.Today))
+                    {
+                        this.StatusMessageTextField.StringValue += cf.Amount().ToString("#,##0.00") + "(" + cf.TransactionID().ToString() + ") Marked ACTUAL\n";
+                        dAddlInterestReceived += cf.Amount();
+                    }
+                    else
+                        this.StatusMessageTextField.StringValue += "!" + cf.TransactionID().ToString() + "! FAILED\n";
+                }
+            }
+            this.StatusMessageTextField.StringValue += "Total Marked Actual: " + dAddlInterestReceived.ToString("#,##0.00");
+            this.loan.Save();
+        }
+
+        private void UpdateScheduledAdditionalInterest()
+        {
+            double dAddlInterestExpired = 0D;
+            this.StatusMessageTextField.StringValue = "";
+            foreach (clsCashflow cf in this.loan.Cashflows())
+            {
+                if ((cf.TypeID() == clsCashflow.Type.InterestAdditional) && (!cf.Actual()) && (cf.DeleteDate() > System.DateTime.Today))
+                {
+                    if (cf.Delete(System.DateTime.Today))
+                    {
+                        this.StatusMessageTextField.StringValue += cf.Amount().ToString("#,##0.00") + "(" + cf.TransactionID().ToString() + ") EXPIRED\n";
+                        dAddlInterestExpired += cf.Amount();
+                    }
+                    else
+                        this.StatusMessageTextField.StringValue += "!" + cf.TransactionID().ToString() + "! FAILED\n";
+                }
+            }
+            loan.AddCashflow(new clsCashflow((DateTime)this.SaleDatePicker.DateValue,
+                                             (DateTime)this.RecordDatePicker.DateValue,
+                                             System.DateTime.MaxValue,
+                                             this.loan.ID(),
+                                             this.ExpectedAdditionalInterestTextField.DoubleValue,
+                                             false,
+                                             clsCashflow.Type.InterestAdditional));
+            this.StatusMessageTextField.StringValue += "\nTotal Expired: " + dAddlInterestExpired.ToString("#,##0.00");
+            this.loan.Save();
+        }
+
+        private void SetDefaultLabels()
+        {
+            this.SalePriceLabel.StringValue = "Expected Sale Price (Net)";
+            this.CashflowDateLabel.StringValue = "Expected Sale Date";
+            this.RepaymentAmountLabel.StringValue = "Repayment Amount Received";
+            this.AdditionalInterestLabel.StringValue = "Expected Additional Interest";
+        }
+
+        private void SetSoldLabels()
+        { 
+            this.SalePriceLabel.StringValue = "N/A";
+            this.CashflowDateLabel.StringValue = "Addl Interest Pay Date";
+            this.RepaymentAmountLabel.StringValue = "N/A";
+            this.AdditionalInterestLabel.StringValue = "Addl Interest Amount";
         }
     }
 }

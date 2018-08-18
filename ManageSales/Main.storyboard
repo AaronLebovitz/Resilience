@@ -860,14 +860,18 @@
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="AdditionalInterestLabel" destination="EGP-hI-Ara" id="5hZ-gx-Xhd"/>
                         <outlet property="AddressComboBox" destination="CrU-LA-RaC" id="emZ-1U-SBR"/>
+                        <outlet property="CashflowDateLabel" destination="AUx-iN-qFe" id="Z7k-0K-VjX"/>
                         <outlet property="ChooseActionPopUp" destination="IZN-CC-GQX" id="Ynt-hd-bJ3"/>
                         <outlet property="ConractReceivedCheckBox" destination="bLL-iL-nZV" id="RlQ-LH-Ugm"/>
                         <outlet property="ExpectedAdditionalInterestTextField" destination="Gfb-qM-Her" id="JMH-Yr-MMd"/>
                         <outlet property="ExpectedSalePriceTextField" destination="Y3B-Ct-YIC" id="rpl-wN-f11"/>
                         <outlet property="RecordDatePicker" destination="GmG-C7-PIH" id="17Y-u2-Q4b"/>
+                        <outlet property="RepaymentAmountLabel" destination="o0A-gy-d9a" id="iQA-BJ-3dl"/>
                         <outlet property="RepaymentAmountTextField" destination="Hqf-bp-sUQ" id="kau-jL-bxx"/>
                         <outlet property="SaleDatePicker" destination="Ecv-ac-mhS" id="QiT-U0-RfS"/>
+                        <outlet property="SalePriceLabel" destination="JqJ-Xb-Krl" id="vr8-ji-RFQ"/>
                         <outlet property="StatusMessageTextField" destination="dch-QK-Bmr" id="2j7-7o-S3A"/>
                         <outlet property="StatusTextField" destination="bX3-hW-7de" id="A0N-E9-Ged"/>
                     </connections>

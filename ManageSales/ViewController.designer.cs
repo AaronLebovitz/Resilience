@@ -9,99 +9,131 @@ using System.CodeDom.Compiler;
 
 namespace ManageSales
 {
-    [Register ("ViewController")]
-    partial class ViewController
-    {
-        [Outlet]
-        AppKit.NSComboBox AddressComboBox { get; set; }
+	[Register ("ViewController")]
+	partial class ViewController
+	{
+		[Outlet]
+		AppKit.NSTextField AdditionalInterestLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSPopUpButton ChooseActionPopUp { get; set; }
+		[Outlet]
+		AppKit.NSComboBox AddressComboBox { get; set; }
 
-        [Outlet]
-        AppKit.NSButton ConractReceivedCheckBox { get; set; }
+		[Outlet]
+		AppKit.NSTextField CashflowDateLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ExpectedAdditionalInterestTextField { get; set; }
+		[Outlet]
+		AppKit.NSPopUpButton ChooseActionPopUp { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ExpectedSalePriceTextField { get; set; }
+		[Outlet]
+		AppKit.NSButton ConractReceivedCheckBox { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker RecordDatePicker { get; set; }
+		[Outlet]
+		AppKit.NSTextField ExpectedAdditionalInterestTextField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField RepaymentAmountTextField { get; set; }
+		[Outlet]
+		AppKit.NSTextField ExpectedSalePriceTextField { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker SaleDatePicker { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker RecordDatePicker { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField StatusMessageTextField { get; set; }
+		[Outlet]
+		AppKit.NSTextField RepaymentAmountLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField StatusTextField { get; set; }
+		[Outlet]
+		AppKit.NSTextField RepaymentAmountTextField { get; set; }
 
-        [Action ("AddressChosen:")]
-        partial void AddressChosen (AppKit.NSComboBox sender);
+		[Outlet]
+		AppKit.NSDatePicker SaleDatePicker { get; set; }
 
-        [Action ("ContractReceivedToggled:")]
-        partial void ContractReceivedToggled (AppKit.NSButton sender);
+		[Outlet]
+		AppKit.NSTextField SalePriceLabel { get; set; }
 
-        [Action ("GoButtonPressed:")]
-        partial void GoButtonPressed (AppKit.NSButton sender);
-        
-        void ReleaseDesignerOutlets ()
-        {
-            if (AddressComboBox != null) {
-                AddressComboBox.Dispose ();
-                AddressComboBox = null;
-            }
+		[Outlet]
+		AppKit.NSTextField StatusMessageTextField { get; set; }
 
-            if (ChooseActionPopUp != null) {
-                ChooseActionPopUp.Dispose ();
-                ChooseActionPopUp = null;
-            }
+		[Outlet]
+		AppKit.NSTextField StatusTextField { get; set; }
 
-            if (ExpectedAdditionalInterestTextField != null) {
-                ExpectedAdditionalInterestTextField.Dispose ();
-                ExpectedAdditionalInterestTextField = null;
-            }
+		[Action ("AddressChosen:")]
+		partial void AddressChosen (AppKit.NSComboBox sender);
 
-            if (ExpectedSalePriceTextField != null) {
-                ExpectedSalePriceTextField.Dispose ();
-                ExpectedSalePriceTextField = null;
-            }
+		[Action ("ContractReceivedToggled:")]
+		partial void ContractReceivedToggled (AppKit.NSButton sender);
 
-            if (RepaymentAmountTextField != null) {
-                RepaymentAmountTextField.Dispose ();
-                RepaymentAmountTextField = null;
-            }
+		[Action ("GoButtonPressed:")]
+		partial void GoButtonPressed (AppKit.NSButton sender);
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (AddressComboBox != null) {
+				AddressComboBox.Dispose ();
+				AddressComboBox = null;
+			}
 
-            if (SaleDatePicker != null) {
-                SaleDatePicker.Dispose ();
-                SaleDatePicker = null;
-            }
+			if (ChooseActionPopUp != null) {
+				ChooseActionPopUp.Dispose ();
+				ChooseActionPopUp = null;
+			}
 
-            if (StatusMessageTextField != null) {
-                StatusMessageTextField.Dispose ();
-                StatusMessageTextField = null;
-            }
+			if (ConractReceivedCheckBox != null) {
+				ConractReceivedCheckBox.Dispose ();
+				ConractReceivedCheckBox = null;
+			}
 
-            if (StatusTextField != null) {
-                StatusTextField.Dispose ();
-                StatusTextField = null;
-            }
+			if (ExpectedAdditionalInterestTextField != null) {
+				ExpectedAdditionalInterestTextField.Dispose ();
+				ExpectedAdditionalInterestTextField = null;
+			}
 
-            if (RecordDatePicker != null) {
-                RecordDatePicker.Dispose ();
-                RecordDatePicker = null;
-            }
+			if (ExpectedSalePriceTextField != null) {
+				ExpectedSalePriceTextField.Dispose ();
+				ExpectedSalePriceTextField = null;
+			}
 
-            if (ConractReceivedCheckBox != null) {
-                ConractReceivedCheckBox.Dispose ();
-                ConractReceivedCheckBox = null;
-            }
-        }
-    }
+			if (RecordDatePicker != null) {
+				RecordDatePicker.Dispose ();
+				RecordDatePicker = null;
+			}
+
+			if (RepaymentAmountTextField != null) {
+				RepaymentAmountTextField.Dispose ();
+				RepaymentAmountTextField = null;
+			}
+
+			if (SaleDatePicker != null) {
+				SaleDatePicker.Dispose ();
+				SaleDatePicker = null;
+			}
+
+			if (StatusMessageTextField != null) {
+				StatusMessageTextField.Dispose ();
+				StatusMessageTextField = null;
+			}
+
+			if (StatusTextField != null) {
+				StatusTextField.Dispose ();
+				StatusTextField = null;
+			}
+
+			if (CashflowDateLabel != null) {
+				CashflowDateLabel.Dispose ();
+				CashflowDateLabel = null;
+			}
+
+			if (SalePriceLabel != null) {
+				SalePriceLabel.Dispose ();
+				SalePriceLabel = null;
+			}
+
+			if (AdditionalInterestLabel != null) {
+				AdditionalInterestLabel.Dispose ();
+				AdditionalInterestLabel = null;
+			}
+
+			if (RepaymentAmountLabel != null) {
+				RepaymentAmountLabel.Dispose ();
+				RepaymentAmountLabel = null;
+			}
+		}
+	}
 }
