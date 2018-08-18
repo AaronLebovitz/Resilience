@@ -35,7 +35,7 @@ namespace ManageNonLoanCashflows
                     (t == clsCashflow.Type.CapitalCall) ||
                     (t == clsCashflow.Type.CatchUp) ||
                     (t == clsCashflow.Type.Distribution) ||
-                    (t == clsCashflow.Type.InterestAdditional) ||
+//                    (t == clsCashflow.Type.InterestAdditional) ||
                     (t == clsCashflow.Type.LegalFees) ||
                     (t == clsCashflow.Type.ManagementFee) ||
                     (t == clsCashflow.Type.Misc) ||
@@ -98,7 +98,7 @@ namespace ManageNonLoanCashflows
             // VALIDATE ENTRIES
             if (this.typeChosen == clsCashflow.Type.Unknown)
             {
-                this.CommentTextField.StringValue += "\nINVALID CASHFLOW TYPE, UNABLE TO ADD";
+                this.SystemMessageTextField.StringValue = "INVALID CASHFLOW TYPE, UNABLE TO ADD";
             }
             else
             {
@@ -110,16 +110,17 @@ namespace ManageNonLoanCashflows
                 cashflow.Save();
                 this.CashflowIDTextField.IntValue = cashflow.ID();
                 // UPDATE COMMENT BOX
-                this.CommentTextField.StringValue += "\nCASHFLOW SAVED.";
+                this.SystemMessageTextField.StringValue = "CASHFLOW SAVED.";
                 if ((cashflow.TypeID() == clsCashflow.Type.InterestAdditional) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "\nCheck Amount.  Additional Interest is usually >= 0.";
+                    this.SystemMessageTextField.StringValue += "\nCheck Amount.  Additional Interest is usually >= 0.";
                 else if ((cashflow.TypeID() == clsCashflow.Type.CapitalCall) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "\nCheck Amount.  Capital Calls are usually >= 0.";
+                    this.SystemMessageTextField.StringValue += "\nCheck Amount.  Capital Calls are usually >= 0.";
                 else if ((cashflow.TypeID() == clsCashflow.Type.CatchUp) && (cashflow.Amount() < 0D))
-                    this.CommentTextField.StringValue += "\nCheck Amount.  Catchup Payments are usually >= 0.";
+                    this.SystemMessageTextField.StringValue += "\nCheck Amount.  Catchup Payments are usually >= 0.";
                 else if (cashflow.Amount() > 0)
-                    this.CommentTextField.StringValue += "\nCheck Amount.  Expenses are normally <0.";
+                    this.SystemMessageTextField.StringValue += "\nCheck Amount.  Expenses are normally <0.";
             }
+            RedrawTable();
         }
 
         partial void CashflowIDEntered(AppKit.NSTextField sender)
@@ -133,7 +134,7 @@ namespace ManageNonLoanCashflows
             if (this.TypePopUpButton.TitleOfSelectedItem == null)
             {
                 this.typeChosen = clsCashflow.Type.Unknown;
-                this.CommentTextField.StringValue = "INVALID CASHFLOW TYPE (" + cf.TypeID().ToString() + ")";
+                this.SystemMessageTextField.StringValue = "INVALID CASHFLOW TYPE (" + cf.TypeID().ToString() + ")";
                 this.validIDEntered = false;
             }
             else
@@ -146,6 +147,7 @@ namespace ManageNonLoanCashflows
                 this.RedrawTable();
             }
             this.ActualTextField.StringValue = "Actual : " + cf.Actual().ToString();
+            this.RedrawTable();
         }
 
         partial void ExpireButtonPressed(AppKit.NSButton sender)
@@ -155,14 +157,15 @@ namespace ManageNonLoanCashflows
                 clsCashflow cashflow = new clsCashflow(this.CashflowIDTextField.IntValue);
                 if (cashflow.Delete(System.DateTime.Now))
                 {
-                    this.CommentTextField.StringValue += "\nCASHFLOW EXPIRED";
+                    this.SystemMessageTextField.StringValue = "CASHFLOW EXPIRED";
                     cashflow.Save();
                 }
                 else
                 {
-                    this.CommentTextField.StringValue += "\nCASHFLOW IS ALREADY ACTUAL, EXPIRE FAILED";
+                    this.SystemMessageTextField.StringValue = "CASHFLOW IS ALREADY ACTUAL, EXPIRE FAILED";
                 }
             }
+            RedrawTable();
         }
 
         partial void RecordDateOverriden(AppKit.NSDatePicker sender)
@@ -181,19 +184,20 @@ namespace ManageNonLoanCashflows
                     this.CommentTextField.StringValue = "";
                 if (cashflow.Actual())
                 {
-                    this.CommentTextField.StringValue += "\nCASHFLOW IS ALREADY ACTUAL";
+                    this.SystemMessageTextField.StringValue = "CASHFLOW IS ALREADY ACTUAL";
                 }
                 else if (cashflow.MarkActual(System.DateTime.Today))
                 {
-                    this.CommentTextField.StringValue += "\nCASHFLOW MADE ACTUAL";
+                    this.SystemMessageTextField.StringValue = "CASHFLOW MADE ACTUAL";
                     this.ActualTextField.StringValue = "Actual : " + true.ToString();
                     cashflow.Save();
                 }
                 else
                 {
-                    this.CommentTextField.StringValue += "\nCASHFLOW EXPIRED, CAN'T MAKE ACTUAL";
+                    this.SystemMessageTextField.StringValue = "CASHFLOW EXPIRED, CAN'T MAKE ACTUAL";
                 }
             }
+            RedrawTable();
         }
 
         private void RedrawTable()
@@ -225,6 +229,7 @@ namespace ManageNonLoanCashflows
             this.CashflowIDTextField.StringValue = "Cashflow ID";
             this.CommentTextField.StringValue = "Comment";
             this.ActualTextField.StringValue = "";
+            this.SystemMessageTextField.StringValue = "";
             this.validIDEntered = false;
         }
 

@@ -6,7 +6,7 @@ using Foundation;
 
 namespace ManageNonLoanCashflows
 {
-    public class NonLoanCashflowDataSource:NSTableViewDataSource
+    public class NonLoanCashflowDataSource : NSTableViewDataSource
     {
 
         public List<clsCashflow> Cashflows;
@@ -67,6 +67,77 @@ namespace ManageNonLoanCashflows
             }
 
             return (NSString)text;
+        }
+
+        public void Sort(string key, bool ascending)
+        {
+
+            // Take action based on key
+            switch (key)
+            {
+                case "ID":
+                    if (ascending)
+                    {
+                        Cashflows.Sort((x, y) => x.ID().CompareTo(y.ID()));
+                    }
+                    else
+                    {
+                        Cashflows.Sort((x, y) => -1 * x.ID().CompareTo(y.ID()));
+                    }
+                    break;
+                case "PayDate":
+                    if (ascending)
+                    {
+                        Cashflows.Sort((x, y) => x.PayDate().CompareTo(y.PayDate()));
+                    }
+                    else
+                    {
+                        Cashflows.Sort((x, y) => -1 * x.PayDate().CompareTo(y.PayDate()));
+                    }
+                    break;
+                case "Amount":
+                    if (ascending)
+                    {
+                        Cashflows.Sort((x, y) => x.Amount().CompareTo(y.Amount()));
+                    }
+                    else
+                    {
+                        Cashflows.Sort((x, y) => -1 * x.Amount().CompareTo(y.Amount()));
+                    }
+                    break;
+                case "Type":
+                    if (ascending)
+                    {
+                        Cashflows.Sort((x, y) => x.TypeID().CompareTo(y.TypeID()));
+                    }
+                    else
+                    {
+                        Cashflows.Sort((x, y) => -1 * x.TypeID().CompareTo(y.TypeID()));
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        public override void SortDescriptorsChanged(NSTableView tableView, NSSortDescriptor[] oldDescriptors)
+        {
+            // Sort the data
+            //if (oldDescriptors.Length > 0)
+            //{
+            //    // Update sort
+            //    Sort(oldDescriptors[0].Key, oldDescriptors[0].Ascending);
+            //}
+            //else
+            //{
+                // Grab current descriptors and update sort
+                NSSortDescriptor[] tbSort = tableView.SortDescriptors;
+                Sort(tbSort[0].Key, tbSort[0].Ascending);
+            //}
+
+            // Refresh table
+            tableView.ReloadData();
         }
 
     }
