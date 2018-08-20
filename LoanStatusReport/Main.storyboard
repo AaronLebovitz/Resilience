@@ -746,9 +746,26 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bfD-HR-QLh">
+                                <rect key="frame" x="551" y="762" width="174" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Lender" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="65d-xw-5VM" id="dYS-a2-S8d">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="sU3-2K-y0k">
+                                        <items>
+                                            <menuItem title="Lender" state="on" id="65d-xw-5VM"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="LenderChosen:" target="XfG-lQ-9wD" id="maQ-tO-3ff"/>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="LenderPopUpButton" destination="bfD-HR-QLh" id="S3j-K2-f3X"/>
                         <outlet property="ReportDatePicker" destination="OPv-Ha-tef" id="G4a-fh-7vy"/>
                         <outlet property="ReportDatePicker2" destination="Nz1-ah-QHP" id="DgU-lR-2Di"/>
                         <outlet property="ReportSummaryTextLabel" destination="Jj1-B9-FC6" id="0bw-ys-phw"/>
@@ -760,7 +777,7 @@
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="168" y="1303"/>
+            <point key="canvasLocation" x="168" y="1302.5"/>
         </scene>
     </scenes>
 </document>

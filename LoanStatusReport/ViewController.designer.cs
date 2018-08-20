@@ -9,75 +9,86 @@ using System.CodeDom.Compiler;
 
 namespace LoanStatusReport
 {
-    [Register ("ViewController")]
-    partial class ViewController
-    {
-        [Outlet]
-        AppKit.NSDatePicker ReportDatePicker { get; set; }
+	[Register ("ViewController")]
+	partial class ViewController
+	{
+		[Outlet]
+		AppKit.NSPopUpButton LenderPopUpButton { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker ReportDatePicker2 { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker ReportDatePicker { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ReportSummaryTextLabel { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker ReportDatePicker2 { get; set; }
 
-        [Outlet]
-        AppKit.NSTextFieldCell ReportSummaryTextLabelCell { get; set; }
+		[Outlet]
+		AppKit.NSTextField ReportSummaryTextLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSButton RunReportButton { get; set; }
+		[Outlet]
+		AppKit.NSTextFieldCell ReportSummaryTextLabelCell { get; set; }
 
-        [Outlet]
-        AppKit.NSButtonCell RunReportButtonCell { get; set; }
+		[Outlet]
+		AppKit.NSButton RunReportButton { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField UpdateLabel { get; set; }
+		[Outlet]
+		AppKit.NSButtonCell RunReportButtonCell { get; set; }
 
-        [Action ("DateChosen:")]
-        partial void DateChosen (AppKit.NSDatePicker sender);
+		[Outlet]
+		AppKit.NSTextField UpdateLabel { get; set; }
 
-        [Action ("RunPeriodReportButtonPushed:")]
-        partial void RunPeriodReportButtonPushed (AppKit.NSButton sender);
+		[Action ("DateChosen:")]
+		partial void DateChosen (AppKit.NSDatePicker sender);
 
-        [Action ("RunReportButtonPushed:")]
-        partial void RunReportButtonPushed (AppKit.NSButton sender);
-        
-        void ReleaseDesignerOutlets ()
-        {
-            if (ReportDatePicker != null) {
-                ReportDatePicker.Dispose ();
-                ReportDatePicker = null;
-            }
+		[Action ("LenderChosen:")]
+		partial void LenderChosen (AppKit.NSPopUpButton sender);
 
-            if (RunReportButton != null) {
-                RunReportButton.Dispose ();
-                RunReportButton = null;
-            }
+		[Action ("RunPeriodReportButtonPushed:")]
+		partial void RunPeriodReportButtonPushed (AppKit.NSButton sender);
 
-            if (RunReportButtonCell != null) {
-                RunReportButtonCell.Dispose ();
-                RunReportButtonCell = null;
-            }
+		[Action ("RunReportButtonPushed:")]
+		partial void RunReportButtonPushed (AppKit.NSButton sender);
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (ReportDatePicker != null) {
+				ReportDatePicker.Dispose ();
+				ReportDatePicker = null;
+			}
 
-            if (UpdateLabel != null) {
-                UpdateLabel.Dispose ();
-                UpdateLabel = null;
-            }
+			if (ReportDatePicker2 != null) {
+				ReportDatePicker2.Dispose ();
+				ReportDatePicker2 = null;
+			}
 
-            if (ReportDatePicker2 != null) {
-                ReportDatePicker2.Dispose ();
-                ReportDatePicker2 = null;
-            }
+			if (ReportSummaryTextLabel != null) {
+				ReportSummaryTextLabel.Dispose ();
+				ReportSummaryTextLabel = null;
+			}
 
-            if (ReportSummaryTextLabel != null) {
-                ReportSummaryTextLabel.Dispose ();
-                ReportSummaryTextLabel = null;
-            }
+			if (ReportSummaryTextLabelCell != null) {
+				ReportSummaryTextLabelCell.Dispose ();
+				ReportSummaryTextLabelCell = null;
+			}
 
-            if (ReportSummaryTextLabelCell != null) {
-                ReportSummaryTextLabelCell.Dispose ();
-                ReportSummaryTextLabelCell = null;
-            }
-        }
-    }
+			if (RunReportButton != null) {
+				RunReportButton.Dispose ();
+				RunReportButton = null;
+			}
+
+			if (RunReportButtonCell != null) {
+				RunReportButtonCell.Dispose ();
+				RunReportButtonCell = null;
+			}
+
+			if (UpdateLabel != null) {
+				UpdateLabel.Dispose ();
+				UpdateLabel = null;
+			}
+
+			if (LenderPopUpButton != null) {
+				LenderPopUpButton.Dispose ();
+				LenderPopUpButton = null;
+			}
+		}
+	}
 }

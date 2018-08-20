@@ -9,6 +9,9 @@ namespace LoanStatusReport
     public partial class ViewController : NSViewController
     {
         DateTime dtStartDateChosen;
+        private int lenderID = -1;
+        private List<int> lenderIndexToID = new List<int>();
+        private List<int> lenderLoanIDs = new List<int>();
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -21,6 +24,17 @@ namespace LoanStatusReport
             // Do any additional setup after loading the view.
             this.ReportDatePicker.DateValue = (NSDate)System.DateTime.Today;
             this.ReportDatePicker2.DateValue = (NSDate)System.DateTime.Today.AddDays(91);
+
+            clsCSVTable tblLenders = new clsCSVTable(clsEntity.strEntityPath);
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tblLenders.Length(); i++)
+            {
+                if (tblLoans.Matches(clsLoan.LenderColumn, i.ToString()).Count > 0)
+                {
+                    this.LenderPopUpButton.AddItem(tblLenders.Value(i, clsEntity.NameColumn));
+                    this.lenderIndexToID.Add(i);
+                }
+            }
         }
 
         public override NSObject RepresentedObject
@@ -74,6 +88,23 @@ namespace LoanStatusReport
             this.UpdateLabel.StringValue = "Completed.";
         }
 
+        partial void LenderChosen(NSPopUpButton sender)
+        {
+            this.lenderLoanIDs.Clear();
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            if (this.LenderPopUpButton.IndexOfSelectedItem > 0)
+            {
+                this.lenderID = this.lenderIndexToID[(int)this.LenderPopUpButton.IndexOfSelectedItem - 1];
+                this.lenderLoanIDs = tblLoans.Matches(clsLoan.LenderColumn, this.lenderID.ToString());
+            }
+            else
+            {
+                this.lenderID = -1;
+                for (int i = 0; i < tblLoans.Length(); i++)
+                    this.lenderLoanIDs.Add(i);
+            }
+        }
+
         #endregion
 
         private void CalculateAggregates(DateTime startDate, DateTime endDate)
@@ -113,27 +144,30 @@ namespace LoanStatusReport
             clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
             for (int i = 0; i < tbl.Length(); i++)
             {
-                clsLoan loan = new clsLoan(i);
-                clsLoan loanAsOfEndDate = loan.LoanAsOf(endDate);
-                if (loan.FindDate(clsCashflow.Type.AcquisitionPrice, true, false) <= endDate)
+                if (this.lenderLoanIDs.Contains(i))
                 {
-                    iLoansByStatus[(int)loan.LoanAsOf(startDate).Status(), 0]++;
-                    iLoansByStatus[(int)loanAsOfEndDate.Status(), 1]++;
-                    dTotalLent += loan.Balance(endDate) + loan.PrincipalPaid(endDate);
-                    dTotalRehabRemain += loanAsOfEndDate.RehabRemain(endDate);
-                    dRepaidPeriod += loan.PrincipalPaid(endDate) - loan.PrincipalPaid(startDate);
-                    dRepaidPreviously += loan.PrincipalPaid(startDate);
-                    dHardInterestPaidPreviously += loan.HardInterestPaid(startDate);
-                    dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - loan.HardInterestPaid(startDate);
-                    dAccruedThisPeriod += loan.AccruedInterest(endDate) - loan.AccruedInterest(startDate);
-                    dAdditionalInterestPaidThisPeriod += loan.AdditionalInterestPaid(endDate) - loan.AdditionalInterestPaid(startDate);
-                    dAdditionalInterestAccruedThisPeriod += loan.AccruedAdditionalInterest(endDate);  // needs fixing 
-                    dAdditionalInterestAccruedPreviousPeriod += loan.AccruedAdditionalInterest(startDate);  // needs fixing 
-                    dAccruedFTD += loan.AccruedInterest(endDate) + loan.HardInterestPaid(endDate);
-                    dAccruedNetAtStartDate += loan.AccruedInterest(startDate);
-                    if (loanAsOfEndDate.Status() == clsLoan.State.Listed) { dSaleListings += loan.Balance(endDate); }
-                    if (loanAsOfEndDate.Status() == clsLoan.State.PendingSale) { dSaleContracts += loan.Balance(endDate); }
-                    if (loanAsOfEndDate.Status() == clsLoan.State.PendingAcquisition) { dPendingAcq += loan.AcquisitionCost(false); }
+                    clsLoan loan = new clsLoan(i);
+                    clsLoan loanAsOfEndDate = loan.LoanAsOf(endDate);
+                    if (loan.FindDate(clsCashflow.Type.AcquisitionPrice, true, false) <= endDate)
+                    {
+                        iLoansByStatus[(int)loan.LoanAsOf(startDate).Status(), 0]++;
+                        iLoansByStatus[(int)loanAsOfEndDate.Status(), 1]++;
+                        dTotalLent += loan.Balance(endDate) + loan.PrincipalPaid(endDate);
+                        dTotalRehabRemain += loanAsOfEndDate.RehabRemain(endDate);
+                        dRepaidPeriod += loan.PrincipalPaid(endDate) - loan.PrincipalPaid(startDate);
+                        dRepaidPreviously += loan.PrincipalPaid(startDate);
+                        dHardInterestPaidPreviously += loan.HardInterestPaid(startDate);
+                        dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - loan.HardInterestPaid(startDate);
+                        dAccruedThisPeriod += loan.AccruedInterest(endDate) - loan.AccruedInterest(startDate);
+                        dAdditionalInterestPaidThisPeriod += loan.AdditionalInterestPaid(endDate) - loan.AdditionalInterestPaid(startDate);
+                        dAdditionalInterestAccruedThisPeriod += loan.AccruedAdditionalInterest(endDate);  // needs fixing 
+                        dAdditionalInterestAccruedPreviousPeriod += loan.AccruedAdditionalInterest(startDate);  // needs fixing 
+                        dAccruedFTD += loan.AccruedInterest(endDate) + loan.HardInterestPaid(endDate);
+                        dAccruedNetAtStartDate += loan.AccruedInterest(startDate);
+                        if (loanAsOfEndDate.Status() == clsLoan.State.Listed) { dSaleListings += loan.Balance(endDate); }
+                        if (loanAsOfEndDate.Status() == clsLoan.State.PendingSale) { dSaleContracts += loan.Balance(endDate); }
+                        if (loanAsOfEndDate.Status() == clsLoan.State.PendingAcquisition) { dPendingAcq += loan.AcquisitionCost(false); }
+                    }
                 }
             }
             dTotalCommitted = dTotalLent + dTotalRehabRemain + dPendingAcq;
@@ -203,8 +237,9 @@ namespace LoanStatusReport
         private void RunLoanStatusReport(DateTime dtReport)
         {
             // create report file
-            string fileName = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/LoanStatus";
+            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanStatus";
             fileName += dtReport.ToString("yyyyMMdd");
+            fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".txt";
             System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName);
 
@@ -215,7 +250,8 @@ namespace LoanStatusReport
             clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
             for (int i = 0; i < tbl.Length(); i++)
             {
-                this.WriteLoan(i, dtReport, sw);
+                if (this.lenderLoanIDs.Contains(i))
+                    this.WriteLoan(i, dtReport, sw);
             }
             sw.Close();
         }
@@ -293,8 +329,9 @@ namespace LoanStatusReport
             List<double> totals = new List<double>();
             for (int i = 0; i < 13; i++)
                 totals.Add(0D);
-            string fileName = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/LoanStatus";
+            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanStatus";
             fileName += dtReport.ToString("yyyyMMdd");
+            fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".htm";
             System.IO.StreamWriter sw = new System.IO.StreamWriter(fileName);
 
@@ -318,12 +355,13 @@ namespace LoanStatusReport
             clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
             for (int i = 0; i < tbl.Length(); i++)
             {
-                string rowID = "";
-                if ((i % 3) == 2) rowID = "ROW2";
-                this.WriteLoanHTML(i, dtReport, sw, totals, rowID);
-//                if ((i % 30) == 29) WriteHTMLHeaderRow(sw);
+                if (this.lenderLoanIDs.Contains(i))
+                {
+                    string rowID = "";
+                    if ((i % 3) == 2) rowID = "ROW2";
+                    this.WriteLoanHTML(i, dtReport, sw, totals, rowID);
+                }
             }
-
             // end of doc tags
             sw.WriteLine("<tr><td>TOTALS</td></tr>");
             sw.Write("<tr text-decoration:underline><td></td><td></td>");
