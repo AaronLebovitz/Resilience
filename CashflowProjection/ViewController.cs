@@ -99,6 +99,8 @@ namespace CashflowProjection
                     this.lenderIndexToID.Add(i);
                 }
             }
+            for (int i = 0; i < tblLoans.Length(); i++)
+                this.lenderLoanIDs.Add(i);
         }
 
         public override NSObject RepresentedObject
@@ -331,15 +333,17 @@ namespace CashflowProjection
         partial void LenderSelected(NSPopUpButton sender)
         {
             this.lenderLoanIDs.Clear();
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
             if (this.LenderPopUp.IndexOfSelectedItem > 0)
             {
                 this.lenderID = this.lenderIndexToID[(int)this.LenderPopUp.IndexOfSelectedItem - 1];
-                clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
                 this.lenderLoanIDs = tblLoans.Matches(clsLoan.LenderColumn, this.lenderID.ToString());
             }
             else
             {
                 this.lenderID = -1;
+                for (int i = 0; i < tblLoans.Length(); i++)
+                    this.lenderLoanIDs.Add(i);
             }
             this.RefreshTable();
         }
@@ -374,7 +378,7 @@ namespace CashflowProjection
             foreach (clsCashflow cf in this.activeCashflows)
             {
                 // cashflow must be part of a loan that belongs to the selected Lender
-                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() < 0);
+                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
                 // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
                 bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
                 // cashflow must belong to selected address OR no address must be selected ("All")
