@@ -14,6 +14,8 @@ namespace ManageNonLoanCashflows
         public bool showExpired = false;
         public bool showActualOnly = true;
         public bool validIDEntered = false;
+        private List<int> entityIndexToID = new List<int>();
+        private int entityID = -1;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -63,6 +65,17 @@ namespace ManageNonLoanCashflows
             this.CashflowsTableView.TableColumns()[7].Width = 200;
 //            this.CashflowsTableView.RemoveColumn(this.CashflowsTableView.TableColumns()[0]);
             this.CashflowsTableView.DataSource = this.dataSource;
+
+            clsCSVTable tblLenders = new clsCSVTable(clsEntity.strEntityPath);
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tblLenders.Length(); i++)
+            {
+                if (tblLoans.Matches(clsLoan.LenderColumn, i.ToString()).Count > 0)
+                {
+                    this.EntityPopUpButton.AddItem(tblLenders.Value(i, clsEntity.NameColumn));
+                    this.entityIndexToID.Add(i);
+                }
+            }
         }
 
         partial void TypeChosen(AppKit.NSPopUpButton sender)
@@ -100,10 +113,14 @@ namespace ManageNonLoanCashflows
             {
                 this.SystemMessageTextField.StringValue = "INVALID CASHFLOW TYPE, UNABLE TO ADD";
             }
+            else if (this.entityID < 0)
+            {
+                this.SystemMessageTextField.StringValue = "NO ENTITY SELECTED, UNABLE TO ADD";
+            }
             else
             {
                 // CREATE NEW CASHFLOW
-                clsCashflow cashflow = new clsCashflow(dtPay, dtRecord, System.DateTime.MaxValue, 0, dAmount, 
+                clsCashflow cashflow = new clsCashflow(dtPay, dtRecord, System.DateTime.MaxValue, -this.entityID, dAmount, 
                                                        false, this.typeChosen, this.CommentTextField.StringValue);
                 if (dtPay <= System.DateTime.Today.Date) cashflow.MarkActual(System.DateTime.Today.Date);
                 // SAVE TO TABLE
@@ -200,6 +217,12 @@ namespace ManageNonLoanCashflows
             RedrawTable();
         }
 
+        partial void EntityChosen(NSPopUpButton sender)
+        {
+            this.entityID = this.entityIndexToID[(int)this.EntityPopUpButton.IndexOfSelectedItem - 1];
+            RedrawTable();
+        }
+
         private void RedrawTable()
         {
             clsCSVTable tbl = new clsCSVTable(clsCashflow.strCashflowPath);
@@ -215,7 +238,7 @@ namespace ManageNonLoanCashflows
             foreach (int id in IDs)
             {
                 clsCashflow newCf = new clsCashflow(id);
-                if ((this.showExpired) || (newCf.DeleteDate() > System.DateTime.Today.AddYears(50)))
+                if (((this.showExpired) || (newCf.DeleteDate() > System.DateTime.Today.AddYears(50))) && (newCf.LoanID() == -this.entityID))
                     this.dataSource.Cashflows.Add(newCf);
             }
             this.CashflowsTableView.ReloadData();

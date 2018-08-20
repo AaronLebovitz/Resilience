@@ -34,6 +34,9 @@ namespace ManageNonLoanCashflows
 		AppKit.NSDatePicker DatePicker { get; set; }
 
 		[Outlet]
+		AppKit.NSPopUpButton EntityPopUpButton { get; set; }
+
+		[Outlet]
 		AppKit.NSScrollView ExistingCashflowsScrollView { get; set; }
 
 		[Outlet]
@@ -65,6 +68,9 @@ namespace ManageNonLoanCashflows
 
 		[Action ("DateChosen:")]
 		partial void DateChosen (AppKit.NSDatePicker sender);
+
+		[Action ("EntityChosen:")]
+		partial void EntityChosen (AppKit.NSPopUpButton sender);
 
 		[Action ("ExpireButtonPressed:")]
 		partial void ExpireButtonPressed (AppKit.NSButton sender);
@@ -138,14 +144,19 @@ namespace ManageNonLoanCashflows
 				ShowExpiredButton = null;
 			}
 
+			if (SystemMessageTextField != null) {
+				SystemMessageTextField.Dispose ();
+				SystemMessageTextField = null;
+			}
+
 			if (TypePopUpButton != null) {
 				TypePopUpButton.Dispose ();
 				TypePopUpButton = null;
 			}
 
-			if (SystemMessageTextField != null) {
-				SystemMessageTextField.Dispose ();
-				SystemMessageTextField = null;
+			if (EntityPopUpButton != null) {
+				EntityPopUpButton.Dispose ();
+				EntityPopUpButton = null;
 			}
 		}
 	}

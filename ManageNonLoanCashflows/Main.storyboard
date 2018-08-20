@@ -1022,7 +1022,7 @@
                                     </subviews>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Kc4-5Y-hIE">
-                                    <rect key="frame" x="1" y="7" width="0.0" height="16"/>
+                                    <rect key="frame" x="1" y="8" width="0.0" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="UzA-mb-s88">
@@ -1133,6 +1133,22 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QEN-Kt-8du">
+                                <rect key="frame" x="477" y="27" width="186" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Entity" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="Dwc-is-Fek" id="1Sw-h9-9Qk">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="lgx-8L-beV">
+                                        <items>
+                                            <menuItem title="Entity" state="on" id="Dwc-is-Fek"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="EntityChosen:" target="XfG-lQ-9wD" id="epY-tK-Jcm"/>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
@@ -1143,6 +1159,7 @@
                         <outlet property="CashflowsTableView" destination="nYg-Ns-guX" id="Tw6-q6-PhR"/>
                         <outlet property="CommentTextField" destination="Ify-2R-2JA" id="qpn-qc-Q1s"/>
                         <outlet property="DatePicker" destination="dki-Do-hF1" id="M9p-EJ-7pw"/>
+                        <outlet property="EntityPopUpButton" destination="QEN-Kt-8du" id="qqY-Zk-QSo"/>
                         <outlet property="ExistingCashflowsScrollView" destination="6Bc-Xl-Iio" id="L8w-zQ-lgE"/>
                         <outlet property="ExpireButton" destination="BM0-0x-PNz" id="weG-F0-jm2"/>
                         <outlet property="RecordDateOverridePicker" destination="CNb-1z-RRl" id="fHv-ed-w48"/>
