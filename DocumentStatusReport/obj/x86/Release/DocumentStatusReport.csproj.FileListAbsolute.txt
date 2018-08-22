@@ -1,0 +1,16 @@
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/bin/Release/DocumentStatusReport.exe
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/bin/Release/DocumentStatusReport.pdb
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/bin/Release/ResilienceClasses.dll
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/actool/partial-info.plist
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/actool/asset-manifest.plist
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/actool/bundle/AppIcon.icns
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/actool/bundle/Assets.car
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/ibtool-manifests/Main.storyboardc
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/ibtool/Main.storyboardc/Info.plist
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/ibtool/Main.storyboardc/MainMenu.nib
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/ibtool/Main.storyboardc/NSWindowController-B8D-0N-5wS.nib
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/ibtool/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/DocumentStatusReport.csprojResolveAssemblyReference.cache
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/DocumentStatusReport.csproj.CoreCompileInputs.cache
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/DocumentStatusReport.exe
+/Users/aaronlebovitz/Projects/AaronLebovitz/DocumentStatusReport/DocumentStatusReport/obj/x86/Release/DocumentStatusReport.pdb
