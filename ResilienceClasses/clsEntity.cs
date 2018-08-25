@@ -32,7 +32,12 @@ namespace ResilienceClasses
         #region Constructors
         public clsEntity(int id)
         {
-            this._Load(id);
+            this._Load(id, new clsCSVTable(clsEntity.strEntityPath));
+        }
+
+        public clsEntity(int id, clsCSVTable tbl)
+        {
+            this._Load(id, tbl);
         }
 
         public clsEntity(string name, string address, string town, string state, int zip, string phone, string contact, string email)
@@ -120,9 +125,8 @@ namespace ResilienceClasses
             return tbl.Length();
         }
 
-        private bool _Load(int id)
+        private bool _Load(int id, clsCSVTable tbl)
         {
-            clsCSVTable tbl = new clsCSVTable(clsEntity.strEntityPath);
             if (id < tbl.Length())
             {
                 this.iEntityID = id;

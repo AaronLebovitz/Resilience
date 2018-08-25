@@ -48,7 +48,7 @@ namespace ResilienceClasses
         #region Constructors
         public clsCashflow(int transactionID)
         {
-            this._Load(transactionID);
+            this._Load(transactionID, new clsCSVTable(clsDocumentRecord.strDocumentRecordPath));
         }
 
         public clsCashflow(int transactionID, clsCSVTable tbl)
@@ -109,12 +109,6 @@ namespace ResilienceClasses
             {
                 return false;
             }
-        }
-
-        private bool _Load(int transactionID)
-        {
-            clsCSVTable tbl = new clsCSVTable(clsCashflow.strCashflowPath);
-            return this._Load(transactionID, tbl);
         }
 
         public int Save()

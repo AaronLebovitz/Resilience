@@ -37,7 +37,12 @@ namespace ResilienceClasses
         #region Constructors
         public clsDocumentRecord(int id)
         {
-            this._Load(id);
+            this._Load(id, new clsCSVTable(clsDocumentRecord.strDocumentRecordPath));
+        }
+
+        public clsDocumentRecord(int id, clsCSVTable tbl)
+        {
+            this._Load(id, tbl);
         }
 
         public clsDocumentRecord(int docID, DateTime recordDate, DateTime actionDate, int senderID, int receiverID,
@@ -122,9 +127,8 @@ namespace ResilienceClasses
             return tbl.Length();
         }
 
-        private bool _Load(int id)
+        private bool _Load(int id, clsCSVTable tbl)
         {
-            clsCSVTable tbl = new clsCSVTable(clsDocumentRecord.strDocumentRecordPath);
             if (id < tbl.Length())
             {
                 this.iDocumentRecordID = id;

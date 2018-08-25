@@ -72,12 +72,22 @@ namespace ResilienceClasses
         #region Constructors
         public clsProperty(int propertyID)
         {
-            this._Load(propertyID);
+            this._Load(propertyID, new clsCSVTable(clsProperty.strPropertyPath));
+        }
+
+        public clsProperty(int propertyID, clsCSVTable tbl)
+        {
+            this._Load(propertyID, tbl);
         }
 
         public clsProperty(string address)
         {
-            this._Load(clsProperty.IDFromAddress(address));
+            this._Load(clsProperty.IDFromAddress(address), new clsCSVTable(clsProperty.strPropertyPath));
+        }
+
+        public clsProperty(string address, clsCSVTable tbl)
+        {
+            this._Load(clsProperty.IDFromAddress(address), tbl);
         }
 
         public clsProperty(string address, string town, string county, string state, double bpo, string nickname)
@@ -117,9 +127,8 @@ namespace ResilienceClasses
         #endregion
 
         #region DB Methods
-        private bool _Load(int propertyID)
+        private bool _Load(int propertyID, clsCSVTable tbl)
         {
-            clsCSVTable tbl = new clsCSVTable(clsProperty.strPropertyPath);
             if (propertyID < tbl.Length())
             {
                 this.iPropertyID = propertyID;

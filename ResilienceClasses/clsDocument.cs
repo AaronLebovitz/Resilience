@@ -60,7 +60,12 @@ namespace ResilienceClasses
         #region Constructors
         public clsDocument(int id)
         {
-            this._Load(id);
+            this._Load(id, new clsCSVTable(clsDocument.strDocumentPath));
+        }
+
+        public clsDocument(int id, clsCSVTable tbl)
+        {
+            this._Load(id, tbl);
         }
 
         public clsDocument(string name, int propertyID, clsDocument.Type type)
@@ -129,9 +134,8 @@ namespace ResilienceClasses
             return tbl.Length();
         }
 
-        private bool _Load(int id)
+        private bool _Load(int id, clsCSVTable tbl)
         {
-            clsCSVTable tbl = new clsCSVTable(clsDocument.strDocumentPath);
             if (id < tbl.Length())
             {
                 this.iDocumentID = id;

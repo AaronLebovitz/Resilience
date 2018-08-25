@@ -89,7 +89,28 @@ namespace ResilienceClasses
                 this.dPenaltyRate = 0D;
             }
             else
-                this._Load(loanID);
+                this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
+        }
+
+        public clsLoan(int loanID, clsCSVTable tbl)
+        {
+            if (loanID < 0)
+            {
+                this.iLoanID = loanID;
+                this.iPropertyID = -1;
+                this.iTitleHolderEntityID = -1;
+                this.iAcquisitionTitleCompanyEntityID = -1;
+                this.iCoBorrowerEntityID = -1;
+                this.iLenderEntityID = -1;
+                this.cfCashflows = new List<clsCashflow>();
+                this.pProperty = new clsProperty("N/A", "N/A", "N/A", "NA", 0, "FundOps");
+                this.dtMaturity = System.DateTime.MaxValue;
+                this.dtOrigination = System.DateTime.MinValue;
+                this.dRate = 0D;
+                this.dPenaltyRate = 0D;
+            }
+            else
+                this._Load(loanID, tbl);
         }
 
         public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID,
@@ -242,13 +263,12 @@ namespace ResilienceClasses
         #region Private Methods
         private bool _Load(int loanID)
         {
-            return this._Load(loanID, clsLoan.strLoanPath);
+            return this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
         }
 
-        private bool _Load(int loanID, string path)
+        private bool _Load(int loanID, clsCSVTable tbl)
         {
             this.iLoanID = loanID;
-            clsCSVTable tbl = new clsCSVTable(path);
             if (loanID < tbl.Length())
             {
                 this.iPropertyID = Int32.Parse(tbl.Value(loanID, clsLoan.PropertyColumn));
