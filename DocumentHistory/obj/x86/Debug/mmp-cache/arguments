@@ -1,0 +1,21 @@
+# Version: 4.4.99.193 (d15-7: 64fece5f)
+# [first argument, ignore] # /Library/Frameworks/Xamarin.Mac.framework/Versions/4.4.1.193/lib/mmp/mmp.exe
+/Library/Frameworks/Xamarin.Mac.framework/Versions/4.4.1.193/lib/mmp/mmp.exe \
+	/verbose \
+	/debug \
+	/output:/Users/aaronlebovitz/Projects/DocumentHistory/bin/Debug/ \
+	/name:DocumentHistory \
+	'/profile:Xamarin.Mac,Version=v2.0,Profile=Mobile' \
+	/arch:x86_64 \
+	--http-message-handler=HttpClientHandler \
+	/minos=10.13 \
+	/nolink \
+	/assembly:/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/mscorlib.dll \
+	/assembly:/Users/aaronlebovitz/Projects/ResilienceClasses/bin/Debug/ResilienceClasses.dll \
+	/assembly:/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/System.Core.dll \
+	/assembly:/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/System.dll \
+	/assembly:/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/Xamarin.Mac.dll \
+	/assembly:/Users/aaronlebovitz/Projects/ResilienceClasses/bin/Debug/ResilienceClasses.dll \
+	/root-assembly:/Users/aaronlebovitz/Projects/DocumentHistory/bin/Debug/DocumentHistory.exe \
+	/sdkroot:/Applications/Xcode.app/Contents/Developer \
+	--cache:/Users/aaronlebovitz/Projects/DocumentHistory/obj/x86/Debug/mmp-cache \
