@@ -82,7 +82,7 @@
     <InterfaceDefinition Include="Main.storyboard" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\AaronLebovitz\ResilienceClasses\ResilienceClasses.csproj">
+    <ProjectReference Include="..\ResilienceClasses\ResilienceClasses.csproj">
       <Project>{0D6DC509-1CD9-44F5-9B17-336E2783E96A}</Project>
       <Name>ResilienceClasses</Name>
     </ProjectReference>
