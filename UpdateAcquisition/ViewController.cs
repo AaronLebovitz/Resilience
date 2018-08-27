@@ -34,6 +34,8 @@ namespace UpdateAcquisition
             this.InitialDrawLabel.StringValue = "0";
             this.PropertyTaxLabel.StringValue = "0";
             this.TitlePolicyLabel.StringValue = "0";
+            this.LenderLabel.StringValue = "---";
+            this.BorrowerLabel.StringValue = "---";
 
             this.HOIField.StringValue = this.HOILabel.StringValue;
             this.PriceField.StringValue = this.PriceLabel.StringValue;
@@ -45,6 +47,13 @@ namespace UpdateAcquisition
             this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
             this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
             this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
+
+            clsCSVTable tblEntity = new clsCSVTable(clsEntity.strEntityPath);
+            for (int i = 0; i < tblEntity.Length(); i++)
+            {
+                this.LenderComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+                this.BorrowerComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+            }
         }
 
         public override NSObject RepresentedObject
@@ -67,6 +76,20 @@ namespace UpdateAcquisition
                 this.loanToUpdate = new clsLoan(clsLoan.LoanID(this.AddressComboBox.StringValue));
                 DateTime OGDate = loanToUpdate.OriginationDate();
                 this.ClosingDatePicker.DateValue = (NSDate)DateTime.SpecifyKind(OGDate, DateTimeKind.Utc);
+
+                //clear labels
+                this.ConcessionLabel.StringValue = "";
+                this.HOILabel.StringValue = "";
+                this.PriceLabel.StringValue = "";
+                this.AcqTaxLabel.StringValue = "";
+                this.RecordingLabel.StringValue = "";
+                this.ProcessingLabel.StringValue = "";
+                this.ClosingDateLabel.StringValue = "";
+                this.InitialDrawLabel.StringValue = "";
+                this.PropertyTaxLabel.StringValue = "";
+                this.TitlePolicyLabel.StringValue = "";
+
+                //reload labels
                 foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
                 {
                     if (cf.DeleteDate() > System.DateTime.Today.AddYears(100))
@@ -116,6 +139,10 @@ namespace UpdateAcquisition
                 this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
                 this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
                 this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
+                this.LenderComboBox.SelectItem(this.loanToUpdate.LenderID());
+                this.BorrowerComboBox.SelectItem(this.loanToUpdate.TitleHolderID());
+                this.LenderLabel.StringValue = (NSString)this.LenderComboBox.SelectedValue;
+                this.BorrowerLabel.StringValue = (NSString)this.BorrowerComboBox.SelectedValue;
             }
         }
 
@@ -126,7 +153,7 @@ namespace UpdateAcquisition
             {
                 this.SummaryMessageField.StringValue = "No loan selected.  No updates made.";
             }
-            else
+            else if (this.loanToUpdate.Status() != clsLoan.State.Cancelled)
             {
                 double dTotalCost = 0D;
                 foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
@@ -145,16 +172,40 @@ namespace UpdateAcquisition
                     }
                 }
                 this.SummaryMessageField.StringValue += "TOTAL Marked Actual = " + dTotalCost.ToString("#,##0.00");
-                this.SummaryMessageField.StringValue += "Loan Save to Files " + this.loanToUpdate.Save().ToString().ToUpper();
+                this.SummaryMessageField.StringValue += "Loan Save to Files " + this.loanToUpdate.Save().ToString().ToUpper() + "  " + this.loanToUpdate.Property().Address();
             }
+            else
+                this.SummaryMessageField.StringValue = "Failed to mark actual - loan has already been cancelled.  " + this.loanToUpdate.Property().Address();
         }
 
+        partial void CancelButtonPushed(NSButton sender)
+        {
+            if (this.loanToUpdate == null)
+                this.SummaryMessageField.StringValue = "No loan selected.  No updates made.";
+            else
+            {
+                if (this.loanToUpdate.Status() != clsLoan.State.Cancelled)
+                {
+                    this.loanToUpdate.Cancel();
+                    if (this.loanToUpdate.Save())
+                    {
+                        this.SummaryMessageField.StringValue = "Cancel successful.  " + this.loanToUpdate.Property().Address();
+                    }
+                    else
+                    {
+                        this.SummaryMessageField.StringValue = "Cancel Failed on Save.  " + this.loanToUpdate.Property().Address();
+                    }
+                }
+                else
+                    this.SummaryMessageField.StringValue = "Cancel Failed:  Loan already cancelled.  " + this.loanToUpdate.Property().Address();
+            }
+        }
         partial void UpdateButtonPushed(AppKit.NSButton sender)
         {
             this.SummaryMessageField.StringValue = "";
             if (this.loanToUpdate == null)
                 this.SummaryMessageField.StringValue = "No loan selected.  No updates made.";
-            else
+            else if (this.loanToUpdate.Status() != clsLoan.State.Cancelled)
             {
                 // only validaton is:  are any cashflows ACTUAL
                 bool bAnyActuals = false;
@@ -226,9 +277,12 @@ namespace UpdateAcquisition
                     foreach (clsCashflow cf in newCashflows) { this.loanToUpdate.AddCashflow(cf); }
                     // Update origination Date and Save
                     this.loanToUpdate.SetNewOriginationDate((DateTime)this.ClosingDatePicker.DateValue);
+                    this.loanToUpdate.LenderId = (int)this.LenderComboBox.SelectedIndex;
+                    this.loanToUpdate.BorrowerId = (int)this.BorrowerComboBox.SelectedIndex;
                     if (this.loanToUpdate.Save())
                     {
-                        this.SummaryMessageField.StringValue += "\nSave successful.  Old / New Acquisition Cost = ";
+                        this.SummaryMessageField.StringValue += "\nSave successful.  " + this.loanToUpdate.Property().Address();
+                        this.SummaryMessageField.StringValue += "\nOld / New Acquisition Cost =  " + this.loanToUpdate.Property().Address();
                         this.SummaryMessageField.StringValue += oldAcqCost.ToString("#,##0.00") + " / ";
                         this.SummaryMessageField.StringValue += this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
                     }
@@ -238,6 +292,9 @@ namespace UpdateAcquisition
                     }
                 }
             }
+            else
+                this.SummaryMessageField.StringValue = "Update failed.  Loan has already been cancelled.  " + this.loanToUpdate.Property().Address();
+
         }
     }
 }

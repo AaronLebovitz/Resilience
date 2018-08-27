@@ -9,203 +9,238 @@ using System.CodeDom.Compiler;
 
 namespace UpdateAcquisition
 {
-    [Register ("ViewController")]
-    partial class ViewController
-    {
-        [Outlet]
-        AppKit.NSTextField AcqTaxField { get; set; }
+	[Register ("ViewController")]
+	partial class ViewController
+	{
+		[Outlet]
+		AppKit.NSTextField AcqTaxField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField AcqTaxLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField AcqTaxLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSComboBox AddressComboBox { get; set; }
+		[Outlet]
+		AppKit.NSComboBox AddressComboBox { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ClosingDateLabel { get; set; }
+		[Outlet]
+		AppKit.NSComboBox BorrowerComboBox { get; set; }
 
-        [Outlet]
-        AppKit.NSDatePicker ClosingDatePicker { get; set; }
+		[Outlet]
+		AppKit.NSTextField BorrowerLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ConcessionField { get; set; }
+		[Outlet]
+		AppKit.NSTextField ClosingDateLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ConcessionLabel { get; set; }
+		[Outlet]
+		AppKit.NSDatePicker ClosingDatePicker { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField HOIField { get; set; }
+		[Outlet]
+		AppKit.NSTextField ConcessionField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField HOILabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField ConcessionLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField InitialDrawField { get; set; }
+		[Outlet]
+		AppKit.NSTextField HOIField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField InitialDrawLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField HOILabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField PriceField { get; set; }
+		[Outlet]
+		AppKit.NSTextField InitialDrawField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField PriceLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField InitialDrawLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ProcessingField { get; set; }
+		[Outlet]
+		AppKit.NSComboBox LenderComboBox { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField ProcessingLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField LenderLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField PropertyTaxField { get; set; }
+		[Outlet]
+		AppKit.NSTextField PriceField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField PropertyTaxLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField PriceLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField RecordingField { get; set; }
+		[Outlet]
+		AppKit.NSTextField ProcessingField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField RecordingLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField ProcessingLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField SummaryMessageField { get; set; }
+		[Outlet]
+		AppKit.NSTextField PropertyTaxField { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField TitlePolicyField { get; set; }
+		[Outlet]
+		AppKit.NSTextField PropertyTaxLabel { get; set; }
 
-        [Outlet]
-        AppKit.NSTextField TitlePolicyLabel { get; set; }
+		[Outlet]
+		AppKit.NSTextField RecordingField { get; set; }
 
-        [Outlet]
-        AppKit.NSButton UpdateAcquisitionButton { get; set; }
+		[Outlet]
+		AppKit.NSTextField RecordingLabel { get; set; }
 
-        [Action ("MarkActualPressed:")]
-        partial void MarkActualPressed (AppKit.NSButton sender);
+		[Outlet]
+		AppKit.NSTextField SummaryMessageField { get; set; }
 
-        [Action ("PropertyChosen:")]
-        partial void PropertyChosen (AppKit.NSComboBox sender);
+		[Outlet]
+		AppKit.NSTextField TitlePolicyField { get; set; }
 
-        [Action ("UpdateButtonPushed:")]
-        partial void UpdateButtonPushed (AppKit.NSButton sender);
-        
-        void ReleaseDesignerOutlets ()
-        {
-            if (AcqTaxField != null) {
-                AcqTaxField.Dispose ();
-                AcqTaxField = null;
-            }
+		[Outlet]
+		AppKit.NSTextField TitlePolicyLabel { get; set; }
 
-            if (AcqTaxLabel != null) {
-                AcqTaxLabel.Dispose ();
-                AcqTaxLabel = null;
-            }
+		[Outlet]
+		AppKit.NSButton UpdateAcquisitionButton { get; set; }
 
-            if (AddressComboBox != null) {
-                AddressComboBox.Dispose ();
-                AddressComboBox = null;
-            }
+		[Action ("CancelButtonPushed:")]
+		partial void CancelButtonPushed (AppKit.NSButton sender);
 
-            if (ClosingDateLabel != null) {
-                ClosingDateLabel.Dispose ();
-                ClosingDateLabel = null;
-            }
+		[Action ("MarkActualPressed:")]
+		partial void MarkActualPressed (AppKit.NSButton sender);
 
-            if (ClosingDatePicker != null) {
-                ClosingDatePicker.Dispose ();
-                ClosingDatePicker = null;
-            }
+		[Action ("PropertyChosen:")]
+		partial void PropertyChosen (AppKit.NSComboBox sender);
 
-            if (ConcessionField != null) {
-                ConcessionField.Dispose ();
-                ConcessionField = null;
-            }
+		[Action ("UpdateButtonPushed:")]
+		partial void UpdateButtonPushed (AppKit.NSButton sender);
+		
+		void ReleaseDesignerOutlets ()
+		{
+			if (AcqTaxField != null) {
+				AcqTaxField.Dispose ();
+				AcqTaxField = null;
+			}
 
-            if (ConcessionLabel != null) {
-                ConcessionLabel.Dispose ();
-                ConcessionLabel = null;
-            }
+			if (AcqTaxLabel != null) {
+				AcqTaxLabel.Dispose ();
+				AcqTaxLabel = null;
+			}
 
-            if (HOIField != null) {
-                HOIField.Dispose ();
-                HOIField = null;
-            }
+			if (AddressComboBox != null) {
+				AddressComboBox.Dispose ();
+				AddressComboBox = null;
+			}
 
-            if (HOILabel != null) {
-                HOILabel.Dispose ();
-                HOILabel = null;
-            }
+			if (BorrowerComboBox != null) {
+				BorrowerComboBox.Dispose ();
+				BorrowerComboBox = null;
+			}
 
-            if (InitialDrawField != null) {
-                InitialDrawField.Dispose ();
-                InitialDrawField = null;
-            }
+			if (BorrowerLabel != null) {
+				BorrowerLabel.Dispose ();
+				BorrowerLabel = null;
+			}
 
-            if (InitialDrawLabel != null) {
-                InitialDrawLabel.Dispose ();
-                InitialDrawLabel = null;
-            }
+			if (ClosingDateLabel != null) {
+				ClosingDateLabel.Dispose ();
+				ClosingDateLabel = null;
+			}
 
-            if (PriceField != null) {
-                PriceField.Dispose ();
-                PriceField = null;
-            }
+			if (ClosingDatePicker != null) {
+				ClosingDatePicker.Dispose ();
+				ClosingDatePicker = null;
+			}
 
-            if (PriceLabel != null) {
-                PriceLabel.Dispose ();
-                PriceLabel = null;
-            }
+			if (ConcessionField != null) {
+				ConcessionField.Dispose ();
+				ConcessionField = null;
+			}
 
-            if (ProcessingField != null) {
-                ProcessingField.Dispose ();
-                ProcessingField = null;
-            }
+			if (ConcessionLabel != null) {
+				ConcessionLabel.Dispose ();
+				ConcessionLabel = null;
+			}
 
-            if (ProcessingLabel != null) {
-                ProcessingLabel.Dispose ();
-                ProcessingLabel = null;
-            }
+			if (HOIField != null) {
+				HOIField.Dispose ();
+				HOIField = null;
+			}
 
-            if (PropertyTaxField != null) {
-                PropertyTaxField.Dispose ();
-                PropertyTaxField = null;
-            }
+			if (HOILabel != null) {
+				HOILabel.Dispose ();
+				HOILabel = null;
+			}
 
-            if (PropertyTaxLabel != null) {
-                PropertyTaxLabel.Dispose ();
-                PropertyTaxLabel = null;
-            }
+			if (InitialDrawField != null) {
+				InitialDrawField.Dispose ();
+				InitialDrawField = null;
+			}
 
-            if (RecordingField != null) {
-                RecordingField.Dispose ();
-                RecordingField = null;
-            }
+			if (InitialDrawLabel != null) {
+				InitialDrawLabel.Dispose ();
+				InitialDrawLabel = null;
+			}
 
-            if (RecordingLabel != null) {
-                RecordingLabel.Dispose ();
-                RecordingLabel = null;
-            }
+			if (LenderComboBox != null) {
+				LenderComboBox.Dispose ();
+				LenderComboBox = null;
+			}
 
-            if (SummaryMessageField != null) {
-                SummaryMessageField.Dispose ();
-                SummaryMessageField = null;
-            }
+			if (LenderLabel != null) {
+				LenderLabel.Dispose ();
+				LenderLabel = null;
+			}
 
-            if (TitlePolicyField != null) {
-                TitlePolicyField.Dispose ();
-                TitlePolicyField = null;
-            }
+			if (PriceField != null) {
+				PriceField.Dispose ();
+				PriceField = null;
+			}
 
-            if (TitlePolicyLabel != null) {
-                TitlePolicyLabel.Dispose ();
-                TitlePolicyLabel = null;
-            }
+			if (PriceLabel != null) {
+				PriceLabel.Dispose ();
+				PriceLabel = null;
+			}
 
-            if (UpdateAcquisitionButton != null) {
-                UpdateAcquisitionButton.Dispose ();
-                UpdateAcquisitionButton = null;
-            }
-        }
-    }
+			if (ProcessingField != null) {
+				ProcessingField.Dispose ();
+				ProcessingField = null;
+			}
+
+			if (ProcessingLabel != null) {
+				ProcessingLabel.Dispose ();
+				ProcessingLabel = null;
+			}
+
+			if (PropertyTaxField != null) {
+				PropertyTaxField.Dispose ();
+				PropertyTaxField = null;
+			}
+
+			if (PropertyTaxLabel != null) {
+				PropertyTaxLabel.Dispose ();
+				PropertyTaxLabel = null;
+			}
+
+			if (RecordingField != null) {
+				RecordingField.Dispose ();
+				RecordingField = null;
+			}
+
+			if (RecordingLabel != null) {
+				RecordingLabel.Dispose ();
+				RecordingLabel = null;
+			}
+
+			if (SummaryMessageField != null) {
+				SummaryMessageField.Dispose ();
+				SummaryMessageField = null;
+			}
+
+			if (TitlePolicyField != null) {
+				TitlePolicyField.Dispose ();
+				TitlePolicyField = null;
+			}
+
+			if (TitlePolicyLabel != null) {
+				TitlePolicyLabel.Dispose ();
+				TitlePolicyLabel = null;
+			}
+
+			if (UpdateAcquisitionButton != null) {
+				UpdateAcquisitionButton.Dispose ();
+				UpdateAcquisitionButton = null;
+			}
+		}
+	}
 }
