@@ -134,6 +134,18 @@ namespace ResilienceClasses
         #endregion
 
         #region Public Methods
+        public int LenderId
+        {
+            get { return this.iLenderEntityID; }
+            set { this.iLenderEntityID = value; }
+        }
+
+        public int BorrowerId
+        {
+            get { return this.iTitleHolderEntityID; }
+            set { this.iTitleHolderEntityID = value; }
+        }
+
         public clsLoan LoanAsOf(DateTime dt)
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
@@ -180,6 +192,16 @@ namespace ResilienceClasses
                 return true;
             }
             else return false;
+        }
+
+        public void Cancel() { this.Cancel(System.DateTime.Today); }
+
+        public void Cancel(DateTime dt)
+        {
+            this.dtMaturity = System.DateTime.MinValue;
+            this.dtOrigination = System.DateTime.MinValue;
+            foreach (clsCashflow cf in this.Cashflows())
+                cf.Delete(dt);
         }
 
         public bool Save() { return this.Save(clsLoan.strLoanPath, true, clsCashflow.strCashflowPath); }
