@@ -84,6 +84,9 @@ namespace ManageNonLoanCashflows
 		[Action ("ShowExpiredCheckBoxPressed:")]
 		partial void ShowExpiredCheckBoxPressed (AppKit.NSButton sender);
 
+		[Action ("TableViewEvent:")]
+		partial void TableViewEvent (AppKit.NSTableView sender);
+
 		[Action ("TypeChosen:")]
 		partial void TypeChosen (AppKit.NSPopUpButton sender);
 		
@@ -124,6 +127,11 @@ namespace ManageNonLoanCashflows
 				DatePicker = null;
 			}
 
+			if (EntityPopUpButton != null) {
+				EntityPopUpButton.Dispose ();
+				EntityPopUpButton = null;
+			}
+
 			if (ExistingCashflowsScrollView != null) {
 				ExistingCashflowsScrollView.Dispose ();
 				ExistingCashflowsScrollView = null;
@@ -152,11 +160,6 @@ namespace ManageNonLoanCashflows
 			if (TypePopUpButton != null) {
 				TypePopUpButton.Dispose ();
 				TypePopUpButton = null;
-			}
-
-			if (EntityPopUpButton != null) {
-				EntityPopUpButton.Dispose ();
-				EntityPopUpButton = null;
 			}
 		}
 	}

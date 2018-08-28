@@ -1018,6 +1018,9 @@
                                                     </prototypeCellViews>
                                                 </tableColumn>
                                             </tableColumns>
+                                            <connections>
+                                                <action selector="TableViewEvent:" target="XfG-lQ-9wD" id="ahV-pR-eg2"/>
+                                            </connections>
                                         </tableView>
                                     </subviews>
                                 </clipView>

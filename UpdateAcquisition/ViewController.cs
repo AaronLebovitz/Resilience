@@ -163,16 +163,16 @@ namespace UpdateAcquisition
                         if (cf.MarkActual(System.DateTime.Today))
                         {
                             this.SummaryMessageField.StringValue += "Marked actual " + cf.TypeID().ToString() +
-                                " (" + cf.TransactionID().ToString("#") + ")";
+                                " (" + cf.TransactionID().ToString("#") + ")\n";
                             dTotalCost += cf.Amount();
                         }
                         else
                             this.SummaryMessageField.StringValue += "FAILED to mark actual " + cf.TypeID().ToString() +
-                                " (" + cf.TransactionID().ToString("#") + ")";
+                                " (" + cf.TransactionID().ToString("#") + ")\n";
                     }
                 }
                 this.SummaryMessageField.StringValue += "TOTAL Marked Actual = " + dTotalCost.ToString("#,##0.00");
-                this.SummaryMessageField.StringValue += "Loan Save to Files " + this.loanToUpdate.Save().ToString().ToUpper() + "  " + this.loanToUpdate.Property().Address();
+                this.SummaryMessageField.StringValue += "\nLoan Save to Files " + this.loanToUpdate.Save().ToString().ToUpper() + "  " + this.loanToUpdate.Property().Address();
             }
             else
                 this.SummaryMessageField.StringValue = "Failed to mark actual - loan has already been cancelled.  " + this.loanToUpdate.Property().Address();

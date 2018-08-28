@@ -76,6 +76,8 @@ namespace ManageNonLoanCashflows
                     this.entityIndexToID.Add(i);
                 }
             }
+            this.entityID = this.entityIndexToID[0];
+            this.EntityPopUpButton.SelectItem(1);
         }
 
         partial void TypeChosen(AppKit.NSPopUpButton sender)
@@ -221,6 +223,17 @@ namespace ManageNonLoanCashflows
         {
             this.entityID = this.entityIndexToID[(int)this.EntityPopUpButton.IndexOfSelectedItem - 1];
             RedrawTable();
+        }
+
+        partial void TableViewEvent(NSTableView sender)
+        {
+            int selectedRowIndex = (int)this.CashflowsTableView.SelectedRow;
+            if (selectedRowIndex >= 0)
+            {
+                int cashflowID = this.dataSource.Cashflows[selectedRowIndex].ID();
+                this.CashflowIDTextField.IntValue = cashflowID;
+                this.CashflowIDEntered(this.CashflowIDTextField);
+            }
         }
 
         private void RedrawTable()
