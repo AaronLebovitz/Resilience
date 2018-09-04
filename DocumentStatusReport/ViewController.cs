@@ -129,6 +129,8 @@ namespace DocumentStatusReport
             sw.WriteLine("<tr id=HEADER>");
             title = "Property";
             sw.WriteLine("<th align=\"left\">" + title + "</th>");
+            title = "Status";
+            sw.WriteLine("<th align=\"left\">" + title + "</th>");
             foreach (clsDocument.Type t in Enum.GetValues(typeof(clsDocument.Type)))
             {
                 switch (t)
@@ -159,6 +161,7 @@ namespace DocumentStatusReport
         {
             streamWriter.WriteLine("<tr>");
             streamWriter.WriteLine("<td align=\"left\">" + address + "</td>");
+            streamWriter.WriteLine("<td align=\"left\">" + status.ToString() + "</td>");
             // loop through document types checking for docstatus given loan status
             foreach (clsDocument.Type t in Enum.GetValues(typeof(clsDocument.Type)))
             {
