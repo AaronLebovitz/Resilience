@@ -70,6 +70,7 @@ namespace DocumentStatusReport
             sw.WriteLine("th {text-decoration:underline;}");
             sw.WriteLine("tr {background-color:WhiteSmoke;}");
             sw.WriteLine("td#MUSTHAVE {background-color:Red;}");
+            sw.WriteLine("td#MIGHTHAVE {background-color:Orange;}");
             sw.WriteLine("td#SHOULDHAVE {background-color:Yellow;}");
             sw.WriteLine("td#TODO {background-color:Green;}");
             sw.WriteLine("td#COMPLETE {background-color:White;}");
@@ -102,8 +103,8 @@ namespace DocumentStatusReport
                     List<int> documentRecordIDs = new List<int>();
                     List<clsDocument.Type> documentTypes = new List<clsDocument.Type>();
 
-                    foreach (int id in documentListIDs) 
-                    { 
+                    foreach (int id in documentListIDs)
+                    {
                         documentList.Add(id, new clsDocument(id));
                         foreach (int recID in tblDocumentRecords.Matches(clsDocumentRecord.DocumentColumn, id.ToString()))
                         {
@@ -119,9 +120,12 @@ namespace DocumentStatusReport
             }
 
             // end of doc tags
-            sw.WriteLine("<tr><td>TOTALS</td></tr>");
-            sw.Write("<tr text-decoration:underline><td></td><td></td>");
+            this.WriteHTMLFooter(sw);
+            sw.WriteLine("</table></body></html>");
+            sw.Flush();
         }
+
+        #region HTML write methods
 
         private void WriteHTMLHeaderRow(System.IO.StreamWriter sw)
         {
@@ -174,8 +178,44 @@ namespace DocumentStatusReport
             streamWriter.Flush();
         }
 
+        void WriteHTMLFooter(System.IO.StreamWriter sw)
+        {
+            string title = "";
+            foreach (clsDocument.Type t in Enum.GetValues(typeof(clsDocument.Type)))
+            {
+                sw.WriteLine("<tr>");
+                switch (t)
+                {
+                    case clsDocument.Type.BPO: title = "BPO"; break;
+                    case clsDocument.Type.Calculator: title = "CLC"; break;
+                    case clsDocument.Type.ClosingProtectionLetter: title = "CPL"; break;
+                    case clsDocument.Type.Discharge: title = "DIS"; break;
+                    case clsDocument.Type.EscrowInstructionLetter: title = "EIL"; break;
+                    case clsDocument.Type.HomeownersInsurance: title = "HOI"; break;
+                    case clsDocument.Type.LoanPayoffLetter: title = "PAY"; break;
+                    case clsDocument.Type.Mortgage: title = "MTG"; break;
+                    case clsDocument.Type.ProfitStatement: title = "PNL"; break;
+                    case clsDocument.Type.ProFormaLenderPolicy: title = "PRO"; break;
+                    case clsDocument.Type.PurchaseStatement: title = "PST"; break;
+                    case clsDocument.Type.RehabBid: title = "RHB"; break;
+                    case clsDocument.Type.SaleContract: title = "SCT"; break;
+                    case clsDocument.Type.SaleStatement: title = "SST"; break;
+                    case clsDocument.Type.TitleCommitment: title = "TCM"; break;
+                    case clsDocument.Type.TitleWork: title = "TWK"; break;
+                }
+                title += " = " + t.ToString();
+                sw.WriteLine("<td>" + title + "</td>");
+                sw.WriteLine("</tr>");
+            }
+        }
+
+        #endregion
+
+        #region Private Calculations
+
         private string[] DocStatus(clsLoan.State loanStatus, List<clsDocumentRecord> documentRecords, List<clsDocument.Type> docTypes, clsDocument.Type docType)
         {
+            bool orange = false;
             bool red = false;
             bool yellow = false;
             bool green = false;
@@ -227,9 +267,9 @@ namespace DocumentStatusReport
                         }
                         break;
                     //case clsDocument.Type.Mortgage:
-                        //if (!DocListContains(documentRecords, docTypes, docType, TAny, SAny, this.lenderID, EAny))
-                        //    green = true;
-                        //break;
+                    //if (!DocListContains(documentRecords, docTypes, docType, TAny, SAny, this.lenderID, EAny))
+                    //    green = true;
+                    //break;
                     case clsDocument.Type.ClosingProtectionLetter:
                         if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, EAny, this.lenderID))
                         {
@@ -262,7 +302,7 @@ namespace DocumentStatusReport
             {
                 switch (docType)
                 {
-                    //RED
+                    //RED OR ORANGE
                     case clsDocument.Type.ProFormaLenderPolicy:
                     case clsDocument.Type.ClosingProtectionLetter:
                         if (!DocListContains(documentRecords, docTypes, docType, TAny, SAny, EAny, this.lenderID))
@@ -275,20 +315,44 @@ namespace DocumentStatusReport
                     case clsDocument.Type.Mortgage: // no requirement to send executed mortgage to fund admin
                         if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, EAny, this.lenderID))
                         {
-                            reason = "!R";
-                            red = true;
+                            if (DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Unkown, EAny, this.lenderID))
+                            {
+                                reason = "U!R";
+                                orange = true;
+                            }
+                            else
+                            {
+                                reason = "!R";
+                                red = true;
+                            }
                         }
                         break;
                     case clsDocument.Type.PurchaseStatement:
-                        if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, this.lenderID, EAny))
+                        if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, EAny, this.lenderID))
                         {
-                            reason = "!S";
-                            red = true;
+                            if (DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Unkown, EAny, this.lenderID))
+                            {
+                                reason = "U!R";
+                                orange = true;
+                            }
+                            else
+                            {
+                                reason = "!R";
+                                red = true;
+                            }
                         }
-                        else if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, EAny, this.lenderID))
+                        else if (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, this.lenderID, EAny))
                         {
-                            reason = "!R";
-                            red = true;
+                            if (DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Unkown, this.lenderID, EAny))
+                            {
+                                reason = "U!S";
+                                orange = true;
+                            }
+                            else
+                            {
+                                reason = "!S";
+                                red = true;
+                            }
                         }
                         break;
 
@@ -304,7 +368,7 @@ namespace DocumentStatusReport
                         }
                         break;
                 }
-                if ((!red) && (!yellow) && (docType == clsDocument.Type.Mortgage) &&
+                if ((!red) && (!orange) && (!yellow) && (docType == clsDocument.Type.Mortgage) &&
                     (!DocListContains(documentRecords, docTypes, docType, clsDocumentRecord.Transmission.Post, clsDocumentRecord.Status.Executed, EAny, this.lenderID)))
                 {
                     reason = "!RP";
@@ -343,7 +407,7 @@ namespace DocumentStatusReport
                     if ((docType == clsDocument.Type.SaleContract) && (!DocListContains(documentRecords, docTypes, docType, TAny, clsDocumentRecord.Status.Executed, EAny, this.lenderID)))
                     {
                         reason = "!R";
-                        red = true;
+                        yellow = true;
                     }
                     else if ((!yellow) && (!green))
                     {
@@ -385,7 +449,8 @@ namespace DocumentStatusReport
 
             // calculate return value
             string[] docstatus = new string[2];
-            if (red) docstatus[0] = "MUSTHAVE";
+            if (orange) docstatus[0] = "MIGHTHAVE";
+            else if (red) docstatus[0] = "MUSTHAVE";
             else if (yellow) docstatus[0] = "SHOULDHAVE";
             else if (green) docstatus[0] = "TODO";
             else docstatus[0] = "COMPLETE";
@@ -394,9 +459,9 @@ namespace DocumentStatusReport
         }
 
         private bool DocListContains(List<clsDocumentRecord> list, List<clsDocument.Type> docTypesByRecord, clsDocument.Type docType,
-                                     clsDocumentRecord.Transmission transmission = clsDocumentRecord.Transmission.Unknown, 
-                                     clsDocumentRecord.Status status = clsDocumentRecord.Status.Unkown, 
-                                     int senderID = -1, 
+                                     clsDocumentRecord.Transmission transmission = clsDocumentRecord.Transmission.Unknown,
+                                     clsDocumentRecord.Status status = clsDocumentRecord.Status.Unkown,
+                                     int senderID = -1,
                                      int receiverID = -1)
         {
             bool found = false;
@@ -501,6 +566,6 @@ namespace DocumentStatusReport
             return docstatus;
         }
 
-    
+        #endregion
     }
 }
