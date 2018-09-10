@@ -19,6 +19,9 @@ namespace ConstructionHistory
 		AppKit.NSTextField cashflowID { get; set; }
 
 		[Outlet]
+		AppKit.NSPopUpButton CashflowIDPopUp { get; set; }
+
+		[Outlet]
 		AppKit.NSTextField constructionAmountNew { get; set; }
 
 		[Outlet]
@@ -50,6 +53,9 @@ namespace ConstructionHistory
 
 		[Action ("addNewConstruction:")]
 		partial void addNewConstruction (AppKit.NSButton sender);
+
+		[Action ("CashflowIDChosen:")]
+		partial void CashflowIDChosen (AppKit.NSPopUpButton sender);
 
 		[Action ("dateChangeClicked:")]
 		partial void dateChangeClicked (AppKit.NSButton sender);
@@ -100,6 +106,11 @@ namespace ConstructionHistory
 				deleteButton = null;
 			}
 
+			if (LoanStatusTextField != null) {
+				LoanStatusTextField.Dispose ();
+				LoanStatusTextField = null;
+			}
+
 			if (markTrueButton != null) {
 				markTrueButton.Dispose ();
 				markTrueButton = null;
@@ -120,9 +131,9 @@ namespace ConstructionHistory
 				rehabDrawDisplayTrue = null;
 			}
 
-			if (LoanStatusTextField != null) {
-				LoanStatusTextField.Dispose ();
-				LoanStatusTextField = null;
+			if (CashflowIDPopUp != null) {
+				CashflowIDPopUp.Dispose ();
+				CashflowIDPopUp = null;
 			}
 		}
 	}

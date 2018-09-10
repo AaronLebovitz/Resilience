@@ -23,7 +23,7 @@ namespace ConstructionHistory
             addressList = clsProperty.AddressList();
             foreach (string s in addressList) propertyMenu.AddItem(s);
 
-            // Do any additional setup after loading the view.
+            this.constructionDateNew.DateValue = (NSDate)(System.DateTime.Today.ToUniversalTime());
 
         }
 
@@ -84,47 +84,55 @@ namespace ConstructionHistory
        
         partial void deleteButtonClicked(AppKit.NSButton sender)
         {
-            int cfID = 0;
-            cfID = Int32.Parse(cashflowID.StringValue);
-
-            clsCashflow deletedCashflow = new clsCashflow(cfID);
-            if (deletedCashflow.Actual() == true)
-                rehabDrawDisplayFalse.StringValue += "Error: Could not delete cashflow, already payed.";
-            else
-                deletedCashflow.Delete(System.DateTime.Today);
-            deletedCashflow.Save();
-            loadRehabInfo();
+            if (Int32.TryParse(CashflowIDPopUp.SelectedItem.Title, out int i))
+            {
+                clsCashflow deletedCashflow = new clsCashflow(Int32.Parse(CashflowIDPopUp.SelectedItem.Title));
+                if (deletedCashflow.Actual() == true)
+                    rehabDrawDisplayFalse.StringValue += "Error: Could not delete cashflow, already payed.";
+                else
+                {
+                    deletedCashflow.Delete(System.DateTime.Today);
+                    deletedCashflow.Save();
+                }
+                loadRehabInfo();
+            }
         }
 
         partial void markTrueClicked(AppKit.NSButton sender)
         {
-            int cfID = 0;
-            cfID = Int32.Parse(cashflowID.StringValue);
-
-            clsCashflow cf = new clsCashflow(cfID);
-            cf.MarkActual(System.DateTime.Today);
-            cf.Save();
-            loadRehabInfo();
+            if (Int32.TryParse(CashflowIDPopUp.SelectedItem.Title, out int i))
+            {
+                clsCashflow cf = new clsCashflow(Int32.Parse(CashflowIDPopUp.SelectedItem.Title));
+                cf.MarkActual(System.DateTime.Today);
+                cf.Save();
+                loadRehabInfo();
+            }
         }
 
         partial void dateChangeClicked(AppKit.NSButton sender)
         {
-            clsLoan loan = new clsLoan(chosenID);
-            int cfID = 0;
-            cfID = Int32.Parse(cashflowID.StringValue);
-            DateTime newDate = (DateTime)(dateChanger.DateValue);
+            if (Int32.TryParse(CashflowIDPopUp.SelectedItem.Title, out int i))
+            {
+                clsLoan loan = new clsLoan(chosenID);
+                DateTime newDate = (DateTime)(dateChanger.DateValue);
 
-            clsCashflow cf = new clsCashflow(cfID);
-            cf.Delete(System.DateTime.Today);
-            cf.Save();
+                // Delete existing (old) cashflow
+                clsCashflow cf = new clsCashflow(Int32.Parse(CashflowIDPopUp.SelectedItem.Title));
+                cf.Delete(System.DateTime.Today);
+                cf.Save();
 
-            clsCashflow updatedCF = new clsCashflow(newDate, System.DateTime.Today, System.DateTime.MaxValue, cf.LoanID(), cf.Amount(), false, cf.TypeID());
-            loan.AddCashflow(updatedCF);
-            updatedCF.Save();
+                // Create new cashflow with new date
+                clsCashflow updatedCF = new clsCashflow(newDate, System.DateTime.Today, System.DateTime.MaxValue, cf.LoanID(), cf.Amount(), false, cf.TypeID());
+                loan.AddCashflow(updatedCF);
+                updatedCF.Save();
+                loadRehabInfo();
+            }
+        }
 
-            loadRehabInfo();
-
-
+        partial void CashflowIDChosen(NSPopUpButton sender)
+        {
+            clsCashflow cf = new clsCashflow(Int32.Parse(CashflowIDPopUp.SelectedItem.Title));
+            this.dateChanger.DateValue = (NSDate)(cf.PayDate().AddDays(7).ToUniversalTime());
         }
 
         private void loadRehabInfo()
@@ -145,6 +153,10 @@ namespace ConstructionHistory
             }
             rehabDrawDisplayTrue.StringValue = "Payed draws:" + "\n";
             rehabDrawDisplayFalse.StringValue = "Not payed draws:" + "\n";
+
+            // Repopulate Cashflow ID Pop Up
+            this.CashflowIDPopUp.RemoveAllItems();
+            this.CashflowIDPopUp.AddItem("Select Cashflow");
 
             double trueTotal = 0;
             double falseTotal = 0;
@@ -169,6 +181,7 @@ namespace ConstructionHistory
                         rehabDrawDisplayFalse.StringValue += "Amount: " + "$" + (-cashFlow.Amount()).ToString("00,000.00") + ", ";
                         rehabDrawDisplayFalse.StringValue += "Payed: " + cashFlow.Actual() + ", ";
                         rehabDrawDisplayFalse.StringValue += "Cashflow ID: " + cashFlow.ID() + "\n";
+                        this.CashflowIDPopUp.AddItem(cashFlow.ID().ToString());
 
                     }
                 }
@@ -180,8 +193,5 @@ namespace ConstructionHistory
             rehabDrawDisplayTrue.StringValue += "Total amount: " + "$" + trueTotal.ToString("00,000.00");
             rehabDrawDisplayFalse.StringValue += "Total amount: " + "$" + falseTotal.ToString("00,000.00");
         }
-
-   
-    
     }
 }
