@@ -75,7 +75,7 @@ namespace UpdateAcquisition
             {
                 this.loanToUpdate = new clsLoan(clsLoan.LoanID(this.AddressComboBox.StringValue));
                 DateTime OGDate = loanToUpdate.OriginationDate();
-                this.ClosingDatePicker.DateValue = (NSDate)DateTime.SpecifyKind(OGDate, DateTimeKind.Utc);
+                this.ClosingDatePicker.DateValue = (NSDate)OGDate.ToUniversalTime();
 
                 //clear labels
                 this.ConcessionLabel.StringValue = "";
@@ -135,7 +135,7 @@ namespace UpdateAcquisition
                 this.RecordingField.StringValue = this.RecordingLabel.StringValue;
                 this.ConcessionField.StringValue = this.ConcessionLabel.StringValue;
                 this.ProcessingField.StringValue = this.ProcessingLabel.StringValue;
-                this.ClosingDatePicker.DateValue = (NSDate)DateTime.SpecifyKind(this.loanToUpdate.OriginationDate(), DateTimeKind.Utc);
+                this.ClosingDatePicker.DateValue = (NSDate)this.loanToUpdate.OriginationDate().ToUniversalTime();
                 this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
                 this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
                 this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
