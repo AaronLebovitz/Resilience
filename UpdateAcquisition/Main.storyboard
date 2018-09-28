@@ -907,6 +907,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="PriceUpdated:" target="XfG-lQ-9wD" id="aPg-rp-oDv"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CAt-Yv-2Xp">
                                 <rect key="frame" x="482" y="283" width="96" height="22"/>
@@ -917,6 +920,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="ConcessionUpdated:" target="XfG-lQ-9wD" id="8yE-sw-bSe"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="urU-CW-Gjw">
                                 <rect key="frame" x="482" y="258" width="96" height="22"/>
@@ -927,6 +933,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="ProcessingUpdated:" target="XfG-lQ-9wD" id="nY6-eD-HKi"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6AA-8H-FHd">
                                 <rect key="frame" x="482" y="233" width="96" height="22"/>
@@ -937,6 +946,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="RecordingUpdated:" target="XfG-lQ-9wD" id="GZs-d0-8Hy"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YT2-UI-kRH">
                                 <rect key="frame" x="482" y="208" width="96" height="22"/>
@@ -947,6 +959,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="AcqTaxUpdated:" target="XfG-lQ-9wD" id="vYT-Cr-AvO"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dbb-cr-4kx">
                                 <rect key="frame" x="482" y="183" width="96" height="22"/>
@@ -957,6 +972,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="TitlePolicyUpdated:" target="XfG-lQ-9wD" id="dep-VE-zie"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I2w-Fk-aHK">
                                 <rect key="frame" x="482" y="158" width="96" height="22"/>
@@ -967,6 +985,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="HOIUpdated:" target="XfG-lQ-9wD" id="T60-WG-uIf"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vqd-O8-rrg">
                                 <rect key="frame" x="482" y="133" width="96" height="22"/>
@@ -977,6 +998,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="DrawUpdated:" target="XfG-lQ-9wD" id="9yc-5D-Z1J"/>
+                                </connections>
                             </textField>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yfR-iz-qnl">
                                 <rect key="frame" x="482" y="108" width="96" height="22"/>
@@ -987,6 +1011,9 @@
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <connections>
+                                    <action selector="PropertyTaxUpdated:" target="XfG-lQ-9wD" id="9W6-g9-2BZ"/>
+                                </connections>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s1l-jR-ZTt">
                                 <rect key="frame" x="451" y="456" width="129" height="25"/>
@@ -1078,6 +1105,24 @@ Gw
                                     <action selector="CancelButtonPushed:" target="XfG-lQ-9wD" id="25O-3f-PdA"/>
                                 </connections>
                             </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fiu-yU-32U">
+                                <rect key="frame" x="482" y="20" width="98" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="TotalLabel" id="is2-2b-p86">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Iy-wm-tYA">
+                                <rect key="frame" x="272" y="20" width="98" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Total :" id="ZQf-Zj-61z">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -1107,6 +1152,7 @@ Gw
                         <outlet property="SummaryMessageField" destination="em8-6A-2Wc" id="5Li-5x-1Xo"/>
                         <outlet property="TitlePolicyField" destination="dbb-cr-4kx" id="tCu-eq-0n5"/>
                         <outlet property="TitlePolicyLabel" destination="h43-WS-cpn" id="ef7-br-JSy"/>
+                        <outlet property="TotalCostLabel" destination="fiu-yU-32U" id="mLo-BG-nlA"/>
                         <outlet property="UpdateAcquisitionButton" destination="s1l-jR-ZTt" id="WJb-lF-4Ld"/>
                     </connections>
                 </viewController>

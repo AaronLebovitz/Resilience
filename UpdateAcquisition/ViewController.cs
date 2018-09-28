@@ -143,6 +143,7 @@ namespace UpdateAcquisition
                 this.BorrowerComboBox.SelectItem(this.loanToUpdate.TitleHolderID());
                 this.LenderLabel.StringValue = (NSString)this.LenderComboBox.SelectedValue;
                 this.BorrowerLabel.StringValue = (NSString)this.BorrowerComboBox.SelectedValue;
+                this.UpdateTotalCostLabel();
             }
         }
 
@@ -200,6 +201,7 @@ namespace UpdateAcquisition
                     this.SummaryMessageField.StringValue = "Cancel Failed:  Loan already cancelled.  " + this.loanToUpdate.Property().Address();
             }
         }
+
         partial void UpdateButtonPushed(AppKit.NSButton sender)
         {
             this.SummaryMessageField.StringValue = "";
@@ -282,9 +284,10 @@ namespace UpdateAcquisition
                     if (this.loanToUpdate.Save())
                     {
                         this.SummaryMessageField.StringValue += "\nSave successful.  " + this.loanToUpdate.Property().Address();
-                        this.SummaryMessageField.StringValue += "\nOld / New Acquisition Cost =  " + this.loanToUpdate.Property().Address();
+                        this.SummaryMessageField.StringValue += "\nOld / New Acquisition Cost = ";
                         this.SummaryMessageField.StringValue += oldAcqCost.ToString("#,##0.00") + " / ";
                         this.SummaryMessageField.StringValue += this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
+                        this.UpdateTotalCostLabel();
                     }
                     else
                     {
@@ -295,6 +298,66 @@ namespace UpdateAcquisition
             else
                 this.SummaryMessageField.StringValue = "Update failed.  Loan has already been cancelled.  " + this.loanToUpdate.Property().Address();
 
+        }
+
+        partial void AcqTaxUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void ConcessionUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void DrawUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void HOIUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void PriceUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void ProcessingUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void PropertyTaxUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void RecordingUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        partial void TitlePolicyUpdated(NSTextField sender)
+        {
+            this.UpdateTotalCostLabel();
+        }
+
+        private void UpdateTotalCostLabel()
+        {
+            double total = 0D;
+            total = this.HOIField.DoubleValue;
+            total += this.PriceField.DoubleValue;
+            total += this.AcqTaxField.DoubleValue;
+            total += this.RecordingField.DoubleValue;
+            total += -Math.Abs(this.ConcessionField.DoubleValue);
+            total += this.ProcessingField.DoubleValue;
+            total += this.InitialDrawField.DoubleValue;
+            total += this.PropertyTaxField.DoubleValue;
+            total += this.TitlePolicyField.DoubleValue;
+            this.TotalCostLabel.DoubleValue = total;
         }
     }
 }

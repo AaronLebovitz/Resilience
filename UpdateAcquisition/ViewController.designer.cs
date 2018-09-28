@@ -91,16 +91,46 @@ namespace UpdateAcquisition
 		AppKit.NSTextField TitlePolicyLabel { get; set; }
 
 		[Outlet]
+		AppKit.NSTextField TotalCostLabel { get; set; }
+
+		[Outlet]
 		AppKit.NSButton UpdateAcquisitionButton { get; set; }
+
+		[Action ("AcqTaxUpdated:")]
+		partial void AcqTaxUpdated (AppKit.NSTextField sender);
 
 		[Action ("CancelButtonPushed:")]
 		partial void CancelButtonPushed (AppKit.NSButton sender);
 
+		[Action ("ConcessionUpdated:")]
+		partial void ConcessionUpdated (AppKit.NSTextField sender);
+
+		[Action ("DrawUpdated:")]
+		partial void DrawUpdated (AppKit.NSTextField sender);
+
+		[Action ("HOIUpdated:")]
+		partial void HOIUpdated (AppKit.NSTextField sender);
+
 		[Action ("MarkActualPressed:")]
 		partial void MarkActualPressed (AppKit.NSButton sender);
 
+		[Action ("PriceUpdated:")]
+		partial void PriceUpdated (AppKit.NSTextField sender);
+
+		[Action ("ProcessingUpdated:")]
+		partial void ProcessingUpdated (AppKit.NSTextField sender);
+
 		[Action ("PropertyChosen:")]
 		partial void PropertyChosen (AppKit.NSComboBox sender);
+
+		[Action ("PropertyTaxUpdated:")]
+		partial void PropertyTaxUpdated (AppKit.NSTextField sender);
+
+		[Action ("RecordingUpdated:")]
+		partial void RecordingUpdated (AppKit.NSTextField sender);
+
+		[Action ("TitlePolicyUpdated:")]
+		partial void TitlePolicyUpdated (AppKit.NSTextField sender);
 
 		[Action ("UpdateButtonPushed:")]
 		partial void UpdateButtonPushed (AppKit.NSButton sender);
@@ -240,6 +270,11 @@ namespace UpdateAcquisition
 			if (UpdateAcquisitionButton != null) {
 				UpdateAcquisitionButton.Dispose ();
 				UpdateAcquisitionButton = null;
+			}
+
+			if (TotalCostLabel != null) {
+				TotalCostLabel.Dispose ();
+				TotalCostLabel = null;
 			}
 		}
 	}
