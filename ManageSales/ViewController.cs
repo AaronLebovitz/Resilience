@@ -114,7 +114,7 @@ namespace ManageSales
                         this.ExpectedAdditionalInterestTextField.DoubleValue = this.loan.ScheduledAdditionalInterest(System.DateTime.Today.Date);
 
                         DateTime scheduledSale = this.loan.SaleDate().Date;
-                        double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(-1)).Balance(scheduledSale.AddDays(-1));
+                        double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(1)).PrincipalPaid(scheduledSale.AddDays(1));
                         double dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
                         double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
                         double dAdditionalInterest = this.ExpectedAdditionalInterestTextField.DoubleValue;
