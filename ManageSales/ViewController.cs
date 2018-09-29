@@ -11,6 +11,9 @@ namespace ManageSales
 
         private clsLoan loan;
         private bool bRecordSaleContract = false;
+        private clsLoan.State statusFilter = clsLoan.State.Unknown;
+        private int lenderID = -1;
+        private Dictionary<string, clsLoan> loansByAddress = new Dictionary<string, clsLoan>();
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -20,13 +23,29 @@ namespace ManageSales
         {
             base.ViewDidLoad();
 
+            // load Loans By Address
+            clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
+            for (int i = 0; i < tbl.Length(); i++)
+            {
+                clsLoan l = new clsLoan(i);
+                loansByAddress.Add(l.Property().Address(), l);
+            }
+
             // Do any additional setup after loading the view.
-            List<string> addressList = clsProperty.AddressList();
-            this.AddressComboBox.RemoveAll();
-            foreach (string address in addressList) { this.AddressComboBox.Add((NSString)address); }
+            this.UpdateAddressList();
             this.SaleDatePicker.DateValue = (NSDate)System.DateTime.Today.Date;
             this.ChooseActionPopUp.RemoveAllItems();
             this.RecordDatePicker.DateValue = (NSDate)System.DateTime.Today.Date;
+            this.LenderComboBox.RemoveAll();
+            clsCSVTable tblEntities = new clsCSVTable(clsEntity.strEntityPath);
+            for (int i = 0; i < tblEntities.Length(); i++)
+            {
+                if (tbl.Matches(clsLoan.LenderColumn,i.ToString()).Count > 0)
+                    this.LenderComboBox.Add((NSString)(new clsEntity(i)).Name());
+            }
+            this.StatusComboBox.RemoveAll();
+            foreach (clsLoan.State c in Enum.GetValues(typeof(clsLoan.State)))
+                this.StatusComboBox.Add((NSString)c.ToString());
         }
 
         public override NSObject RepresentedObject
@@ -551,6 +570,31 @@ namespace ManageSales
             this.CashflowDateLabel.StringValue = "Addl Interest Pay Date";
             this.RepaymentAmountLabel.StringValue = "N/A";
             this.AdditionalInterestLabel.StringValue = "Addl Interest Amount";
+        }
+
+        private void UpdateAddressList()
+        {
+            this.AddressComboBox.RemoveAll();
+            foreach (string address in clsProperty.AddressList()) 
+            { 
+                if (((this.lenderID < 0) || (this.lenderID == loansByAddress[address].LenderId)) &&
+                    ((this.statusFilter == clsLoan.State.Unknown) || (this.statusFilter == loansByAddress[address].Status())))
+                {
+                    this.AddressComboBox.Add((NSString)address);
+                }
+            }
+        }
+
+        partial void LenderChosen(NSComboBox sender)
+        {
+            this.lenderID = (int)this.LenderComboBox.SelectedIndex;
+            this.UpdateAddressList();
+        }
+
+        partial void StatusChosen(NSComboBox sender)
+        {
+            this.statusFilter = (clsLoan.State)((int)this.StatusComboBox.SelectedIndex);
+            this.UpdateAddressList();
         }
     }
 }

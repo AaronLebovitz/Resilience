@@ -34,6 +34,9 @@ namespace ManageSales
 		AppKit.NSTextField ExpectedSalePriceTextField { get; set; }
 
 		[Outlet]
+		AppKit.NSComboBox LenderComboBox { get; set; }
+
+		[Outlet]
 		AppKit.NSDatePicker RecordDatePicker { get; set; }
 
 		[Outlet]
@@ -49,6 +52,9 @@ namespace ManageSales
 		AppKit.NSTextField SalePriceLabel { get; set; }
 
 		[Outlet]
+		AppKit.NSComboBox StatusComboBox { get; set; }
+
+		[Outlet]
 		AppKit.NSTextField StatusMessageTextField { get; set; }
 
 		[Outlet]
@@ -62,12 +68,28 @@ namespace ManageSales
 
 		[Action ("GoButtonPressed:")]
 		partial void GoButtonPressed (AppKit.NSButton sender);
+
+		[Action ("LenderChosen:")]
+		partial void LenderChosen (AppKit.NSComboBox sender);
+
+		[Action ("StatusChosen:")]
+		partial void StatusChosen (AppKit.NSComboBox sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (AdditionalInterestLabel != null) {
+				AdditionalInterestLabel.Dispose ();
+				AdditionalInterestLabel = null;
+			}
+
 			if (AddressComboBox != null) {
 				AddressComboBox.Dispose ();
 				AddressComboBox = null;
+			}
+
+			if (CashflowDateLabel != null) {
+				CashflowDateLabel.Dispose ();
+				CashflowDateLabel = null;
 			}
 
 			if (ChooseActionPopUp != null) {
@@ -95,6 +117,11 @@ namespace ManageSales
 				RecordDatePicker = null;
 			}
 
+			if (RepaymentAmountLabel != null) {
+				RepaymentAmountLabel.Dispose ();
+				RepaymentAmountLabel = null;
+			}
+
 			if (RepaymentAmountTextField != null) {
 				RepaymentAmountTextField.Dispose ();
 				RepaymentAmountTextField = null;
@@ -103,6 +130,11 @@ namespace ManageSales
 			if (SaleDatePicker != null) {
 				SaleDatePicker.Dispose ();
 				SaleDatePicker = null;
+			}
+
+			if (SalePriceLabel != null) {
+				SalePriceLabel.Dispose ();
+				SalePriceLabel = null;
 			}
 
 			if (StatusMessageTextField != null) {
@@ -115,24 +147,14 @@ namespace ManageSales
 				StatusTextField = null;
 			}
 
-			if (CashflowDateLabel != null) {
-				CashflowDateLabel.Dispose ();
-				CashflowDateLabel = null;
+			if (StatusComboBox != null) {
+				StatusComboBox.Dispose ();
+				StatusComboBox = null;
 			}
 
-			if (SalePriceLabel != null) {
-				SalePriceLabel.Dispose ();
-				SalePriceLabel = null;
-			}
-
-			if (AdditionalInterestLabel != null) {
-				AdditionalInterestLabel.Dispose ();
-				AdditionalInterestLabel = null;
-			}
-
-			if (RepaymentAmountLabel != null) {
-				RepaymentAmountLabel.Dispose ();
-				RepaymentAmountLabel = null;
+			if (LenderComboBox != null) {
+				LenderComboBox.Dispose ();
+				LenderComboBox = null;
 			}
 		}
 	}
