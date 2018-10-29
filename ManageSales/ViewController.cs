@@ -3,6 +3,7 @@ using ResilienceClasses;
 using System.Collections.Generic;
 using AppKit;
 using Foundation;
+using Xceed.Words.NET;
 
 namespace ManageSales
 {
@@ -14,6 +15,10 @@ namespace ManageSales
         private clsLoan.State statusFilter = clsLoan.State.Unknown;
         private int lenderID = -1;
         private Dictionary<string, clsLoan> loansByAddress = new Dictionary<string, clsLoan>();
+        private int R1ID = 1;
+        private int R2ID = 16;
+        private int HCRID = 3;
+        private int HHID = 4;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -101,6 +106,14 @@ namespace ManageSales
                 {
                     this.UpdateScheduledAdditionalInterest();
                 }
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Payoff Letter")
+                {
+                    this.GeneratePayoffLetter();
+                }
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Discharge Letter")
+                {
+                    this.GenerateDischargeLetter();
+                }
             }
             this.UpdateChosenAddress(false);
         }
@@ -127,6 +140,7 @@ namespace ManageSales
                     case clsLoan.State.PendingSale:
                         this.ChooseActionPopUp.AddItem("Cancel");
                         this.ChooseActionPopUp.AddItem("Update");
+                        this.ChooseActionPopUp.AddItem("Payoff Letter");
                         if (this.loan.SaleDate() <= System.DateTime.Today) this.ChooseActionPopUp.AddItem("Mark Loan Repaid");
                         this.SaleDatePicker.DateValue = (NSDate)this.loan.SaleDate().Date.ToUniversalTime();
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
@@ -164,6 +178,7 @@ namespace ManageSales
                         this.SetSoldLabels();
                         this.ChooseActionPopUp.AddItem("Update/Add");
                         this.ChooseActionPopUp.AddItem("Mark Addl Int Actual");
+                        this.ChooseActionPopUp.AddItem("Discharge Letter");
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
                         this.ExpectedAdditionalInterestTextField.DoubleValue = this.loan.ScheduledAdditionalInterest() 
                                                                              + this.loan.PastDueAdditionalInterest();
@@ -173,6 +188,137 @@ namespace ManageSales
 
                 }
             }
+        }
+
+        private void GeneratePayoffLetter()
+        {
+            // identify template
+            string destinationPath = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/Payoff Letter (" + this.AddressComboBox.StringValue + ") (" + this.loan.SaleDate().ToString("yyMMdd") + ").docx";
+            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/Payoff Letter ";
+              //  lender
+            if (this.loan.LenderId == R1ID) templatePath += "R1 ";
+            else if (this.loan.LenderId == R2ID) templatePath += "R2 ";
+              //  borrower
+            if (this.loan.BorrowerId == HCRID) templatePath += "HCR";
+            else if (this.loan.BorrowerId == HHID) templatePath += "HH";
+            templatePath += ".docx";
+            // copy template to correct folder
+            System.IO.File.Copy(templatePath, destinationPath, true);
+
+            // find and replace using doc library
+              // get/compute replacement values
+            DateTime letterDate = DateTime.Today.Date;
+            DateTime scheduledSale = this.loan.SaleDate().Date;
+            double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(1)).PrincipalPaid(scheduledSale.AddDays(1));
+            double dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
+            double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
+              // find and replace
+            DocX newLetter = DocX.Load(destinationPath);
+            newLetter.ReplaceText("[LETTERDATE]",letterDate.ToString("MMMM d, yyyy"));
+            newLetter.ReplaceText("[SALEDATE]",scheduledSale.ToString("MMMM d, yyyy"));
+            newLetter.ReplaceText("[ADDRESS]",this.AddressComboBox.StringValue);
+            newLetter.ReplaceText("[INTEREST]",dHardInterest.ToString("#,##0.00"));
+            newLetter.ReplaceText("[PRINCIPAL]",dPrincipalRepay.ToString("#,##0.00"));
+            newLetter.ReplaceText("[PAYOFF]",(dHardInterest + dPrincipalRepay).ToString("#,##0.00"));
+            newLetter.ReplaceText("[PERDIEM]",perdiem.ToString("#0.00"));
+            // save new file
+            newLetter.Save();
+            // notify
+            this.StatusMessageTextField.StringValue = "Payoff Letter Created at " + destinationPath;
+        }
+
+        private void GenerateDischargeLetter()
+        {
+            // identify template
+            string destinationPath = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/";
+            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/";
+            switch (this.loan.Property().State())
+            {
+                case "MD":
+                    templatePath += "Certificate of Satisfaction MD";
+                    destinationPath += "Certificate of Satisfaction";
+                    break;
+                case "NJ":
+                    templatePath += "Discharge of Mortgage NJ";
+                    destinationPath += "Discharge of Mortgage";
+                    break;
+                case "PA":
+                    templatePath += "Satisfaction of Mortgage PA";
+                    destinationPath += "Discharge of Mortgage";
+                    break;
+                default:
+                    templatePath += "Discharge of Mortgage GN";
+                    destinationPath += "Discharge of Mortgage";
+                    break;
+            }
+            //  lender
+            if (this.loan.LenderId == R1ID) templatePath += " R1";
+            else if (this.loan.LenderId == R2ID) templatePath += " R2";
+            //  borrower
+            if (this.loan.BorrowerId == HCRID) templatePath += " HCR";
+            else if (this.loan.BorrowerId == HHID) templatePath += " HH";
+            // copy template to correct folder
+            destinationPath += " (" + this.AddressComboBox.StringValue + ").docx";
+            templatePath += ".docx";
+            System.IO.File.Copy(templatePath, destinationPath, true);
+
+            // find and replace using doc library
+            // get/compute replacement values
+            DateTime todayDate = DateTime.Today.Date;
+            DateTime datedDate = this.loan.OriginationDate().Date;
+            string county = this.loan.Property().County();
+            string address = this.loan.Property().Address();
+            string city = this.loan.Property().Town();
+            DateTime recordDate = (DateTime)this.RecordDatePicker.DateValue;
+            // find and replace
+            DocX newLetter = DocX.Load(destinationPath);
+            if (this.loan.Property().State() != "PA")
+            {
+                string book = ExpectedSalePriceTextField.IntValue.ToString("#");
+                if (book == "0") { book = "____________"; }
+                string pages = RepaymentAmountTextField.IntValue.ToString("#");
+                if (pages == "0") { pages = "____________"; }
+
+                newLetter.ReplaceText("[TODAYDAY]", todayDate.Day.ToString());
+                newLetter.ReplaceText("[TODAYMONTH]", todayDate.ToString("MMMM"));
+                newLetter.ReplaceText("[TODAYYEAR]", todayDate.ToString("yyyy"));
+                newLetter.ReplaceText("[DATEDDATE]", datedDate.ToString("MMMM d, yyyy"));
+                newLetter.ReplaceText("[RECORDDATE]", recordDate.ToString("MMMM d, yyyy"));
+                newLetter.ReplaceText("[ADDRESS]", address);
+                newLetter.ReplaceText("[BOOK]", book);
+                newLetter.ReplaceText("[PAGES]", pages);
+                newLetter.ReplaceText("[COUNTY]", county);
+                newLetter.ReplaceText("[CITY]", city);
+            }
+            else
+            {
+                string instrument = ExpectedSalePriceTextField.IntValue.ToString("#");
+                if (instrument == "0") { instrument = "____________"; }
+                string parcel = RepaymentAmountTextField.IntValue.ToString("00-000-000");
+                if (parcel == "0") { parcel = "____________"; }
+
+                newLetter.ReplaceText("[DATEDDATE]", datedDate.ToString("MMMM d, yyyy"));
+                newLetter.ReplaceText("[RECORDDATE]", recordDate.ToString("MMMM d, yyyy"));
+                newLetter.ReplaceText("[ADDRESS]", address);
+                newLetter.ReplaceText("[CITY]", city);
+                newLetter.ReplaceText("[COUNTY]", county);
+                newLetter.ReplaceText("[TODAYDATE]", todayDate.ToString("MMMM d, yyyy"));
+                newLetter.ReplaceText("[PARCEL]", parcel);
+                newLetter.ReplaceText("[INSTRUMENT]", instrument);
+            }
+            // save new file
+            newLetter.Save();
+            string destinationPath2 = "/Volumes/GoogleDrive/Team Drives/";
+            if (this.loan.LenderId == R1ID)
+                destinationPath2 += "Resilience I/";
+            else if (this.loan.LenderId == R2ID)
+                destinationPath2 += "Resilience II/";
+            destinationPath2 += "Loans/" + this.loan.Property().State() + "/" + address + ", " + city;
+            destinationPath2 += "/Sale/Satisfaction of Mortgage (" + address + ").docx";
+            newLetter.SaveAs(destinationPath2);
+            // notify
+            this.StatusMessageTextField.StringValue = "Release Letter Created at:/n" + destinationPath;
+            this.StatusMessageTextField.StringValue += "/n/nRelease Letter Copied to:/n" + destinationPath2;
         }
 
         private void UpdateScheduledSale()
@@ -566,9 +712,17 @@ namespace ManageSales
 
         private void SetSoldLabels()
         { 
-            this.SalePriceLabel.StringValue = "N/A";
+            if (this.loan.Property().State() == "PA")
+            {
+                this.SalePriceLabel.StringValue = "Instrument";
+                this.RepaymentAmountLabel.StringValue = "Parcel";
+            }
+            else
+            {
+                this.SalePriceLabel.StringValue = "Book";
+                this.RepaymentAmountLabel.StringValue = "Pages";
+            }
             this.CashflowDateLabel.StringValue = "Addl Interest Pay Date";
-            this.RepaymentAmountLabel.StringValue = "N/A";
             this.AdditionalInterestLabel.StringValue = "Addl Interest Amount";
         }
 

@@ -106,7 +106,7 @@ namespace CashflowProjection
                     break;
 
                 case "Amount":
-                    text = this.data[irow].Amount().ToString("#,##0.00");
+                    text = this.data[irow].Amount().ToString("#,##0.00  ");
                     break;
 
                 case "Type":

@@ -108,6 +108,9 @@ namespace UpdateAcquisition
 		[Action ("DrawUpdated:")]
 		partial void DrawUpdated (AppKit.NSTextField sender);
 
+		[Action ("GenerateDocsPressed:")]
+		partial void GenerateDocsPressed (AppKit.NSButton sender);
+
 		[Action ("HOIUpdated:")]
 		partial void HOIUpdated (AppKit.NSTextField sender);
 
@@ -267,14 +270,14 @@ namespace UpdateAcquisition
 				TitlePolicyLabel = null;
 			}
 
-			if (UpdateAcquisitionButton != null) {
-				UpdateAcquisitionButton.Dispose ();
-				UpdateAcquisitionButton = null;
-			}
-
 			if (TotalCostLabel != null) {
 				TotalCostLabel.Dispose ();
 				TotalCostLabel = null;
+			}
+
+			if (UpdateAcquisitionButton != null) {
+				UpdateAcquisitionButton.Dispose ();
+				UpdateAcquisitionButton = null;
 			}
 		}
 	}

@@ -4,71 +4,24 @@ using AppKit;
 using Foundation;
 using ResilienceClasses;
 using System.Collections.Generic;
+using Xceed.Words.NET;
 
 namespace UpdateAcquisition
 {
     public partial class ViewController : NSViewController
     {
-        clsLoan loanToUpdate;
 
+        #region Private Variables
+        clsLoan loanToUpdate;
+        #endregion
+
+        #region Constructors
         public ViewController(IntPtr handle) : base(handle)
         {
         }
+        #endregion
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            // Do any additional setup after loading the view.
-            List<string> addressList = clsProperty.AddressList();
-            this.AddressComboBox.RemoveAll();
-            foreach (string address in addressList) { this.AddressComboBox.Add((NSString)address); }
-
-            this.HOILabel.StringValue = "0";
-            this.PriceLabel.StringValue = "0";
-            this.AcqTaxLabel.StringValue = "0";
-            this.RecordingLabel.StringValue = "0";
-            this.ConcessionLabel.StringValue = "0";
-            this.ProcessingLabel.StringValue = "0";
-            this.ClosingDateLabel.StringValue = "--/--/--";
-            this.InitialDrawLabel.StringValue = "0";
-            this.PropertyTaxLabel.StringValue = "0";
-            this.TitlePolicyLabel.StringValue = "0";
-            this.LenderLabel.StringValue = "---";
-            this.BorrowerLabel.StringValue = "---";
-
-            this.HOIField.StringValue = this.HOILabel.StringValue;
-            this.PriceField.StringValue = this.PriceLabel.StringValue;
-            this.AcqTaxField.StringValue = this.AcqTaxLabel.StringValue;
-            this.RecordingField.StringValue = this.RecordingLabel.StringValue;
-            this.ConcessionField.StringValue = this.ConcessionLabel.StringValue;
-            this.ProcessingField.StringValue = this.ProcessingLabel.StringValue;
-            this.ClosingDatePicker.DateValue = (NSDate)System.DateTime.Today;
-            this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
-            this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
-            this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
-
-            clsCSVTable tblEntity = new clsCSVTable(clsEntity.strEntityPath);
-            for (int i = 0; i < tblEntity.Length(); i++)
-            {
-                this.LenderComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
-                this.BorrowerComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
-            }
-        }
-
-        public override NSObject RepresentedObject
-        {
-            get
-            {
-                return base.RepresentedObject;
-            }
-            set
-            {
-                base.RepresentedObject = value;
-                // Update the view, if already loaded.
-            }
-        }
-
+        #region WiredActions
         partial void PropertyChosen(AppKit.NSComboBox sender)
         {
             if (this.AddressComboBox.StringValue != "")
@@ -345,6 +298,13 @@ namespace UpdateAcquisition
             this.UpdateTotalCostLabel();
         }
 
+        partial void GenerateDocsPressed(NSButton sender)
+        {
+//            GenerateDocs();
+        }
+        #endregion
+
+        #region Encapsulation Methods
         private void UpdateTotalCostLabel()
         {
             double total = 0D;
@@ -359,5 +319,244 @@ namespace UpdateAcquisition
             total += this.TitlePolicyField.DoubleValue;
             this.TotalCostLabel.DoubleValue = total;
         }
+
+        public void GenerateDocs(string Field0Value, string Field1Value, string Field2Value, string Field3Value, string Field4Value)
+        {
+            string prefix = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/";
+            string destPrefix = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/";
+            string mtgPath = prefix;
+            string destMtgPath = destPrefix;
+            string disclosurePath = prefix + "Disclosure for Confession of Judgment ";
+            string destDisclosurePath = destPrefix + "Disclosure for Confession of Judgment ";
+            string escrowPath = prefix + "Escrow Instructions ";
+            string destEscrowPath = destPrefix + "EIL ";
+            string stateAbbrev = this.loanToUpdate.Property().State();
+            string lenderAbbrev = "";
+            string borrowerAbrev = "";
+
+            if (this.loanToUpdate.LenderId == 1) lenderAbbrev = "R1";
+            else if (this.loanToUpdate.LenderId == 16) lenderAbbrev = "R2";
+
+            if (this.loanToUpdate.BorrowerId == 3) borrowerAbrev = "HCR";
+            else if (this.loanToUpdate.BorrowerId == 4) borrowerAbrev = "HH";
+
+            // find and copy template(s) (Mortgage, Disclosure, Escrow Instruction Letter)
+            destEscrowPath += this.loanToUpdate.Property().Address() + ".docx";
+            switch (stateAbbrev)
+            {
+                case "MD":
+                    mtgPath += "DOT " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "DOT " + this.loanToUpdate.Property().Address() + ".docx";
+                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " GS.docx";
+                    System.IO.File.Copy(mtgPath, destMtgPath, true);
+                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
+                    break;
+                case "NJ":
+                    mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
+                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " FTNJ.docx";
+                    disclosurePath += lenderAbbrev + " " + borrowerAbrev + ".docx";
+                    destDisclosurePath += this.loanToUpdate.Property().Address() + ".docx";
+                    System.IO.File.Copy(mtgPath, destMtgPath, true);
+                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
+                    System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
+                    break;
+                case "PA":
+                    mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
+                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " VP.docx";
+                    disclosurePath += lenderAbbrev + " " + borrowerAbrev + ".docx";
+                    destDisclosurePath += this.loanToUpdate.Property().Address() + ".docx";
+                    System.IO.File.Copy(mtgPath, destMtgPath, true);
+                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
+                    System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
+                    break;
+                default:
+                    break;
+            }
+
+            // get replacement values
+            // - EIL:  LETTERDATE, ACQUISITIONDATE, FILENUMBER, WIREAMOUNT, EXPIRATIONDATE (= ACQ + 3d), COUNTY
+            string LETTERDATE = System.DateTime.Today.Date.ToString("MMMM d, yyyy");
+            string ACQUISITIONDATE = this.loanToUpdate.OriginationDate().Date.ToString("MMMM d, yyyy");
+            string FILENUMBER = Field0Value; // from custom dialog
+            string WIREAMOUNT = this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
+            string EXPIRATIONDATE = this.loanToUpdate.OriginationDate().Date.AddDays(5).ToString("MMMM d, yyyy");
+            string COUNTY = this.loanToUpdate.Property().County();
+            // - MTG:  DATEDDATE, DUEDATE, COUNTY, ADDRESS (full address with city, state, zip)
+            // - DISC: ADDRESS (full address with city, state, zip)
+            string DATEDDATE = ACQUISITIONDATE;
+            string DUEDATE = this.loanToUpdate.MaturityDate().ToString("MMMM d, yyyy");
+            string ADDRESS = this.loanToUpdate.Property().Address() + ", " + this.loanToUpdate.Property().Town() + ", ";
+            ADDRESS += this.loanToUpdate.Property().State();
+            //   -     MD:  STREETADDRESS, CITY, MAXAMOUNT, MAXAMOUNTWORDS, PURCHASEAMOUNT, PURCHASEAMOUNTWORDS
+            string STREETADDRESS = this.loanToUpdate.Property().Address();
+            string CITY = this.loanToUpdate.Property().Town();
+            string MAXAMOUNT = Convert.ToDouble(Field1Value).ToString("#,##0.00"); // from custom dialog
+            string MAXAMOUNTWORDS = Field2Value;  // from custom dialog
+            string PURCHASEAMOUNT = Convert.ToDouble(Field3Value).ToString("#,##0.00");  // from custom dialog
+            string PURCHASEAMOUNTWORDS = Field4Value;  // from custom dialog
+            //   -     NJ:  LOT, BLOCK, MAP
+            string LOT = Field1Value;  // from custom dialog
+            string BLOCK = Field2Value;  // from custom dialog
+            string MAP = Field3Value;  // from custom dialog
+            //   -     PA:  PARCEL
+            string PARCEL = Field1Value;  // from custom dialog
+            DocX doc;
+
+            // do find and replaces
+            SummaryMessageField.StringValue = "";
+
+            // Disclosure
+            if (stateAbbrev != "MD")
+            {
+                doc = DocX.Load(destDisclosurePath);
+                doc.ReplaceText("[ADDRESS]", ADDRESS);
+                doc.Save();
+                SummaryMessageField.StringValue += "Updated " + destDisclosurePath;
+            }
+
+            // Escrow
+            doc = DocX.Load(destEscrowPath);
+            doc.ReplaceText("[LETTERDATE]", LETTERDATE);
+            //doc.Headers.Odd.ReplaceText("[LETTERDATE]", LETTERDATE);
+            //doc.Headers.Even.ReplaceText("[LETTERDATE]", LETTERDATE);
+            //doc.Headers.First.ReplaceText("[LETTERDATE]", LETTERDATE);
+            doc.ReplaceText("[ACQUISITIONDATE]", ACQUISITIONDATE);
+            doc.ReplaceText("[FILENUMBER]", FILENUMBER);
+            doc.ReplaceText("[WIREAMOUNT]", WIREAMOUNT);
+            doc.ReplaceText("[EXPIRATIONDATE]", EXPIRATIONDATE);
+            doc.ReplaceText("[COUNTY]", COUNTY);
+            doc.Save();
+            SummaryMessageField.StringValue += "\nUpdated " + destEscrowPath;
+
+            // Mortgage/Deed of Trust
+            doc = DocX.Load(destMtgPath);
+            doc.ReplaceText("[DATEDDATE]", DATEDDATE);
+            doc.ReplaceText("[DUEDATE]", DUEDATE);
+            doc.ReplaceText("[STREET]", STREETADDRESS);
+            doc.ReplaceText("[COUNTY]", COUNTY);
+            doc.ReplaceText("[ADDRESS]", ADDRESS);
+            if (stateAbbrev == "MD")
+            {
+                doc.ReplaceText("[CITY]", CITY);
+                doc.ReplaceText("[MAXAMOUNT]", MAXAMOUNT);
+                doc.ReplaceText("[MAXAMOUNTWORDS]", MAXAMOUNTWORDS.ToUpper());
+                doc.ReplaceText("[PURCHASEAMOUNT]", PURCHASEAMOUNT);
+                doc.ReplaceText("[PURCHASEAMOUNTWORDS]", PURCHASEAMOUNTWORDS.ToUpper());
+
+            }
+            else if (stateAbbrev == "NJ")
+            {
+                doc.ReplaceText("[LOT]", LOT);
+                doc.ReplaceText("[BLOCK]", BLOCK);
+                doc.ReplaceText("[MAP]", MAP);
+
+            }
+            else if (stateAbbrev == "PA")
+            {
+                doc.ReplaceText("[PARCEL]", PARCEL);
+            }
+            doc.Save();
+            SummaryMessageField.StringValue = "\nUpdated " + destMtgPath;
+            SummaryMessageField.StringValue = "\n*** REMEMBER TO UPDATE LEGAL ADDRESS MANUALLY ***";
+        }
+        #endregion
+
+        #region Overrides
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            // Do any additional setup after loading the view.
+            List<string> addressList = clsProperty.AddressList();
+            this.AddressComboBox.RemoveAll();
+            foreach (string address in addressList) { this.AddressComboBox.Add((NSString)address); }
+
+            this.HOILabel.StringValue = "0";
+            this.PriceLabel.StringValue = "0";
+            this.AcqTaxLabel.StringValue = "0";
+            this.RecordingLabel.StringValue = "0";
+            this.ConcessionLabel.StringValue = "0";
+            this.ProcessingLabel.StringValue = "0";
+            this.ClosingDateLabel.StringValue = "--/--/--";
+            this.InitialDrawLabel.StringValue = "0";
+            this.PropertyTaxLabel.StringValue = "0";
+            this.TitlePolicyLabel.StringValue = "0";
+            this.LenderLabel.StringValue = "---";
+            this.BorrowerLabel.StringValue = "---";
+
+            this.HOIField.StringValue = this.HOILabel.StringValue;
+            this.PriceField.StringValue = this.PriceLabel.StringValue;
+            this.AcqTaxField.StringValue = this.AcqTaxLabel.StringValue;
+            this.RecordingField.StringValue = this.RecordingLabel.StringValue;
+            this.ConcessionField.StringValue = this.ConcessionLabel.StringValue;
+            this.ProcessingField.StringValue = this.ProcessingLabel.StringValue;
+            this.ClosingDatePicker.DateValue = (NSDate)System.DateTime.Today;
+            this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
+            this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
+            this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
+
+            clsCSVTable tblEntity = new clsCSVTable(clsEntity.strEntityPath);
+            for (int i = 0; i < tblEntity.Length(); i++)
+            {
+                this.LenderComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+                this.BorrowerComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+            }
+        }
+
+        public override NSObject RepresentedObject
+        {
+            get
+            {
+                return base.RepresentedObject;
+            }
+            set
+            {
+                base.RepresentedObject = value;
+                // Update the view, if already loaded.
+            }
+        }
+
+        public override void PrepareForSegue(NSStoryboardSegue segue, NSObject sender)
+        {
+            switch (segue.Identifier)
+            {
+                case "ModelSegue": // I wanted this to be ModalSegue, but had a typo...
+                    var dialog = segue.DestinationController as CustomDialogController;
+                    dialog.Label0Title = "FILENUMBER";
+                    if (this.loanToUpdate.Property().State() == "MD")
+                    {
+                        dialog.Label1Title = "MAXAMOUNT";
+                        dialog.Label2Title = "...WORDS";
+                        dialog.Label3Title = "PURCHASEAMOUNT";
+                        dialog.Label4Title = "...WORDS";
+                    }
+                    else if (this.loanToUpdate.Property().State() == "NJ")
+                    {
+                        dialog.Label1Title = "LOT";
+                        dialog.Label2Title = "BLOCK";
+                        dialog.Label3Title = "MAP";
+                        dialog.Label4Title = "";
+                    }
+                    else if (this.loanToUpdate.Property().State() == "PA")
+                    {
+                        dialog.Label1Title = "PARCEL";
+                        dialog.Label2Title = "";
+                        dialog.Label3Title = "";
+                        dialog.Label4Title = "";
+                    }
+                    else
+                    {
+                        dialog.Label1Title = "";
+                        dialog.Label2Title = "";
+                        dialog.Label3Title = "";
+                        dialog.Label4Title = "";
+                    }
+                    dialog.Presentor = this;
+                    break;
+            }
+        }
+        #endregion
     }
 }

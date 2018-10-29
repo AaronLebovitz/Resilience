@@ -42,6 +42,9 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Data" />
+    <Reference Include="Xceed.Words.NET">
+      <HintPath>..\packages\DocX.1.2.1\lib\Xceed.Words.NET.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,6 +56,10 @@
     <Compile Include="clsEntity.cs" />
     <Compile Include="clsCSVTable.cs" />
     <Compile Include="ComboBoxStringListDataSource.cs" />
+    <Compile Include="NumberToText.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
