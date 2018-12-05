@@ -10,10 +10,13 @@ namespace ResilienceRecordDocument
     {
         List<clsDocument> docList;
         List<clsEntity> entityList;
+        Dictionary<string, int> loanList;
         string addressSelected;
+        clsDocument.Type docType;
         int docID;
         int senderID;
         int receiverID;
+        clsLoan loan;
         clsDocumentRecord.Status status;
         clsDocumentRecord.Transmission transmittal;
         DateTime dtAction;
@@ -55,7 +58,9 @@ namespace ResilienceRecordDocument
             { TransmitChooser.Add((NSString)t.ToString()); }
 
             ActionDateChooser.DateValue = (NSDate)System.DateTime.Today;
-            RecordDateChooser.DateValue = (NSDate)System.DateTime.Today;
+            RecordDateChooser.DateValue = (NSDate)System.DateTime.Now;
+
+            this.loanList = clsLoan.LoanIDsByAddress();
 
             ChosenDocumentLabel.StringValue = "";
         }
@@ -81,13 +86,39 @@ namespace ResilienceRecordDocument
                 if (newRecord.Save())
                 {
                     SaveMessage.StringValue = "Saved New Document Record " + newRecord.ID().ToString();
-                    SaveMessage.TextColor = NSColor.Black;
+                    SaveMessage.TextColor = NSColor.Gray;
                 }
                 else
                 {
                     SaveMessage.StringValue = "Save Failed";
                     SaveMessage.TextColor = NSColor.Red;
                 }
+                // check for recording information
+                if ((this.docType == (int)clsDocument.Type.Mortgage) && (this.status == clsDocumentRecord.Status.Notarized))
+                {
+                    int iBook = 0;
+                    int iPage = 0;
+                    int iInstrument = 0;
+                    int iParcel = 0;
+
+                    if (this.loan.Property().State() == "PA")
+                    {
+                        iParcel = this.PageTextField.IntValue;
+                        iInstrument = this.BookInstrumentTextField.IntValue;
+                    }
+                    else
+                    {
+                        iBook = this.BookInstrumentTextField.IntValue;
+                        iPage = this.PageTextField.IntValue;
+                    }
+
+                    clsLoanRecording lr = new clsLoanRecording(this.loan.ID(), iBook, iPage, iInstrument, iParcel, this.dtAction);
+                    if (lr.Save())
+                        SaveMessage.StringValue += ".  Recording Saved.";
+                    else
+                        SaveMessage.StringValue += ".  Failed to Save Recording.";
+                }
+
             }
             else
             {
@@ -98,6 +129,9 @@ namespace ResilienceRecordDocument
 
         partial void PropertyChosen(NSComboBox sender)
         {
+            this.addressSelected = this.PropertyChooser.StringValue;
+            if (this.addressSelected.Length > 1)
+                this.loan = new clsLoan(this.loanList[this.addressSelected]);
             this.Update();
         }
 
@@ -129,6 +163,7 @@ namespace ResilienceRecordDocument
         partial void ActionDateChosen(NSDatePicker sender)
         {
             this.Update();
+            RecordDateChooser.DateValue = (NSDate)System.DateTime.Now;
         }
 
         partial void RecordDateChosen(NSDatePicker sender)
@@ -146,7 +181,11 @@ namespace ResilienceRecordDocument
             {
                 foreach (clsDocument doc in this.docList)
                 {
-                    if ((int)doc.DocumentType() == DocumentChooser.SelectedIndex) this.docID = doc.ID();
+                    if ((int)doc.DocumentType() == DocumentChooser.SelectedIndex)
+                    {
+                        this.docID = doc.ID();
+                        this.docType = doc.DocumentType();
+                    }
                 }
             }
             this.senderID = (int)SenderChooser.SelectedIndex;

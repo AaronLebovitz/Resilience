@@ -289,6 +289,12 @@ namespace ManageSales
                 newLetter.ReplaceText("[PAGES]", pages);
                 newLetter.ReplaceText("[COUNTY]", county);
                 newLetter.ReplaceText("[CITY]", city);
+                clsLoanRecording lr = new clsLoanRecording(address);
+                if (lr.ID() < 0)
+                {
+                    lr = new clsLoanRecording(this.loan.ID(), Int32.Parse(book), Int32.Parse(pages), 0, 0, recordDate);
+                    lr.Save();
+                }
             }
             else
             {
@@ -305,6 +311,12 @@ namespace ManageSales
                 newLetter.ReplaceText("[TODAYDATE]", todayDate.ToString("MMMM d, yyyy"));
                 newLetter.ReplaceText("[PARCEL]", parcel);
                 newLetter.ReplaceText("[INSTRUMENT]", instrument);
+                clsLoanRecording lr = new clsLoanRecording(address);
+                if (lr.ID() < 0)
+                {
+                    lr = new clsLoanRecording(this.loan.ID(), 0, 0, Int32.Parse(parcel), Int32.Parse(instrument), recordDate);
+                    lr.Save();
+                }
             }
             // save new file
             newLetter.Save();
@@ -724,6 +736,29 @@ namespace ManageSales
             }
             this.CashflowDateLabel.StringValue = "Addl Interest Pay Date";
             this.AdditionalInterestLabel.StringValue = "Addl Interest Amount";
+        }
+
+        private void PopulateRecordingInfo()
+        {
+            clsLoanRecording rec = new clsLoanRecording(this.loan.Property().Address());
+            if (rec.ID() > 0)
+            {
+                if (this.loan.Property().State() == "PA")
+                {
+                    this.ExpectedSalePriceTextField.IntValue = rec.Instrument();
+                    this.RepaymentAmountTextField.IntValue = rec.Parcel();
+                }
+                else
+                {
+                    this.ExpectedSalePriceTextField.IntValue = rec.Book();
+                    this.RepaymentAmountTextField.IntValue = rec.Page();
+                }
+            }
+            else
+            {
+                this.ExpectedSalePriceTextField.IntValue = 0;
+                this.RepaymentAmountTextField.IntValue = 0;
+            }
         }
 
         private void UpdateAddressList()

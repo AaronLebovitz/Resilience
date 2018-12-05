@@ -24,5 +24,5 @@ namespace UpdateAcquisition
         {
             return true;
         }
-    }
+	}
 }

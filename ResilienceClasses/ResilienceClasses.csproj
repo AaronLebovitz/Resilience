@@ -57,6 +57,7 @@
     <Compile Include="clsCSVTable.cs" />
     <Compile Include="ComboBoxStringListDataSource.cs" />
     <Compile Include="NumberToText.cs" />
+    <Compile Include="clsLoanRecording.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
