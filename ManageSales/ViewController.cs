@@ -173,6 +173,7 @@ namespace ManageSales
 
                     case clsLoan.State.Unknown:
                     case clsLoan.State.Cancelled:
+                        break;
                     case clsLoan.State.Sold:
                     default:
                         this.SetSoldLabels();
@@ -184,8 +185,9 @@ namespace ManageSales
                                                                              + this.loan.PastDueAdditionalInterest();
                         this.SaleDatePicker.DateValue = 
                             (NSDate)this.loan.FindDate(clsCashflow.Type.InterestAdditional,false,true).ToUniversalTime();
+                        // check for LoanRecording and populate book/page or instrument/parcel if applicable
+                        this.PopulateRecordingInfo();
                         break;
-
                 }
             }
         }
@@ -246,6 +248,10 @@ namespace ManageSales
                     templatePath += "Satisfaction of Mortgage PA";
                     destinationPath += "Discharge of Mortgage";
                     break;
+                case "GA":
+                    templatePath += "Cancellation of Security Deed GA";
+                    destinationPath += "Discharge of Mortgage";
+                    break;
                 default:
                     templatePath += "Discharge of Mortgage GN";
                     destinationPath += "Discharge of Mortgage";
@@ -272,7 +278,7 @@ namespace ManageSales
             DateTime recordDate = (DateTime)this.RecordDatePicker.DateValue;
             // find and replace
             DocX newLetter = DocX.Load(destinationPath);
-            if (this.loan.Property().State() != "PA")
+            if ((this.loan.Property().State() == "NJ") || (this.loan.Property().State() == "MD"))
             {
                 string book = ExpectedSalePriceTextField.IntValue.ToString("#");
                 if (book == "0") { book = "____________"; }
@@ -296,7 +302,7 @@ namespace ManageSales
                     lr.Save();
                 }
             }
-            else
+            else if (this.loan.Property().State() == "PA")
             {
                 string instrument = ExpectedSalePriceTextField.IntValue.ToString("#");
                 if (instrument == "0") { instrument = "____________"; }
@@ -317,6 +323,10 @@ namespace ManageSales
                     lr = new clsLoanRecording(this.loan.ID(), 0, 0, Int32.Parse(parcel), Int32.Parse(instrument), recordDate);
                     lr.Save();
                 }
+            }
+            else if (this.loan.Property().State() == "GA")
+            {
+                // COMPLETE GA DISCHARGE FIND/REPLACES
             }
             // save new file
             newLetter.Save();
@@ -741,7 +751,7 @@ namespace ManageSales
         private void PopulateRecordingInfo()
         {
             clsLoanRecording rec = new clsLoanRecording(this.loan.Property().Address());
-            if (rec.ID() > 0)
+            if (rec.ID() >= 0)
             {
                 if (this.loan.Property().State() == "PA")
                 {

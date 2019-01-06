@@ -75,6 +75,7 @@ namespace UpdateAcquisition
                                 this.InitialDrawLabel.StringValue = amount;
                                 break;
                             case clsCashflow.Type.PropertyTax:
+                                amount = (-cf.Amount()).ToString("#,##0.00");
                                 this.PropertyTaxLabel.StringValue = amount;
                                 break;
                             default:
@@ -371,6 +372,14 @@ namespace UpdateAcquisition
                     System.IO.File.Copy(escrowPath, destEscrowPath, true);
                     System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
                     break;
+                case "GA":
+                    mtgPath += "Security Deed (MTG) " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "Deed " + this.loanToUpdate.Property().Address() + ".docx";
+                    // CHECK THIS ONCE WE IDENTIFY THE TITLE COMPANY
+                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " GA.docx";
+                    System.IO.File.Copy(mtgPath, destMtgPath, true);
+                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
+                    break;
                 default:
                     break;
             }
@@ -390,25 +399,50 @@ namespace UpdateAcquisition
             string ADDRESS = this.loanToUpdate.Property().Address() + ", " + this.loanToUpdate.Property().Town() + ", ";
             ADDRESS += this.loanToUpdate.Property().State();
             //   -     MD:  STREETADDRESS, CITY, MAXAMOUNT, MAXAMOUNTWORDS, PURCHASEAMOUNT, PURCHASEAMOUNTWORDS
-            string STREETADDRESS = this.loanToUpdate.Property().Address();
-            string CITY = this.loanToUpdate.Property().Town();
-            string MAXAMOUNT = Convert.ToDouble(Field1Value).ToString("#,##0.00"); // from custom dialog
-            string MAXAMOUNTWORDS = Field2Value;  // from custom dialog
-            string PURCHASEAMOUNT = Convert.ToDouble(Field3Value).ToString("#,##0.00");  // from custom dialog
-            string PURCHASEAMOUNTWORDS = Field4Value;  // from custom dialog
+            string STREETADDRESS = "";
+            string CITY = "";
+            string MAXAMOUNT = "";
+            string MAXAMOUNTWORDS = "";
+            string PURCHASEAMOUNT = "";
+            string PURCHASEAMOUNTWORDS="";
             //   -     NJ:  LOT, BLOCK, MAP
-            string LOT = Field1Value;  // from custom dialog
-            string BLOCK = Field2Value;  // from custom dialog
-            string MAP = Field3Value;  // from custom dialog
-            //   -     PA:  PARCEL
-            string PARCEL = Field1Value;  // from custom dialog
+            string LOT = "";
+            string BLOCK = "";
+            string MAP = "";
+            //   -     PA, GA:  PARCEL
+            string PARCEL = "";  // from custom dialog
             DocX doc;
+
+            switch (stateAbbrev)
+            {
+                case "GA":
+                    PARCEL = Field1Value;  // from custom dialog
+                    break;
+                case "NJ":
+                    LOT = Field1Value;  // from custom dialog
+                    BLOCK = Field2Value;  // from custom dialog
+                    MAP = Field3Value;  // from custom dialog
+                    break;
+                case "MD":
+                    STREETADDRESS = this.loanToUpdate.Property().Address();
+                    CITY = this.loanToUpdate.Property().Town();
+                    MAXAMOUNT = Convert.ToDouble(Field1Value).ToString("#,##0.00"); // from custom dialog
+                    MAXAMOUNTWORDS = Field2Value;  // from custom dialog
+                    PURCHASEAMOUNT = Convert.ToDouble(Field3Value).ToString("#,##0.00");  // from custom dialog
+                    PURCHASEAMOUNTWORDS = Field4Value;  // from custom dialog
+                    break;
+                case "PA":
+                    PARCEL = Field1Value;  // from custom dialog
+                    break;
+                default:
+                    break;
+            }
 
             // do find and replaces
             SummaryMessageField.StringValue = "";
 
             // Disclosure
-            if (stateAbbrev != "MD")
+            if ((stateAbbrev == "NJ") || (stateAbbrev == "PA"))
             {
                 doc = DocX.Load(destDisclosurePath);
                 doc.ReplaceText("[ADDRESS]", ADDRESS);
@@ -434,11 +468,11 @@ namespace UpdateAcquisition
             doc = DocX.Load(destMtgPath);
             doc.ReplaceText("[DATEDDATE]", DATEDDATE);
             doc.ReplaceText("[DUEDATE]", DUEDATE);
-            doc.ReplaceText("[STREET]", STREETADDRESS);
             doc.ReplaceText("[COUNTY]", COUNTY);
             doc.ReplaceText("[ADDRESS]", ADDRESS);
             if (stateAbbrev == "MD")
             {
+                doc.ReplaceText("[STREET]", STREETADDRESS);
                 doc.ReplaceText("[CITY]", CITY);
                 doc.ReplaceText("[MAXAMOUNT]", MAXAMOUNT);
                 doc.ReplaceText("[MAXAMOUNTWORDS]", MAXAMOUNTWORDS.ToUpper());
@@ -453,7 +487,7 @@ namespace UpdateAcquisition
                 doc.ReplaceText("[MAP]", MAP);
 
             }
-            else if (stateAbbrev == "PA")
+            else if ((stateAbbrev == "PA") || (stateAbbrev == "GA"))
             {
                 doc.ReplaceText("[PARCEL]", PARCEL);
             }
@@ -542,6 +576,13 @@ namespace UpdateAcquisition
                     else if (this.loanToUpdate.Property().State() == "PA")
                     {
                         dialog.Label1Title = "PARCEL";
+                        dialog.Label2Title = "";
+                        dialog.Label3Title = "";
+                        dialog.Label4Title = "";
+                    }
+                    else if (this.loanToUpdate.Property().State() == "GA")
+                    {
+                        dialog.Label1Title = "PARCEL/PIN";
                         dialog.Label2Title = "";
                         dialog.Label3Title = "";
                         dialog.Label4Title = "";

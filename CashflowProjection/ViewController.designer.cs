@@ -46,6 +46,9 @@ namespace CashflowProjection
 		AppKit.NSButton ScheduledOnlyButton { get; set; }
 
 		[Outlet]
+		AppKit.NSButton ShowExpiredCheckBox { get; set; }
+
+		[Outlet]
 		AppKit.NSDatePicker StartDatePicker { get; set; }
 
 		[Outlet]
@@ -90,6 +93,9 @@ namespace CashflowProjection
 		[Action ("ScheduledOnlyPressed:")]
 		partial void ScheduledOnlyPressed (AppKit.NSButton sender);
 
+		[Action ("ShowExpiredCheckBoxToggled:")]
+		partial void ShowExpiredCheckBoxToggled (AppKit.NSButton sender);
+
 		[Action ("StartDatePicked:")]
 		partial void StartDatePicked (AppKit.NSDatePicker sender);
 
@@ -133,6 +139,11 @@ namespace CashflowProjection
 				FullDetailCheckBox = null;
 			}
 
+			if (LenderPopUp != null) {
+				LenderPopUp.Dispose ();
+				LenderPopUp = null;
+			}
+
 			if (OutflowsOnlyButton != null) {
 				OutflowsOnlyButton.Dispose ();
 				OutflowsOnlyButton = null;
@@ -158,9 +169,9 @@ namespace CashflowProjection
 				TypeFilterComboBox = null;
 			}
 
-			if (LenderPopUp != null) {
-				LenderPopUp.Dispose ();
-				LenderPopUp = null;
+			if (ShowExpiredCheckBox != null) {
+				ShowExpiredCheckBox.Dispose ();
+				ShowExpiredCheckBox = null;
 			}
 		}
 	}

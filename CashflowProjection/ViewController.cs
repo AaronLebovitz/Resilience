@@ -12,12 +12,14 @@ namespace CashflowProjection
         #region Private Fields
 
         private List<clsCashflow> activeCashflows = new List<clsCashflow>();
+        private List<clsCashflow> expiredCashflows = new List<clsCashflow>();
         private Dictionary<string, int> addressToLoanID = clsLoan.LoanIDsByAddress();
         private DateTime startDate;
         private DateTime endDate;
         private bool showAll;
         private bool showScheduledOnly;
         private bool showExpensesOnly;
+        private bool showExpired;
         private CashflowTableDataSource dataSource;
         private CashflowTableDataSourceDelegate dataSourceDelegate;
         private bool showFullDetail = true;
@@ -49,12 +51,15 @@ namespace CashflowProjection
             this.showAll = true;
             this.showScheduledOnly = false;
             this.showExpensesOnly = false;
+            this.showExpired = false;
 
             clsCSVTable cfTable = new clsCSVTable(clsCashflow.strCashflowPath);
             for (int i = 0; i < cfTable.Length(); i++)
             {
                 if (DateTime.Parse(cfTable.Value(i, clsCashflow.DeleteDateColumn)) > System.DateTime.Today.AddYears(50))
                     this.activeCashflows.Add(new clsCashflow(i));
+                else
+                    this.expiredCashflows.Add(new clsCashflow(i));
             }
 
             this.DateFilterDatePicker.DateValue = (NSDate)System.DateTime.Today;
@@ -272,9 +277,39 @@ namespace CashflowProjection
             this.RefreshTable();
         }
 
+        partial void ShowExpiredCheckBoxToggled(NSButton sender)
+        {
+            this.showExpired = !this.showExpired;
+            this.FullDetailCheckBox.NIntValue = 0;
+            if (this.showExpired)
+            {
+                // turn off Actual
+                this.includeActual = true;
+                this.includeNonActual = true;
+                this.ActualFilterComboxBox.StringValue = "All";
+                // turn off Scheduled
+                this.showAll = true;
+                this.showExpensesOnly = false;
+                this.showScheduledOnly = false;
+                this.OutflowsOnlyButton.State = NSCellStateValue.Off;
+                this.ScheduledOnlyButton.State = NSCellStateValue.Off;
+                // turn off FullDetail
+                this.showFullDetail = false;
+                this.FullDetailCheckBox.State = NSCellStateValue.Off;
+            }
+            this.RefreshTable();
+        }
+
         partial void PastDueButtonPressed(NSButton sender)
         {
             List<clsCashflow> includedCashflows = new List<clsCashflow>();
+            if (this.showExpired)
+            {
+                this.ShowExpiredCheckBox.State = NSCellStateValue.Off;
+                this.showExpired = false;
+                this.FullDetailCheckBox.State = NSCellStateValue.On;
+                this.showFullDetail = true;
+            }
             foreach (clsCashflow cf in this.activeCashflows)
             {
                 if ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today))
@@ -356,10 +391,13 @@ namespace CashflowProjection
         {
             clsCSVTable cfTable = new clsCSVTable(clsCashflow.strCashflowPath);
             this.activeCashflows.Clear();
+            this.expiredCashflows.Clear();
             for (int i = 0; i < cfTable.Length(); i++)
             {
                 if (DateTime.Parse(cfTable.Value(i, clsCashflow.DeleteDateColumn)) > System.DateTime.Today.AddYears(50))
                     this.activeCashflows.Add(new clsCashflow(i));
+                else
+                    this.expiredCashflows.Add(new clsCashflow(i));
             }
             this.RefreshTable();
         }
@@ -421,8 +459,36 @@ namespace CashflowProjection
                 }
             }
 
+            if (this.showExpired)
+            {
+                foreach (clsCashflow cf in this.expiredCashflows)
+                {
+                    // cashflow must be part of a loan that belongs to the selected Lender
+                    bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                    // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
+                    bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
+                    // cashflow must belong to selected address OR no address must be selected ("All")
+                    if (bInclude)
+                        bInclude = ((this.addressFilter == "All") || (this.addressToLoanID[this.addressFilter] == cf.LoanID()));
+                    // cashflow must be of type chosen, or no type must be chosen
+                    if (bInclude) bInclude = ((this.typeFilter == clsCashflow.Type.Unknown) || (this.typeFilter == cf.TypeID()));
+                    if (bInclude)
+                    {
+                        hashCashflow = cf.PayDate().ToString("yyyyMMdd") + cf.LoanID().ToString("0000") + ((int)cf.TypeID()).ToString("00");
+                        // Create shortened Cashflow List
+                        if ((cf.PayDate() >= this.startDate.Date) && (cf.PayDate() <= this.endDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
+                        {
+                            if (this.showAll)
+                                includedCashflows.Add(cf);
+                            else if ((cf.Amount() < 0D) || (cf.Actual()) && (this.showExpensesOnly))
+                                includedCashflows.Add(cf);
+                        }
+                    }
+                }
+            }
+
             // Roll up cashflows if necessary
-            if (!this.showFullDetail)
+            if ((!this.showFullDetail) && (!this.showExpired))
             {
                 foreach (clsCashflow cf in includedCashflows)
                 {

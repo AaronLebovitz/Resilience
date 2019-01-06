@@ -166,6 +166,7 @@ namespace AddNewProperty
                         transferTax = bpo * 0.01;
                         break;
 
+                    case "GA":
                     default:
 
                         processingCost = -250D;

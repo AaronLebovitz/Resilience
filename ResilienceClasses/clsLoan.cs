@@ -687,7 +687,8 @@ namespace ResilienceClasses
         {
             // the idea here is that if principal had been repaid, but additional interest not yet received, 
             // then we can accrue for it 
-            // we only count it if it's booked within 30 days of the sale, to filter out escrowed amounts (see property 21 e.g.)
+            // we only count it if it's booked within 14 days of the sale (see property 21 e.g. to filter out escrowed amounts)
+            //  (or see property 40 for additional interest paid after Q3 was reported)
             double dReturnValue = 0;
             if (this.LoanAsOf(dt).Status() == State.Sold)
             {
@@ -695,7 +696,7 @@ namespace ResilienceClasses
                 foreach (clsCashflow cf in this.cfCashflows)
                 {
                     if ((cf.PayDate() > dt)
-                        && ((cf.PayDate() - dtSaleDate).Days <= 30)
+                        && ((cf.PayDate() - dtSaleDate).Days <= 14)
                         && (cf.TypeID() == clsCashflow.Type.InterestAdditional)
                         && (cf.Actual()))
                     {

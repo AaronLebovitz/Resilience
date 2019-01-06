@@ -128,6 +128,10 @@ namespace CashflowProjection
                         text = "";
                     break;
 
+                case "ExpireDate":
+                    text = this.data[irow].DeleteDate().ToString("MM/dd/yy");
+                    break;
+
                 default:
                     break;
             }
@@ -168,6 +172,16 @@ namespace CashflowProjection
                     else
                     {
                         data.Sort((x, y) => -1 * x.PayDate().CompareTo(y.PayDate()));
+                    }
+                    break;
+                case "ExpireDate":
+                    if (ascending)
+                    {
+                        data.Sort((x, y) => x.DeleteDate().CompareTo(y.DeleteDate()));
+                    }
+                    else
+                    {
+                        data.Sort((x, y) => -1 * x.DeleteDate().CompareTo(y.DeleteDate()));
                     }
                     break;
                 case "Amount":
