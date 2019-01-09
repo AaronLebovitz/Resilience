@@ -174,7 +174,7 @@ namespace ManageNonLoanCashflows
             if (this.validIDEntered)
             {
                 clsCashflow cashflow = new clsCashflow(this.CashflowIDTextField.IntValue);
-                if (cashflow.Delete(System.DateTime.Now))
+                if (cashflow.Delete(System.DateTime.Now, true))
                 {
                     this.SystemMessageTextField.StringValue = "CASHFLOW EXPIRED";
                     cashflow.Save();

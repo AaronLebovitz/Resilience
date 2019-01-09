@@ -222,9 +222,9 @@ namespace ResilienceClasses
             return this.dAmount;
         }
 
-        public bool Delete(DateTime dt) 
+        public bool Delete(DateTime dt, Boolean hardDelete = false) 
         {
-            if (this.Actual()) return false;
+            if ((this.Actual()) && (!hardDelete)) return false;
             else
             {
                 this.dtDeleteDate = dt;

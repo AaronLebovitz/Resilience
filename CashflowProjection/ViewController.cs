@@ -213,7 +213,7 @@ namespace CashflowProjection
 
         partial void NAVExportPressed(NSButton sender)
         {
-            string filePath = "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/CashflowReportNAV";
+            string filePath = "/Users/" + Environment.UserName + "/GoogleDrive/Team Drives/Resilience/Reports/CashflowReportNAV";
             filePath += "_" + this.startDate.ToString("yyyyMMdd");
             filePath += "_" + this.endDate.ToString("yyyyMMdd");
             filePath += ".csv";
