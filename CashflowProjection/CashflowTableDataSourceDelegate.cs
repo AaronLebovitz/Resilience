@@ -135,7 +135,20 @@ namespace CashflowProjection
                     if (view == null)
                     {
                         view = new NSTextField();
-                        view.Identifier = "DateCell";
+                        view.Identifier = "ExpireDateCell";
+                        view.BackgroundColor = NSColor.Clear;
+                        view.Bordered = false;
+                        view.Selectable = false;
+                        view.Editable = false;
+                    }
+                    break;
+
+                case "RecordDate":
+                    view = (NSTextField)tableView.MakeView("DateCell", this);
+                    if (view == null)
+                    {
+                        view = new NSTextField();
+                        view.Identifier = "RecordDateCell";
                         view.BackgroundColor = NSColor.Clear;
                         view.Bordered = false;
                         view.Selectable = false;

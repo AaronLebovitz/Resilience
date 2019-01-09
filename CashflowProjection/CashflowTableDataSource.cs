@@ -132,6 +132,10 @@ namespace CashflowProjection
                     text = this.data[irow].DeleteDate().ToString("MM/dd/yy");
                     break;
 
+                case "RecordDate":
+                    text = this.data[irow].RecordDate().ToString("MM/dd/yy");
+                    break;
+
                 default:
                     break;
             }
@@ -182,6 +186,16 @@ namespace CashflowProjection
                     else
                     {
                         data.Sort((x, y) => -1 * x.DeleteDate().CompareTo(y.DeleteDate()));
+                    }
+                    break;
+                case "RecordDate":
+                    if (ascending)
+                    {
+                        data.Sort((x, y) => x.RecordDate().CompareTo(y.RecordDate()));
+                    }
+                    else
+                    {
+                        data.Sort((x, y) => -1 * x.RecordDate().CompareTo(y.RecordDate()));
                     }
                     break;
                 case "Amount":
