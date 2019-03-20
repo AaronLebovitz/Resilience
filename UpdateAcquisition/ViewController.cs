@@ -558,6 +558,7 @@ namespace UpdateAcquisition
             {
                 case "ModelSegue": // I wanted this to be ModalSegue, but had a typo...
                     var dialog = segue.DestinationController as CustomDialogController;
+                    dialog.Title = "Additional Information for the State of " + this.loanToUpdate.Property().State();
                     dialog.Label0Title = "FILENUMBER";
                     if (this.loanToUpdate.Property().State() == "MD")
                     {
@@ -571,28 +572,28 @@ namespace UpdateAcquisition
                         dialog.Label1Title = "LOT";
                         dialog.Label2Title = "BLOCK";
                         dialog.Label3Title = "MAP";
-                        dialog.Label4Title = "";
+                        dialog.Label4Title = "N/A";
                     }
                     else if (this.loanToUpdate.Property().State() == "PA")
                     {
                         dialog.Label1Title = "PARCEL";
-                        dialog.Label2Title = "";
-                        dialog.Label3Title = "";
-                        dialog.Label4Title = "";
+                        dialog.Label2Title = "N/A";
+                        dialog.Label3Title = "N/A";
+                        dialog.Label4Title = "N/A";
                     }
                     else if (this.loanToUpdate.Property().State() == "GA")
                     {
                         dialog.Label1Title = "PARCEL/PIN";
-                        dialog.Label2Title = "";
-                        dialog.Label3Title = "";
-                        dialog.Label4Title = "";
+                        dialog.Label2Title = "N/A";
+                        dialog.Label3Title = "N/A";
+                        dialog.Label4Title = "N/A";
                     }
                     else
                     {
-                        dialog.Label1Title = "";
-                        dialog.Label2Title = "";
-                        dialog.Label3Title = "";
-                        dialog.Label4Title = "";
+                        dialog.Label1Title = "N/A";
+                        dialog.Label2Title = "N/A";
+                        dialog.Label3Title = "N/A";
+                        dialog.Label4Title = "N/A";
                     }
                     dialog.Presentor = this;
                     break;

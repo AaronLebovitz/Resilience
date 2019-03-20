@@ -22,8 +22,8 @@ namespace LoanStatusReport
             base.ViewDidLoad();
 
             // Do any additional setup after loading the view.
-            this.ReportDatePicker.DateValue = (NSDate)System.DateTime.Today;
-            this.ReportDatePicker2.DateValue = (NSDate)System.DateTime.Today.AddDays(91);
+            this.ReportDatePicker.DateValue = (NSDate)System.DateTime.Today.Date.ToUniversalTime();
+            this.ReportDatePicker2.DateValue = (NSDate)System.DateTime.Today.Date.AddDays(91).ToUniversalTime();
 
             clsCSVTable tblLenders = new clsCSVTable(clsEntity.strEntityPath);
             clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
@@ -55,8 +55,8 @@ namespace LoanStatusReport
         partial void RunPeriodReportButtonPushed(AppKit.NSButton sender)
         {
             this.UpdateLabel.StringValue = "Working...";
-            DateTime dt1 = (DateTime)ReportDatePicker.DateValue;
-            DateTime dt2 = (DateTime)ReportDatePicker2.DateValue;
+            DateTime dt1 = ((DateTime)ReportDatePicker.DateValue).Date.ToUniversalTime();
+            DateTime dt2 = ((DateTime)ReportDatePicker2.DateValue).Date.ToUniversalTime();
             if (dt2 == dt1) { dt2 = dt2.AddDays(1); }
             else if (dt2 < dt1)
             {
@@ -73,10 +73,10 @@ namespace LoanStatusReport
 
         partial void DateChosen(AppKit.NSDatePicker sender)
         {
-            if ((DateTime)this.ReportDatePicker.DateValue != dtStartDateChosen)
+            if (((DateTime)this.ReportDatePicker.DateValue).Date != dtStartDateChosen)
             {
-                dtStartDateChosen = (DateTime)this.ReportDatePicker.DateValue;
-                this.ReportDatePicker2.DateValue = (NSDate)(((DateTime)this.ReportDatePicker.DateValue).AddMonths(3));
+                dtStartDateChosen = ((DateTime)this.ReportDatePicker.DateValue).Date;
+                this.ReportDatePicker2.DateValue = (NSDate)(((DateTime)this.ReportDatePicker.DateValue).Date.AddDays(1).AddMonths(3).AddDays(-1).ToUniversalTime());
             }
         }
 

@@ -106,6 +106,11 @@ namespace ManageSales
                 {
                     this.UpdateScheduledAdditionalInterest();
                 }
+                else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Add Addl Int and Mark Actual")
+                {
+                    this.UpdateScheduledAdditionalInterest();
+                    this.MarkAdditionalInterestActual();
+                }
                 else if (this.ChooseActionPopUp.TitleOfSelectedItem == "Payoff Letter")
                 {
                     this.GeneratePayoffLetter();
@@ -178,6 +183,7 @@ namespace ManageSales
                     default:
                         this.SetSoldLabels();
                         this.ChooseActionPopUp.AddItem("Update/Add");
+                        this.ChooseActionPopUp.AddItem("Add Addl Int and Mark Actual");
                         this.ChooseActionPopUp.AddItem("Mark Addl Int Actual");
                         this.ChooseActionPopUp.AddItem("Discharge Letter");
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
