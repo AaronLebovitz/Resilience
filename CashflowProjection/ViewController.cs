@@ -213,7 +213,7 @@ namespace CashflowProjection
 
         partial void NAVExportPressed(NSButton sender)
         {
-            string filePath = "/Users/" + Environment.UserName + "/GoogleDrive/Team Drives/Resilience/Reports/CashflowReportNAV";
+            string filePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/CashflowReportNAV";
             filePath += "_" + this.startDate.ToString("yyyyMMdd");
             filePath += "_" + this.endDate.ToString("yyyyMMdd");
             filePath += ".csv";
@@ -312,7 +312,8 @@ namespace CashflowProjection
             }
             foreach (clsCashflow cf in this.activeCashflows)
             {
-                if ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today))
+                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                if (bInclude && ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today)))
                     includedCashflows.Add(cf);
             }
             this.dataSource.Cashflows = includedCashflows;

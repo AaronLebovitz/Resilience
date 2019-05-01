@@ -42,6 +42,9 @@ namespace LoanStatusReport
 		[Action ("LenderChosen:")]
 		partial void LenderChosen (AppKit.NSPopUpButton sender);
 
+		[Action ("RunAnnualReportButtonPushed:")]
+		partial void RunAnnualReportButtonPushed (AppKit.NSButton sender);
+
 		[Action ("RunPeriodReportButtonPushed:")]
 		partial void RunPeriodReportButtonPushed (AppKit.NSButton sender);
 
@@ -50,6 +53,11 @@ namespace LoanStatusReport
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (LenderPopUpButton != null) {
+				LenderPopUpButton.Dispose ();
+				LenderPopUpButton = null;
+			}
+
 			if (ReportDatePicker != null) {
 				ReportDatePicker.Dispose ();
 				ReportDatePicker = null;
@@ -83,11 +91,6 @@ namespace LoanStatusReport
 			if (UpdateLabel != null) {
 				UpdateLabel.Dispose ();
 				UpdateLabel = null;
-			}
-
-			if (LenderPopUpButton != null) {
-				LenderPopUpButton.Dispose ();
-				LenderPopUpButton = null;
 			}
 		}
 	}

@@ -146,6 +146,7 @@ namespace ManageSales
                         this.ChooseActionPopUp.AddItem("Cancel");
                         this.ChooseActionPopUp.AddItem("Update");
                         this.ChooseActionPopUp.AddItem("Payoff Letter");
+                        this.ChooseActionPopUp.AddItem("Discharge Letter");
                         if (this.loan.SaleDate() <= System.DateTime.Today) this.ChooseActionPopUp.AddItem("Mark Loan Repaid");
                         this.SaleDatePicker.DateValue = (NSDate)this.loan.SaleDate().Date.ToUniversalTime();
                         this.ExpectedSalePriceTextField.DoubleValue = 0D;
