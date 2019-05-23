@@ -21,7 +21,8 @@ namespace ResilienceClasses
         public static int MaturityDateCoumn = 6;
         public static int RateColumn = 7;
         public static int PenaltyRateColumn = 8;
-        public static int LenderColumn = 9;
+        public static int PointsColumn = 9;
+        public static int LenderColumn = 10;
         #endregion
 
         #region Static Methods
@@ -68,6 +69,7 @@ namespace ResilienceClasses
         private DateTime dtMaturity;
         private double dRate;
         private double dPenaltyRate;
+        private double dPoints;
         #endregion
 
         #region Constructors
@@ -87,6 +89,7 @@ namespace ResilienceClasses
                 this.dtOrigination = System.DateTime.MinValue;
                 this.dRate = 0D;
                 this.dPenaltyRate = 0D;
+                this.dPoints = 0D;
             }
             else
                 this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
@@ -108,13 +111,14 @@ namespace ResilienceClasses
                 this.dtOrigination = System.DateTime.MinValue;
                 this.dRate = 0D;
                 this.dPenaltyRate = 0D;
+                this.dPoints = 0D;
             }
             else
                 this._Load(loanID, tbl);
         }
 
         public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID,
-                       DateTime orig, DateTime mature, double r, double pr, int loanID = -1)
+                       DateTime orig, DateTime mature, double r, double pr, double pts, int loanID = -1)
         {
             if (loanID < 0) { this.iLoanID = this._NewLoanID(); }
             else { this.iLoanID = loanID; }
@@ -130,6 +134,7 @@ namespace ResilienceClasses
             this.dPenaltyRate = pr;
             this.pProperty = new clsProperty(propertyID);
             this.cfCashflows = new List<clsCashflow>();
+            this.dPoints = pts;
         }
         #endregion
 
@@ -150,7 +155,7 @@ namespace ResilienceClasses
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
                                           this.iAcquisitionTitleCompanyEntityID, this.iLenderEntityID, this.dtOrigination, this.dtMaturity,
-                                          this.dRate, this.dPenaltyRate, this.iLoanID);
+                                          this.dRate, this.dPenaltyRate, this.dPoints, this.iLoanID);
             if (this.cfCashflows.Count != 0)
             {
                 foreach (clsCashflow cf in this.cfCashflows)
@@ -222,6 +227,7 @@ namespace ResilienceClasses
                 strValues[clsLoan.RateColumn - 1] = this.dRate.ToString();
                 strValues[clsLoan.TitleCompanyColumn - 1] = this.iAcquisitionTitleCompanyEntityID.ToString();
                 strValues[clsLoan.TitleHolderColumn - 1] = this.iTitleHolderEntityID.ToString();
+                strValues[clsLoan.PointsColumn - 1] = this.dPoints.ToString();
                 strValues[clsLoan.LenderColumn - 1] = this.iLenderEntityID.ToString();
                 tbl.New(strValues);
                 if (tbl.Save())
@@ -252,6 +258,7 @@ namespace ResilienceClasses
                         tbl.Update(this.iLoanID, clsLoan.RateColumn, this.dRate.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.TitleCompanyColumn, this.iAcquisitionTitleCompanyEntityID.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.LenderColumn, this.iLenderEntityID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.PointsColumn, this.dPoints.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.TitleHolderColumn, this.iTitleHolderEntityID.ToString()))
                     {
                         if (tbl.Save())
@@ -302,6 +309,7 @@ namespace ResilienceClasses
                 this.dtOrigination = DateTime.Parse(tbl.Value(loanID, clsLoan.OGDateColumn));
                 this.dRate = Double.Parse(tbl.Value(loanID, clsLoan.RateColumn));
                 this.dPenaltyRate = Double.Parse(tbl.Value(loanID, clsLoan.PenaltyRateColumn));
+                this.dPoints = Double.Parse(tbl.Value(loanID, clsLoan.PointsColumn));
                 this.pProperty = new clsProperty(this.iPropertyID);
                 this._LoadCashflows();
                 return true;
@@ -337,6 +345,7 @@ namespace ResilienceClasses
         public DateTime MaturityDate() { return this.dtMaturity; }
         public double Rate() { return this.dRate; }
         public double PenaltyRate() { return this.dPenaltyRate; }
+        public double Points() { return this.dPenaltyRate; }
         public int TitleHolderID() { return this.iTitleHolderEntityID; }
         public int CoBorrowerID() { return this.iCoBorrowerEntityID; }
         public int TitleCompanyID() { return this.iAcquisitionTitleCompanyEntityID; }
