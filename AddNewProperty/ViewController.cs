@@ -29,6 +29,9 @@ namespace AddNewProperty
             this.TitleHolderPopUp.SelectItem(6);
             this.CoBorrowerPopUp.SelectItem(5);
             this.LenderPopUp.SelectItem(4);
+            this.PointsBox.DoubleValue = 0D;
+            this.DefaultRateBox.DoubleValue = 0.05;
+            this.LoanRateBox.DoubleValue = 0.09;
         }
 
         public override NSObject RepresentedObject
@@ -61,8 +64,9 @@ namespace AddNewProperty
             double rehabCost = this.RehabCostBox.DoubleValue;
             double pnl = this.PnLBox.DoubleValue;
             double months = this.MonthsToCompletionBox.DoubleValue;
-            double loanRate = 0.09;
-            double penaltyRate = 0.05;
+            double loanRate = this.LoanRateBox.DoubleValue;
+            double penaltyRate = this.DefaultRateBox.DoubleValue;
+            double points = this.PointsBox.DoubleValue;
 
             // acquisition cost estimates
             double processingCost;
@@ -202,7 +206,7 @@ namespace AddNewProperty
                 newProperty.Save();
 
                 clsLoan newLoan = new clsLoan(newProperty.ID(), titleHolderID, coID, titleID, lenderID,
-                                              acquisitionDate, acquisitionDate.AddMonths(9), loanRate, penaltyRate);
+                                              acquisitionDate, acquisitionDate.AddMonths(9), loanRate, penaltyRate, points);
                 int newLoanID = newLoan.ID();
                 newLoan.AddCashflow(new clsCashflow(acquisitionDate, System.DateTime.Today, System.DateTime.MaxValue, newLoanID, 
                                                     -price, false, clsCashflow.Type.AcquisitionPrice));
