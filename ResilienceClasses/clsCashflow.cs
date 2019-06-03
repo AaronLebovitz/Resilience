@@ -13,7 +13,7 @@ namespace ResilienceClasses
             DispositionPrice, DispositionConcession, DispositionProcessing, DispositionRecording, DispositionTaxes,
             PromoteFee, BankFees, LegalFees, AccountingFees, CapitalCall, BrokersFee, Misc,
             NetDispositionProj, CatchUp, Principal, InterestHard, InterestAdditional, EstimatedTotalCosts, Distribution,
-            InitialExpenseDraw, Acquisition, Repayment
+            InitialExpenseDraw, Acquisition, Repayment, Points
         }
 
         public static string strCashflowPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblCashflow.csv";

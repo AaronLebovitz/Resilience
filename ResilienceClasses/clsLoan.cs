@@ -5,6 +5,227 @@ using System.Collections.Generic;
 
 namespace ResilienceClasses
 {
+    public class Loan
+    {
+        #region Enums and Static Values
+        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold}
+        public static string LoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
+
+        public static int IndexColumn = 0;
+        public static int PropertyColumn = 1;
+        public static int TitleHolderColumn = 2;
+        public static int CoBorrowerColumn = 3;
+        public static int TitleCompanyColumn = 4;
+        public static int OGDateColumn = 5;
+        public static int MaturityDateCoumn = 6;
+        public static int RateColumn = 7;
+        public static int PenaltyRateColumn = 8;
+        public static int PointsColumn = 9;
+        public static int LenderColumn = 10;
+        public static int ProfitSplitColumn = 11;
+        public static int ParameterColumn = 12;
+        // {type=?}
+        #endregion
+
+        #region Static Methods
+        public static int LoanID(string address)
+        {
+            clsCSVTable tblLoans = new clsCSVTable(Loan.LoanPath);
+            int loanID = -1;
+
+            // Find PropertyID from Address First
+            int propertyID = clsProperty.IDFromAddress(address);
+            if (propertyID == -1) return -1;
+
+            // Now match propertyID to the loan
+            for (int i = 0; i < tblLoans.Length(); i++)
+            {
+                if (tblLoans.Value(i, clsLoan.PropertyColumn) == propertyID.ToString()) loanID = i;
+            }
+            return loanID;
+        }
+
+        public static Loan Load(int loanID)
+        {
+            return Loan.Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
+        }
+
+        public static Loan Load(int loanID, clsCSVTable tbl)
+        {
+            // TODO load the stuff from the table, then instantiate the right type based on the parameter given
+
+
+            //this.iLoanID = loanID;
+            //if (loanID < tbl.Length())
+            //{
+            //    this.iPropertyID = Int32.Parse(tbl.Value(loanID, Loan.PropertyColumn));
+            //    this.iBorrowerEntityID = Int32.Parse(tbl.Value(loanID, Loan.TitleHolderColumn));
+            //    this.iAcquisitionTitleCompanyEntityID = Int32.Parse(tbl.Value(loanID, Loan.TitleCompanyColumn));
+            //    this.iLenderEntityID = Int32.Parse(tbl.Value(loanID, Loan.LenderColumn));
+            //    this.dtMaturity = DateTime.Parse(tbl.Value(loanID, Loan.MaturityDateCoumn));
+            //    this.dtOrigination = DateTime.Parse(tbl.Value(loanID, Loan.OGDateColumn));
+            //    this.dRate = Double.Parse(tbl.Value(loanID, Loan.RateColumn));
+            //    this.dPenaltyRate = Double.Parse(tbl.Value(loanID, Loan.PenaltyRateColumn));
+            //    this.dPoints = Double.Parse(tbl.Value(loanID, Loan.PointsColumn));
+            //    this.pProperty = new clsProperty(this.iPropertyID);
+            //    this.dProfitSplit = Double.Parse(tbl.Value(loanID, Loan.ProfitSplitColumn));
+            //    this.sParameters = tbl.Value(loanID, Loan.ParameterColumn);
+            //    // TODO Parse Parameters - may have to redo this part entirely and have a static _Load method
+            //    this._LoadCashflows();
+            //    return true;
+            //}
+            //else
+            return new Loan(-1);
+        }
+
+        #endregion
+
+        #region Properties
+        private int iLoanID;
+        private int iPropertyID;
+        private int iBorrowerEntityID;
+        private int iAcquisitionTitleCompanyEntityID;
+        private int iLenderEntityID;
+        private List<clsCashflow> cfCashflows;
+        private clsProperty pProperty;
+        private DateTime dtOrigination;
+        private DateTime dtMaturity;
+        private double dRate;
+        private double dPenaltyRate;
+        private double dPoints;
+        private double dProfitSplit;
+        private string sParameters;
+        #endregion
+
+        #region Constructors
+        public Loan(int loanID)
+        {
+            if (loanID < 0)
+            {
+                this._Initialize(-1, -1, -1, -1, System.DateTime.MinValue, System.DateTime.MaxValue, 0D, 0D, 0D, 0D, -1);
+            }
+            else
+                this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
+        }
+
+        public Loan(int loanID, clsCSVTable tbl)
+        {
+            if (loanID < 0)
+            {
+                this._Initialize(-1, -1, -1, -1, System.DateTime.MinValue, System.DateTime.MaxValue, 0D, 0D, 0D, 0D, -1);
+            }
+            else
+                this._Load(loanID, tbl);
+        }
+
+        public Loan(int propertyID, int borrowerID, int titleCoID, int lenderID,
+                       DateTime orig, DateTime mature, double r, double pr, double pts, double split, int loanID = -1)
+        {
+            this._Initialize(propertyID, borrowerID, titleCoID, lenderID, orig, mature, r, pr, pts, split, (loanID < 0) ? this._NewLoanID() : loanID);
+        }
+        #endregion
+
+        #region Accessors
+        public DateTime OriginationDate() { return this.dtOrigination; }
+        public DateTime MaturityDate() { return this.dtMaturity; }
+        public double Rate() { return this.dRate; }
+        public double PenaltyRate() { return this.dPenaltyRate; }
+        public double Points() { return this.dPoints; }
+        public double ProfitSplit() { return this.dProfitSplit; }
+        public int TitleHolderID() { return this.iBorrowerEntityID; }
+        public int TitleCompanyID() { return this.iAcquisitionTitleCompanyEntityID; }
+        public int PropertyID() { return this.iPropertyID; }
+        public int LenderID() { return this.iLenderEntityID; }
+        public int ID() { return this.iLoanID; }
+        public clsProperty Property() { return this.pProperty; }
+        public List<clsCashflow> Cashflows() { return this.cfCashflows; }
+        #endregion
+
+        #region Public Methods
+        #endregion
+
+        #region Private Methods
+        private void _Initialize(int propertyID, int borrowerID, int titleCoID, int lenderID,
+                       DateTime orig, DateTime mature, double r, double pr, double pts, double split, int loanID)
+        {
+            if (loanID < 0) { this.iLoanID = this._NewLoanID(); } else { this.iLoanID = loanID; }
+            this.iPropertyID = propertyID;
+            this.iBorrowerEntityID = borrowerID;
+            this.iAcquisitionTitleCompanyEntityID = titleCoID;
+            this.iLenderEntityID = lenderID;
+            this.dtMaturity = mature;
+            this.dtOrigination = orig;
+            this.dRate = r;
+            this.dPenaltyRate = pr;
+            this.cfCashflows = new List<clsCashflow>();
+            this.dPoints = pts;
+            this.dProfitSplit = split;
+            if (propertyID < 0)
+                this.pProperty = new clsProperty("N/A", "N/A", "N/A", "NA", 0, "FundOps");
+            else
+                this.pProperty = new clsProperty(propertyID);
+            this.sParameters = "";
+        }
+
+        private bool _Load(int loanID)
+        {
+            return this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
+        }
+
+        private bool _Load(int loanID, clsCSVTable tbl)
+        {
+            this.iLoanID = loanID;
+            if (loanID < tbl.Length())
+            {
+                this.iPropertyID = Int32.Parse(tbl.Value(loanID, Loan.PropertyColumn));
+                this.iBorrowerEntityID = Int32.Parse(tbl.Value(loanID, Loan.TitleHolderColumn));
+                this.iAcquisitionTitleCompanyEntityID = Int32.Parse(tbl.Value(loanID, Loan.TitleCompanyColumn));
+                this.iLenderEntityID = Int32.Parse(tbl.Value(loanID, Loan.LenderColumn));
+                this.dtMaturity = DateTime.Parse(tbl.Value(loanID, Loan.MaturityDateCoumn));
+                this.dtOrigination = DateTime.Parse(tbl.Value(loanID, Loan.OGDateColumn));
+                this.dRate = Double.Parse(tbl.Value(loanID, Loan.RateColumn));
+                this.dPenaltyRate = Double.Parse(tbl.Value(loanID, Loan.PenaltyRateColumn));
+                this.dPoints = Double.Parse(tbl.Value(loanID, Loan.PointsColumn));
+                this.pProperty = new clsProperty(this.iPropertyID);
+                this.dProfitSplit = Double.Parse(tbl.Value(loanID, Loan.ProfitSplitColumn));
+                this.sParameters = tbl.Value(loanID, Loan.ParameterColumn);
+                // TODO Parse Parameters - may have to redo this part entirely and have a static _Load method
+                this._LoadCashflows();
+                return true;
+            }
+            else return false;
+        }
+
+        private void _LoadCashflows()
+        {
+            this._LoadCashflows(clsCashflow.strCashflowPath);
+        }
+
+        private void _LoadCashflows(string path)
+        {
+            clsCSVTable tbl = new clsCSVTable(path);
+            this.cfCashflows = new List<clsCashflow>();
+            int iCFLoanID;
+            for (int i = 0; i < tbl.Length(); i++)
+            {
+                if (Int32.TryParse(tbl.Value(i, clsCashflow.LoanColumn), out iCFLoanID))
+                {
+                    if (iCFLoanID == this.iLoanID)
+                    {
+                        this.cfCashflows.Add(new clsCashflow(i, tbl));
+                    }
+                }
+            }
+        }
+
+        private int _NewLoanID()
+        {
+            return 0;
+        }
+
+        #endregion
+    }
+
     public class clsLoan
     {
         #region Enums and Static Values
@@ -23,6 +244,8 @@ namespace ResilienceClasses
         public static int PenaltyRateColumn = 8;
         public static int PointsColumn = 9;
         public static int LenderColumn = 10;
+        public static int ProfitSplitColumn = 11;
+        public static int AcquisitionOnlyColumn = 12;
         #endregion
 
         #region Static Methods
@@ -70,27 +293,15 @@ namespace ResilienceClasses
         private double dRate;
         private double dPenaltyRate;
         private double dPoints;
+        private double dProfitSplit;
+        private bool bAcquisitionOnly;
         #endregion
 
         #region Constructors
         public clsLoan(int loanID)
         {
             if (loanID < 0)
-            {
-                this.iLoanID = loanID;
-                this.iPropertyID = -1;
-                this.iTitleHolderEntityID = -1;
-                this.iAcquisitionTitleCompanyEntityID = -1;
-                this.iCoBorrowerEntityID = -1;
-                this.iLenderEntityID = -1;
-                this.cfCashflows = new List<clsCashflow>();
-                this.pProperty = new clsProperty("N/A","N/A","N/A","NA",0,"FundOps");
-                this.dtMaturity = System.DateTime.MaxValue;
-                this.dtOrigination = System.DateTime.MinValue;
-                this.dRate = 0D;
-                this.dPenaltyRate = 0D;
-                this.dPoints = 0D;
-            }
+                this._Initialize(-1, -1, -1, -1, -1, DateTime.MinValue, DateTime.MaxValue, 0D, 0D, 0D, 0D, false, this._NewLoanID());
             else
                 this._Load(loanID, new clsCSVTable(clsLoan.strLoanPath));
         }
@@ -98,64 +309,27 @@ namespace ResilienceClasses
         public clsLoan(int loanID, clsCSVTable tbl)
         {
             if (loanID < 0)
-            {
-                this.iLoanID = loanID;
-                this.iPropertyID = -1;
-                this.iTitleHolderEntityID = -1;
-                this.iAcquisitionTitleCompanyEntityID = -1;
-                this.iCoBorrowerEntityID = -1;
-                this.iLenderEntityID = -1;
-                this.cfCashflows = new List<clsCashflow>();
-                this.pProperty = new clsProperty("N/A", "N/A", "N/A", "NA", 0, "FundOps");
-                this.dtMaturity = System.DateTime.MaxValue;
-                this.dtOrigination = System.DateTime.MinValue;
-                this.dRate = 0D;
-                this.dPenaltyRate = 0D;
-                this.dPoints = 0D;
-            }
+                this._Initialize(-1, -1, -1, -1, -1, DateTime.MinValue, DateTime.MaxValue, 0D, 0D, 0D, 0D, false, this._NewLoanID());
             else
                 this._Load(loanID, tbl);
         }
 
-        public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID,
-                       DateTime orig, DateTime mature, double r, double pr, double pts, int loanID = -1)
+        public clsLoan(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID, DateTime orig,
+                       DateTime mature, double r, double pr, double pts, double split, bool acqOnly, int loanID = -1)
         {
-            if (loanID < 0) { this.iLoanID = this._NewLoanID(); }
-            else { this.iLoanID = loanID; }
-            this.iPropertyID = propertyID;
-            this.iTitleHolderEntityID = titleHolderID;
-            this.iCoBorrowerEntityID = coBorrowerID;
-            this.iAcquisitionTitleCompanyEntityID = titleCoID;
-            this.iLenderEntityID = lenderID;
-            this.dtMaturity = mature;
-
-            this.dtOrigination = orig;
-            this.dRate = r;
-            this.dPenaltyRate = pr;
-            this.pProperty = new clsProperty(propertyID);
-            this.cfCashflows = new List<clsCashflow>();
-            this.dPoints = pts;
+            if (loanID < 0)
+                this._Initialize(propertyID, titleHolderID, coBorrowerID, titleCoID, lenderID, orig, mature, r, pr, pts, split, acqOnly, this._NewLoanID());
+            else
+                this._Initialize(propertyID, titleHolderID, coBorrowerID, titleCoID, lenderID, orig, mature, r, pr, pts, split, acqOnly, loanID);
         }
         #endregion
 
         #region Public Methods
-        public int LenderId
-        {
-            get { return this.iLenderEntityID; }
-            set { this.iLenderEntityID = value; }
-        }
-
-        public int BorrowerId
-        {
-            get { return this.iTitleHolderEntityID; }
-            set { this.iTitleHolderEntityID = value; }
-        }
-
         public clsLoan LoanAsOf(DateTime dt)
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
                                           this.iAcquisitionTitleCompanyEntityID, this.iLenderEntityID, this.dtOrigination, this.dtMaturity,
-                                          this.dRate, this.dPenaltyRate, this.dPoints, this.iLoanID);
+                                          this.dRate, this.dPenaltyRate, this.dPoints, this.dProfitSplit, this.bAcquisitionOnly, this.iLoanID);
             if (this.cfCashflows.Count != 0)
             {
                 foreach (clsCashflow cf in this.cfCashflows)
@@ -229,6 +403,8 @@ namespace ResilienceClasses
                 strValues[clsLoan.TitleHolderColumn - 1] = this.iTitleHolderEntityID.ToString();
                 strValues[clsLoan.PointsColumn - 1] = this.dPoints.ToString();
                 strValues[clsLoan.LenderColumn - 1] = this.iLenderEntityID.ToString();
+                strValues[clsLoan.ProfitSplitColumn - 1] = this.dProfitSplit.ToString();
+                strValues[clsLoan.AcquisitionOnlyColumn - 1] = this.bAcquisitionOnly.ToString();
                 tbl.New(strValues);
                 if (tbl.Save())
                 {
@@ -259,7 +435,9 @@ namespace ResilienceClasses
                         tbl.Update(this.iLoanID, clsLoan.TitleCompanyColumn, this.iAcquisitionTitleCompanyEntityID.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.LenderColumn, this.iLenderEntityID.ToString()) &&
                         tbl.Update(this.iLoanID, clsLoan.PointsColumn, this.dPoints.ToString()) &&
-                        tbl.Update(this.iLoanID, clsLoan.TitleHolderColumn, this.iTitleHolderEntityID.ToString()))
+                        tbl.Update(this.iLoanID, clsLoan.TitleHolderColumn, this.iTitleHolderEntityID.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.ProfitSplitColumn, this.dProfitSplit.ToString()) &&
+                        tbl.Update(this.iLoanID, clsLoan.AcquisitionOnlyColumn, this.bAcquisitionOnly.ToString()))
                     {
                         if (tbl.Save())
                         {
@@ -311,10 +489,35 @@ namespace ResilienceClasses
                 this.dPenaltyRate = Double.Parse(tbl.Value(loanID, clsLoan.PenaltyRateColumn));
                 this.dPoints = Double.Parse(tbl.Value(loanID, clsLoan.PointsColumn));
                 this.pProperty = new clsProperty(this.iPropertyID);
+                this.dProfitSplit = Double.Parse(tbl.Value(loanID, clsLoan.ProfitSplitColumn));
+                this.bAcquisitionOnly = Boolean.Parse(tbl.Value(loanID, clsLoan.AcquisitionOnlyColumn));
                 this._LoadCashflows();
                 return true;
             }
             else return false;
+        }
+
+        private void _Initialize(int propertyID, int titleHolderID, int coBorrowerID, int titleCoID, int lenderID, DateTime orig,
+                       DateTime mature, double r, double pr, double pts, double split, bool acqOnly, int loanID)
+        {
+            this.iPropertyID = propertyID;
+            this.iTitleHolderEntityID = titleHolderID;
+            this.iCoBorrowerEntityID = coBorrowerID;
+            this.iAcquisitionTitleCompanyEntityID = titleCoID;
+            this.iLenderEntityID = lenderID;
+            this.dtMaturity = mature;
+            this.dtOrigination = orig;
+            this.dRate = r;
+            this.dPenaltyRate = pr;
+            if (propertyID < 0)
+                this.pProperty = new clsProperty("N/A", "N/A", "N/A", "NA", 0, "FundOps");
+            else
+                this.pProperty = new clsProperty(propertyID);
+            this.cfCashflows = new List<clsCashflow>();
+            this.dPoints = pts;
+            this.dProfitSplit = split;
+            this.bAcquisitionOnly = acqOnly;
+            this.iLoanID = loanID;
         }
 
         private void _LoadCashflows()
@@ -345,18 +548,178 @@ namespace ResilienceClasses
         public DateTime MaturityDate() { return this.dtMaturity; }
         public double Rate() { return this.dRate; }
         public double PenaltyRate() { return this.dPenaltyRate; }
-        public double Points() { return this.dPenaltyRate; }
+        public double Points() { return this.dPoints; }
+        public double ProfitSplit() { return this.dProfitSplit; }
         public int TitleHolderID() { return this.iTitleHolderEntityID; }
         public int CoBorrowerID() { return this.iCoBorrowerEntityID; }
         public int TitleCompanyID() { return this.iAcquisitionTitleCompanyEntityID; }
         public int PropertyID() { return this.iPropertyID; }
-        public int LenderID() { return this.iLenderEntityID; }
         public int ID() { return this.iLoanID; }
         public clsProperty Property() { return this.pProperty; }
         public List<clsCashflow> Cashflows() { return this.cfCashflows; }
+        public bool AcquisitionOnly() { return this.bAcquisitionOnly; }
+        public int LenderID
+        {
+            get { return this.iLenderEntityID; }
+            set { this.iLenderEntityID = value; }
+        }
+        public int BorrowerID
+        {
+            get { return this.iTitleHolderEntityID; }
+            set { this.iTitleHolderEntityID = value; }
+        }
+
         #endregion
 
         #region Calculation Methods
+
+        #region Interest
+
+        public double AccruedInterest(DateTime dt)
+        {
+            // calculates accured interest only for actual payments that took place before the calculation date
+            // this does not account for any future projected cashflows!
+            // TO Account for future projected cashflows, use this.LoanAsOf(dt).AccruedInterest(dt)
+            // TO look back and project forward use this.LoanAsOf(dtLookBack).LoanAsOf(dtLookAhead).AccruedInterest(dtLookAhead)
+            double dAccrued = 0;
+            double dExpiredDays;
+            bool bSold = false;
+            if (this.cfCashflows.Count == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).Days, (dt - cf.PayDate()).Days));
+                    if ((cf.PayDate() < dt) && (cf.Actual()))
+                    {
+                        dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
+                        dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
+                        if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
+                    }
+                }
+                if (bSold) { dAccrued = 0D; }
+                return -dAccrued;
+            }
+        }
+
+        public double AccruedInterest()
+        { return this.AccruedInterest(System.DateTime.Today); }
+
+        public double ProjectedHardInterest()
+        {
+            // if there is a principal repayment scheduled, use its scheduled pay date to take loan as of and then accrued to that date
+            // if not, check for a projected disposition
+            // if neither, return 0
+            DateTime dtSale = this.FindDate(clsCashflow.Type.Principal, false, true);
+            if (dtSale == DateTime.MinValue) dtSale = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
+            if (dtSale == DateTime.MinValue)
+            {
+                return 0;
+            }
+            else
+            {
+                clsLoan l = this.LoanAsOf(dtSale);
+                return l.AccruedInterest(dtSale);
+            }
+        }
+
+        public double ProjectedAdditionalInterest()
+        { return this.ProjectedAdditionalInterest(System.DateTime.Today); }
+
+        public double ProjectedAdditionalInterest(DateTime dt)
+        { return this.ImpliedAdditionalInterest() + this.ScheduledAdditionalInterest(dt); }
+
+        public double ImpliedAdditionalInterest()
+        {
+            DateTime dtProjDisp = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
+            if (dtProjDisp == DateTime.MinValue) { return 0; }
+            else
+            {
+                clsLoan l = this.LoanAsOf(dtProjDisp);
+                return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
+            }
+        }
+
+        public double AccruedAdditionalInterest(DateTime dt)
+        {
+            // the idea here is that if principal had been repaid, but additional interest not yet received, 
+            // then we can accrue for it 
+            // we only count it if it's booked within 14 days of the sale (see property 21 e.g. to filter out escrowed amounts)
+            //  (or see property 40 for additional interest paid after Q3 was reported)
+            double dReturnValue = 0;
+            if ((this.LoanAsOf(dt).Status() == State.Sold) && (this.dProfitSplit > 0D))
+            {
+                DateTime dtSaleDate = this.SaleDate();
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    if ((cf.PayDate() > dt)
+                        && ((cf.PayDate() - dtSaleDate).Days <= 14)
+                        && (cf.TypeID() == clsCashflow.Type.InterestAdditional)
+                        && (cf.Actual()))
+                    {
+                        dReturnValue += cf.Amount();
+                    }
+                }
+            }
+            return dReturnValue;
+        }
+
+        public double ScheduledAdditionalInterest()
+        { return this.ScheduledAdditionalInterest(System.DateTime.Today); }
+
+        public double ScheduledAdditionalInterest(DateTime dt)
+        {
+            if (this.dProfitSplit > 0)
+                return this._ProjectedToBePaid(dt, clsCashflow.Type.InterestAdditional);
+            else
+                return 0D;
+        }
+
+        public double PastDueAdditionalInterest()
+        { return this.PastDueAdditionalInterest(System.DateTime.Today); }
+
+        public double PastDueAdditionalInterest(DateTime dt)
+        {
+            if (this.dProfitSplit > 0)
+                return this._PastDue(dt, clsCashflow.Type.InterestAdditional);
+            else
+                return 0D;
+        }
+
+        public bool PointsCapitalized()
+        {
+            foreach (clsCashflow cf in this.cfCashflows)
+            {
+                if ((cf.PayDate() == this.dtOrigination) && (cf.DeleteDate() > this.dtOrigination.AddYears(100)) &&
+                    (cf.TypeID() == clsCashflow.Type.Points) && (cf.Amount() < 0))
+                    return true;
+            }
+            return false;
+        }
+
+        public double AcquisitionPoints()
+        {
+            // returns points actually paid, if any;  otherwise, calculates based on most recent AcquisitionCost
+            if (this.PointsPaid() > 0)
+                return this.PointsPaid();
+            else if (this.dPoints > 0)
+            {
+                if (this.PointsCapitalized())
+                    return this.AcquisitionCost(false, true) / (1D - this.dPoints * 0.01) * this.dPoints * 0.01;
+                else
+                    return this.AcquisitionCost(false, true) * this.dPoints * 0.01;
+            }
+            else
+                return 0D;
+        }
+
+        #endregion
+
+        #region Status, Dates, Balances
+
         public clsLoan.State Status()
         {
             // takes the current status of a Loan - does not look forward or back
@@ -404,45 +767,13 @@ namespace ResilienceClasses
                 }
                 if (bAllExpired) s = clsLoan.State.Cancelled;
                 else if (bSaleScheduled) s = clsLoan.State.PendingSale;
-                else if ((!bRehabRemains) && (s != clsLoan.State.Sold)) s = clsLoan.State.Listed;
+                else if ((!bRehabRemains) && (s != clsLoan.State.Sold) && (!this.bAcquisitionOnly)) s = clsLoan.State.Listed;
+                // if AcquisitionOnly, assume it's in rehab until its Listed
                 else if (s == clsLoan.State.Unknown) s = clsLoan.State.PendingAcquisition;
                 return s;
             }
             else return clsLoan.State.Cancelled;
         }
-
-        public double AccruedInterest(DateTime dt)
-        {
-            // calculates accured interest only for actual payments that took place before the calculation date
-            // this does not account for any future projected cashflows!
-            // TO Account for future projected cashflows, use this.LoanAsOf(dt).AccruedInterest(dt)
-            // TO look back and project forward use this.LoanAsOf(dtLookBack).LoanAsOf(dtLookAhead).AccruedInterest(dtLookAhead)
-            double dAccrued = 0;
-            double dExpiredDays;
-            bool bSold = false;
-            if (this.cfCashflows.Count == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                foreach (clsCashflow cf in this.cfCashflows)
-                {
-                    dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).Days, (dt - cf.PayDate()).Days));
-                    if ((cf.PayDate() < dt) && (cf.Actual()))
-                    {
-                        dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
-                        dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
-                        if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
-                    }
-                }
-                if (bSold) { dAccrued = 0D; }
-                return -dAccrued;
-            }
-        }
-
-        public double AccruedInterest()
-        { return this.AccruedInterest(System.DateTime.Today); }
 
         public double Balance(DateTime dt)
         {
@@ -461,6 +792,7 @@ namespace ResilienceClasses
                 {
                     if ((cf.PayDate() <= dt) && (cf.Actual()) &&
                         (cf.TypeID() != clsCashflow.Type.InterestHard) &&
+                        (cf.TypeID() != clsCashflow.Type.Points) &&
                         (cf.TypeID() != clsCashflow.Type.InterestAdditional))
                     {
                         dBalance += cf.Amount();
@@ -477,7 +809,10 @@ namespace ResilienceClasses
         {
             // TO Account for future projected cashflows, use this.LoanAsOf(dt).RehabSpent(dt)
             // TO look back and project forward use this.LoanAsOf(dtLookBack).LoanAsOf(dtLookAhead).RehabSpent(dtLookAhead)
-            return -this._Paid(dt, clsCashflow.Type.RehabDraw);
+            if (this.bAcquisitionOnly)
+                return 0;
+            else
+                return -this._Paid(dt, clsCashflow.Type.RehabDraw);
         }
 
         public double RehabSpent()
@@ -487,7 +822,10 @@ namespace ResilienceClasses
         {
             // TO Account for future projected cashflows, use this.LoanAsOf(dt).RehabRemain(dt)
             // TO look back and project forward use this.LoanAsOf(dtLookBack).LoanAsOf(dtLookAhead).RehabRemain(dtLookAhead)
-            return -this._ProjectedToBePaid(dt, clsCashflow.Type.RehabDraw);
+            if (this.bAcquisitionOnly)
+                return 0;
+            else
+                return -this._ProjectedToBePaid(dt, clsCashflow.Type.RehabDraw);
         }
 
         public double RehabRemain()
@@ -500,7 +838,7 @@ namespace ResilienceClasses
         { return this.PrincipalPaid(System.DateTime.Today); }
 
         public double InterestPaid(DateTime dt)
-        { return (this._Paid(dt, clsCashflow.Type.InterestHard) + this._Paid(dt, clsCashflow.Type.InterestAdditional)); }
+        { return (this._Paid(dt, clsCashflow.Type.InterestHard) + this._Paid(dt, clsCashflow.Type.InterestAdditional) + this.PointsPaid(dt)); }
 
         public double InterestPaid()
         { return this.InterestPaid(System.DateTime.Today); }
@@ -516,6 +854,12 @@ namespace ResilienceClasses
 
         public double HardInterestPaid()
         { return this.HardInterestPaid(System.DateTime.Today); }
+
+        public double PointsPaid(DateTime dt)
+        { return this._Paid(dt, clsCashflow.Type.Points) ; }
+
+        public double PointsPaid()
+        { return this.PointsPaid(DateTime.Today); }
 
         public DateTime SaleDate()
         {
@@ -562,22 +906,17 @@ namespace ResilienceClasses
             return dtFound;
         }
 
-        public double AcquisitionCost(bool original)
+        public double AcquisitionCost(bool original, bool beforePoints = false)
         {
+            DateTime dtAsOf = original ? this.FindDate(clsCashflow.Type.Acquisition, true, false) : this.dtOrigination;
+            clsLoan l = this.LoanAsOf(dtAsOf);
+            DateTime dtBalance = original ? l.FindDate(clsCashflow.Type.AcquisitionPrice, true, true) : this.dtOrigination;
             // returns the loan balance as of the origination date of the loan (projected or past)
             // if (original), uses the first record date found;  if (!original) uses the loan origination date
-            if (original)
-            {
-                // take the loan as of the first record date
-                clsLoan l = this.LoanAsOf(this.FindDate(clsCashflow.Type.AcquisitionPrice, true, false));
-                // calc balance as of the first pay date for the as of loan
-                return l.Balance(l.FindDate(clsCashflow.Type.AcquisitionPrice, true, true));
-            }
+            if (beforePoints)
+                return l.Balance(dtBalance) - l._DueFromLender(dtBalance, clsCashflow.Type.Points);
             else
-            {
-                clsLoan l = this.LoanAsOf(this.dtOrigination);
-                return l.Balance(this.dtOrigination);
-            }
+                return l.Balance(dtBalance);
         }
 
         public double OriginalAcquisitionCost()
@@ -650,87 +989,21 @@ namespace ResilienceClasses
 
         public double FirstRehabEstimate()
         {
-            DateTime dtFirstRecording = this.FindDate(clsCashflow.Type.RehabDraw, true, false);
-            if (dtFirstRecording == DateTime.MaxValue)
+            if (this.bAcquisitionOnly)
                 return 0;
             else
-                return this.LoanAsOf(dtFirstRecording).RehabRemain(dtFirstRecording);
-        }
-
-        public double ProjectedHardInterest()
-        {
-            // if there is a principal repayment scheduled, use its scheduled pay date to take loan as of and then accrued to that date
-            // if not, check for a projected disposition
-            // if neither, return 0
-            DateTime dtSale = this.FindDate(clsCashflow.Type.Principal, false, true);
-            if (dtSale == DateTime.MinValue) dtSale = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
-            if (dtSale == DateTime.MinValue)
             {
-                return 0;
-            }
-            else
-            {
-                clsLoan l = this.LoanAsOf(dtSale);
-                return l.AccruedInterest(dtSale);
+                DateTime dtFirstRecording = this.FindDate(clsCashflow.Type.RehabDraw, true, false);
+                if (dtFirstRecording == DateTime.MaxValue)
+                    return 0;
+                else
+                    return this.LoanAsOf(dtFirstRecording).RehabRemain(dtFirstRecording);
             }
         }
 
-        public double ProjectedAdditionalInterest()
-        { return this.ProjectedAdditionalInterest(System.DateTime.Today); }
+        #endregion
 
-        public double ProjectedAdditionalInterest(DateTime dt)
-        { return this.ImpliedAdditionalInterest() + this.ScheduledAdditionalInterest(dt); }
-
-        public double ImpliedAdditionalInterest()
-        {
-            DateTime dtProjDisp = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
-            if (dtProjDisp == DateTime.MinValue) { return 0; }
-            else
-            {
-                clsLoan l = this.LoanAsOf(dtProjDisp);
-                return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
-            }
-        }
-
-        public double AccruedAdditionalInterest(DateTime dt)
-        {
-            // the idea here is that if principal had been repaid, but additional interest not yet received, 
-            // then we can accrue for it 
-            // we only count it if it's booked within 14 days of the sale (see property 21 e.g. to filter out escrowed amounts)
-            //  (or see property 40 for additional interest paid after Q3 was reported)
-            double dReturnValue = 0;
-            if (this.LoanAsOf(dt).Status() == State.Sold)
-            {
-                DateTime dtSaleDate = this.SaleDate();
-                foreach (clsCashflow cf in this.cfCashflows)
-                {
-                    if ((cf.PayDate() > dt)
-                        && ((cf.PayDate() - dtSaleDate).Days <= 14)
-                        && (cf.TypeID() == clsCashflow.Type.InterestAdditional)
-                        && (cf.Actual()))
-                    {
-                        dReturnValue += cf.Amount();
-                    }
-                }
-            }
-            return dReturnValue;
-        }
-
-        public double ScheduledAdditionalInterest()
-        { return this.ScheduledAdditionalInterest(System.DateTime.Today); }
-
-        public double ScheduledAdditionalInterest(DateTime dt)
-        {
-            return this._ProjectedToBePaid(dt, clsCashflow.Type.InterestAdditional);
-        }
-
-        public double PastDueAdditionalInterest()
-        { return this.PastDueAdditionalInterest(System.DateTime.Today); }
-
-        public double PastDueAdditionalInterest(DateTime dt)
-        {
-            return this._PastDue(dt, clsCashflow.Type.InterestAdditional);
-        }
+        #region Returns
 
         public double IRR(bool original)
         {
@@ -783,14 +1056,15 @@ namespace ResilienceClasses
             }
         }
 
-        public double Return(bool original)
+        public double Return(bool original) // this is the return to Lender
         {
-            // just (HardInt + AddlInt) / (Balance)
+            // just (HardInt + AddlInt + Points) / (Balance)
             if (this.cfCashflows.Count == 0) { return double.NaN; }
             clsLoan l;
             DateTime dtAsOf;
             DateTime dtBalanceDate = DateTime.MinValue;  // the day before the principal is repaid
             bool bDisp;
+            // Calculate Balance for Denominator
             if (original)
             {
                 bDisp = true;
@@ -824,9 +1098,10 @@ namespace ResilienceClasses
                 }
                 l = this.LoanAsOf(dtAsOf);
             }
+            // Calculate Return, adding PointsPaid to DispositionAmount when calculating a projection rather than Actual
             if (bDisp)
             {
-                return (l.DispositionAmount(false, !original)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1;
+                return (l.DispositionAmount(false, !original) + l.PointsPaid(dtAsOf)) / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1;
             }
             else
             {
@@ -834,56 +1109,67 @@ namespace ResilienceClasses
             }
         }
 
-        public double GrossReturn(bool original)
+        public double GrossReturn(bool original) // this is total return to Lender and Borrower combined, only relevant where ProfitSplit > 0
         {
-            if (this.cfCashflows.Count == 0) { return double.NaN; }
-            clsLoan l;
-            DateTime dtAsOf;
-            bool bDisp;
-            DateTime dtBalanceDate = DateTime.MaxValue;
-            if (original)
+            if (this.dProfitSplit > 0D)
             {
-                // find the record date of the first projected disposition amount, take the loan as of that date
-                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, false);
-                bDisp = true;
-                l = this.LoanAsOf(dtAsOf);
-            }
-            else
-            {
-                // find the pay date of the last disposition date, or projected principal payment
-                dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
-                if (bDisp = (dtAsOf != DateTime.MinValue))
+                if (this.cfCashflows.Count == 0) { return double.NaN; }
+                clsLoan l;
+                DateTime dtAsOf;
+                bool bDisp;
+                DateTime dtBalanceDate = DateTime.MaxValue;
+                // calculate balance for denominator
+                if (original)
                 {
-                    dtAsOf = dtAsOf.AddDays(-1);
-                    dtBalanceDate = dtAsOf;
+                    // find the record date of the first projected disposition amount, take the loan as of that date
+                    dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, true, false);
+                    bDisp = true;
+                    l = this.LoanAsOf(dtAsOf);
                 }
                 else
                 {
-                    dtAsOf = FindDate(clsCashflow.Type.Principal, false, true);
-                    if (dtAsOf == DateTime.MinValue)
+                    // find the pay date of the last disposition date, or projected principal payment
+                    dtAsOf = this.FindDate(clsCashflow.Type.NetDispositionProj, false, true);
+                    if (bDisp = (dtAsOf != DateTime.MinValue))
                     {
-                        return double.NaN;
+                        dtAsOf = dtAsOf.AddDays(-1);
+                        dtBalanceDate = dtAsOf;
                     }
                     else
                     {
-                        dtBalanceDate = dtAsOf.AddDays(-1);
-                        if (FindDate(clsCashflow.Type.InterestAdditional, false, true) > dtAsOf)
+                        dtAsOf = FindDate(clsCashflow.Type.Principal, false, true);
+                        if (dtAsOf == DateTime.MinValue)
                         {
-                            dtAsOf = FindDate(clsCashflow.Type.InterestAdditional, false, true);
+                            return double.NaN;
+                        }
+                        else
+                        {
+                            dtBalanceDate = dtAsOf.AddDays(-1);
+                            if (FindDate(clsCashflow.Type.InterestAdditional, false, true) > dtAsOf)
+                            {
+                                dtAsOf = FindDate(clsCashflow.Type.InterestAdditional, false, true);
+                            }
                         }
                     }
+                    l = this.LoanAsOf(dtAsOf);
                 }
-                l = this.LoanAsOf(dtAsOf);
+                // calculate return
+                if (bDisp)
+                {
+                    return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest() * (1-this.dProfitSplit)/this.dProfitSplit + l.PointsPaid(dtAsOf)) 
+                        / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1D;
+                }
+                else
+                {
+                    return (l.HardInterestPaid(dtAsOf) + l.AdditionalInterestPaid(dtAsOf) / this.dProfitSplit + l.PointsPaid(dtAsOf)) 
+                        / l.Balance(dtBalanceDate);
+                }
             }
-            if (bDisp)
-            {
-                return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest()) / l.LoanAsOf(FindDate(clsCashflow.Type.NetDispositionProj, true, true).AddDays(-1)).TotalInvestment() - 1D;
-            }
-            else
-            {
-                return (l.HardInterestPaid(dtAsOf) + 2 * l.AdditionalInterestPaid(dtAsOf)) / l.Balance(dtBalanceDate);
-            }
+            else // No profit split, then return Double.NaN
+                return Double.NaN;
         }
+        #endregion
+
         #endregion
 
         #region Private Calculations
@@ -924,6 +1210,38 @@ namespace ResilienceClasses
                     }
                 }
                 return dRemain;
+            }
+        }
+
+        private double _Due(DateTime dt, clsCashflow.Type t)
+        {
+            double dDue = 0D;
+            if (this.cfCashflows.Count == 0)
+                return 0;
+            else
+            {
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    if ((cf.PayDate() == dt) && (cf.DeleteDate() > dt.AddYears(100)) && (cf.TypeID() == t) && (!cf.Actual()))
+                        dDue += cf.Amount();
+                }
+                return dDue;
+            }
+        }
+
+        private double _DueFromLender(DateTime dt, clsCashflow.Type t)
+        {
+            double dDue = 0D;
+            if (this.cfCashflows.Count == 0)
+                return 0;
+            else
+            {
+                foreach (clsCashflow cf in this.cfCashflows)
+                {
+                    if ((cf.PayDate() == dt) && (cf.DeleteDate() > dt.AddYears(100)) && (cf.TypeID() == t) && (!cf.Actual()) && (cf.Amount() < 0))
+                        dDue += cf.Amount();
+                }
+                return dDue;
             }
         }
 
@@ -969,3 +1287,4 @@ namespace ResilienceClasses
         #endregion
     }
 }
+

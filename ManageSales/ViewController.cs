@@ -11,14 +11,13 @@ namespace ManageSales
     {
 
         private clsLoan loan;
+        private clsEntity borrower;
+        private clsEntity lender;
+        private clsEntity title;
         private bool bRecordSaleContract = false;
         private clsLoan.State statusFilter = clsLoan.State.Unknown;
         private int lenderID = -1;
         private Dictionary<string, clsLoan> loansByAddress = new Dictionary<string, clsLoan>();
-        private int R1ID = 1;
-        private int R2ID = 16;
-        private int HCRID = 3;
-        private int HHID = 4;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -65,6 +64,8 @@ namespace ManageSales
                 // Update the view, if already loaded.
             }
         }
+
+        #region Event Handlers
 
         partial void AddressChosen(NSComboBox sender)
         {
@@ -128,12 +129,17 @@ namespace ManageSales
             this.bRecordSaleContract = !this.bRecordSaleContract;
         }
 
+        #endregion
+
         private void UpdateChosenAddress(bool clearMessageText = true)
         {
             this.ChooseActionPopUp.RemoveAllItems();
             if (clsLoan.LoanID(this.AddressComboBox.StringValue) >= 0)
             {
                 this.loan = new clsLoan(clsLoan.LoanID(this.AddressComboBox.StringValue));
+                this.borrower = new clsEntity(this.loan.BorrowerID);
+                this.lender = new clsEntity(this.loan.LenderID);
+                this.title = new clsEntity(this.loan.TitleCompanyID());
                 if (clearMessageText)
                     this.StatusMessageTextField.StringValue = "";
                 this.StatusTextField.StringValue = this.loan.Status().ToString();
@@ -199,18 +205,14 @@ namespace ManageSales
             }
         }
 
+        #region Generate Docs
+
         private void GeneratePayoffLetter()
         {
             // identify template
             string destinationPath = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/Payoff Letter (" + this.AddressComboBox.StringValue + ") (" + this.loan.SaleDate().ToString("yyMMdd") + ").docx";
-            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/Payoff Letter ";
-              //  lender
-            if (this.loan.LenderId == R1ID) templatePath += "R1 ";
-            else if (this.loan.LenderId == R2ID) templatePath += "R2 ";
-              //  borrower
-            if (this.loan.BorrowerId == HCRID) templatePath += "HCR";
-            else if (this.loan.BorrowerId == HHID) templatePath += "HH";
-            templatePath += ".docx";
+            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/Payoff Letter " +
+                                  this.lender.PathAbbreviation() + " " + this.borrower.PathAbbreviation() + ".docx";
             // copy template to correct folder
             System.IO.File.Copy(templatePath, destinationPath, true);
 
@@ -264,15 +266,8 @@ namespace ManageSales
                     destinationPath += "Discharge of Mortgage";
                     break;
             }
-            //  lender
-            if (this.loan.LenderId == R1ID) templatePath += " R1";
-            else if (this.loan.LenderId == R2ID) templatePath += " R2";
-            //  borrower
-            if (this.loan.BorrowerId == HCRID) templatePath += " HCR";
-            else if (this.loan.BorrowerId == HHID) templatePath += " HH";
-            // copy template to correct folder
+            templatePath += " " + this.lender.PathAbbreviation() + " " + this.borrower.PathAbbreviation() + ".docx";
             destinationPath += " (" + this.AddressComboBox.StringValue + ").docx";
-            templatePath += ".docx";
             System.IO.File.Copy(templatePath, destinationPath, true);
 
             // find and replace using doc library
@@ -338,17 +333,18 @@ namespace ManageSales
             // save new file
             newLetter.Save();
             string destinationPath2 = "/Volumes/GoogleDrive/Team Drives/";
-            if (this.loan.LenderId == R1ID)
-                destinationPath2 += "Resilience I/";
-            else if (this.loan.LenderId == R2ID)
-                destinationPath2 += "Resilience II/";
-            destinationPath2 += "Loans/" + this.loan.Property().State() + "/" + address + ", " + city;
+            destinationPath2 += this.lender.Name();
+            destinationPath2 += "/Loans/" + this.loan.Property().State() + "/" + address + ", " + city;
             destinationPath2 += "/Sale/Satisfaction of Mortgage (" + address + ").docx";
             newLetter.SaveAs(destinationPath2);
             // notify
             this.StatusMessageTextField.StringValue = "Release Letter Created at:/n" + destinationPath;
             this.StatusMessageTextField.StringValue += "/n/nRelease Letter Copied to:/n" + destinationPath2;
         }
+
+        #endregion
+
+        #region Update / Schedule / Cancel / Complete Loan
 
         private void UpdateScheduledSale()
         {
@@ -528,7 +524,7 @@ namespace ManageSales
                                                                                  System.DateTime.Now,
                                                                                 (DateTime)this.RecordDatePicker.DateValue,
                                                                                  this.loan.CoBorrowerID(),
-                                                                                 this.loan.LenderID(),
+                                                                                 this.loan.LenderID,
                                                                                  clsDocumentRecord.Status.Preliminary,
                                                                                  clsDocumentRecord.Transmission.Electronic);
                     if (saleContractRecord.Save())
@@ -671,6 +667,8 @@ namespace ManageSales
             this.StatusMessageTextField.StringValue += "\nLoan Save to File : " + this.loan.Save().ToString().ToUpper();
         }
 
+        #endregion
+
         private void ShowLoanPayoffLetterInfo(double principal, double interest, double perDiem)
         {
             this.StatusMessageTextField.StringValue += "\nPrincipal: " + principal.ToString("#,##0.00");
@@ -678,6 +676,8 @@ namespace ManageSales
             this.StatusMessageTextField.StringValue += "\nTotal    : " + (principal + interest).ToString("#,##0.00");
             this.StatusMessageTextField.StringValue += "\nPer Diem : " + perDiem.ToString("#,##0.00");
         }
+
+        #region Additional Interest 
 
         private void MarkAdditionalInterestActual()
         {
@@ -731,6 +731,10 @@ namespace ManageSales
             this.loan.Save();
         }
 
+        #endregion
+
+        #region Update Labels and Dropdowns
+
         private void SetDefaultLabels()
         {
             this.SalePriceLabel.StringValue = "Expected Sale Price (Net)";
@@ -783,13 +787,17 @@ namespace ManageSales
             this.AddressComboBox.RemoveAll();
             foreach (string address in clsProperty.AddressList()) 
             { 
-                if (((this.lenderID < 0) || (this.lenderID == loansByAddress[address].LenderId)) &&
+                if (((this.lenderID < 0) || (this.lenderID == loansByAddress[address].LenderID)) &&
                     ((this.statusFilter == clsLoan.State.Unknown) || (this.statusFilter == loansByAddress[address].Status())))
                 {
                     this.AddressComboBox.Add((NSString)address);
                 }
             }
         }
+
+        #endregion
+
+        #region Event Handlers
 
         partial void LenderChosen(NSComboBox sender)
         {
@@ -802,5 +810,7 @@ namespace ManageSales
             this.statusFilter = (clsLoan.State)((int)this.StatusComboBox.SelectedIndex);
             this.UpdateAddressList();
         }
+
+        #endregion
     }
 }

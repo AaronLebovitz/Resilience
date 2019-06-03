@@ -249,6 +249,8 @@ namespace LoanStatusReport
 
         }
 
+        #region Old (csv) Reports
+
         private void RunAnnualLoanAuditReport(DateTime dtStart, DateTime dtEnd)
         {
             // create report file
@@ -380,11 +382,15 @@ namespace LoanStatusReport
             }
         }
 
+        #endregion
+
+        #region HTML Reports
+
         private void RunLoanAuditReportHTML(DateTime dtStart, DateTime dtEnd)
         {
             // create report file
             List<double> totals = new List<double>();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 7; i++)
                 totals.Add(0D);
             string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanAudit";
             fileName += dtEnd.ToString("yyyyMMdd");
@@ -435,7 +441,7 @@ namespace LoanStatusReport
         {
             // create report file
             List<double> totals = new List<double>();
-            for (int i = 0; i < 13; i++)
+            for (int i = 0; i < 14; i++)
                 totals.Add(0D);
             string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanStatus";
             fileName += dtReport.ToString("yyyyMMdd");
@@ -496,7 +502,10 @@ namespace LoanStatusReport
             sw.WriteLine("<tr ID=" + rowIDName + ">");
 
             sw.Write("<td align=\"left\">" + loan.Property().Address() + "</td>");
-            sw.Write("<td align=\"left\">" + eStatus.ToString().ToUpper() + "</td>");
+            if (eStatus.ToString().Length > 10)
+                sw.Write("<td align=\"left\">" + eStatus.ToString().ToUpper().Substring(0,10) + "</td>");
+            else
+                sw.Write("<td align=\"left\">" + eStatus.ToString().ToUpper() + "</td>");
 
             if (eStatus == clsLoan.State.Cancelled)
             {
@@ -510,21 +519,31 @@ namespace LoanStatusReport
             {
                 if (loan.Status() == clsLoan.State.Sold)
                 {
-                    sw.Write("<td></td><td></td><td></td>");
-                    totalsIndex += 3;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        sw.Write("<td></td>");
+                        totalsIndex++;
+                    }
                     if (loan.AccruedAdditionalInterest(dtAsOf) > 0D)
                     {
                         value = loan.AccruedAdditionalInterest(dtAsOf);
                         totals[totalsIndex] += value;
                         sw.Write("<td align=\"right\">" + value + "</td>");
                     }
-                    sw.Write("<td></td><td></td><td></td>");
-                    totalsIndex += 3;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        sw.Write("<td></td>");
+                        totalsIndex++;
+                    }
                     value = loan.PrincipalPaid(dtAsOf);
                     sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
                     totals[totalsIndex] += value;
                     totalsIndex++;
                     value = loan.InterestPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.PointsPaid(dtAsOf);
                     sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
                     totals[totalsIndex] += value;
                     totalsIndex++;
@@ -567,8 +586,11 @@ namespace LoanStatusReport
                     totals[totalsIndex] += value;
                     totalsIndex++;
                     sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
-                    sw.Write("<td></td><td></td><td></td><td></td><td></td>");
-                    totalsIndex += 5;
+                    for (int i = 0; i < 6; i++)
+                    {
+                        sw.Write("<td></td>");
+                        totalsIndex++;
+                    }
                 }
                 value = loan.RehabRemain(dtAsOf);
                 totals[totalsIndex] += value;
@@ -588,6 +610,8 @@ namespace LoanStatusReport
             sw.Write("<td>" + titleCompany.Name() + "</td>");
             sw.Write("<td>" + loan.Rate().ToString("#0.00%") + "</td>");
             sw.Write("<td>" + loan.PenaltyRate().ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + (loan.Points() * 0.01).ToString("#0.00%") + "</td>");
+            sw.Write("<td>" + loan.ProfitSplit().ToString("#0.00%") + "</td>");
             sw.Write("<td>" + loan.OriginationDate().ToShortDateString() + "</td>");
             sw.Write("<td>" + loan.MaturityDate().ToShortDateString() + "</td>");
             sw.Write("<td>" + loan.GrossReturn(false).ToString("#0.00%") + "</td>");
@@ -602,7 +626,7 @@ namespace LoanStatusReport
         }
 
         private void WriteHTMLHeaderRow(System.IO.StreamWriter sw)
-        {
+        {//TODO Add points paid
             string title;
             sw.WriteLine("<tr id=HEADER>");
             title = "Property";
@@ -625,6 +649,8 @@ namespace LoanStatusReport
             sw.WriteLine("<th>" + title + "</th>");
             title = "Interest Paid";
             sw.WriteLine("<th>" + title + "</th>");
+            title = "Points Paid";
+            sw.WriteLine("<th>" + title + "</th>");
             title = "Addl Int Paid";
             sw.WriteLine("<th>" + title + "</th>");
             title = "Act Return";
@@ -640,6 +666,20 @@ namespace LoanStatusReport
             title = "Purchase Date";
             sw.WriteLine("<th>" + title + "</th>");
             title = "Days";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Borrower";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Co-Borrower";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Title (Acq)";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Rate";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Penalty";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Points";
+            sw.WriteLine("<th>" + title + "</th>");
+            title = "Split";
             sw.WriteLine("<th>" + title + "</th>");
             sw.WriteLine("</tr>");
         }
@@ -721,6 +761,8 @@ namespace LoanStatusReport
             sw.WriteLine("<th>" + title + "</th>");
             sw.WriteLine("</tr>");
         }
+
+        #endregion
 
     }
 }

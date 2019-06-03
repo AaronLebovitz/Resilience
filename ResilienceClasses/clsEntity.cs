@@ -15,6 +15,7 @@ namespace ResilienceClasses
         public static int PhoneNumberColumn = 6;
         public static int ContactNameColumn = 7;
         public static int ContactEmailColumn = 8;
+        public static int PathAbbreviationColumn = 9;
         #endregion
 
         #region Properties
@@ -27,6 +28,7 @@ namespace ResilienceClasses
         private string strPhone;
         private string strContactName;
         private string strEmail;
+        private string strPathAbbrev;
         #endregion
 
         #region Constructors
@@ -40,7 +42,7 @@ namespace ResilienceClasses
             this._Load(id, tbl);
         }
 
-        public clsEntity(string name, string address, string town, string state, int zip, string phone, string contact, string email)
+        public clsEntity(string name, string address, string town, string state, int zip, string phone, string contact, string email, string path)
         {
             this.iEntityID = _NewEntityID();
             this.strName = name;
@@ -51,6 +53,7 @@ namespace ResilienceClasses
             this.strPhone = phone;
             this.strContactName = contact;
             this.strEmail = email;
+            this.strPathAbbrev = path;
         }
         #endregion
 
@@ -64,6 +67,7 @@ namespace ResilienceClasses
         public string Phone() { return this.strPhone; }
         public string ContactName() { return this.strContactName; }
         public string ContactEmail() { return this.strEmail; }
+        public string PathAbbreviation() { return this.strPathAbbrev; }
         #endregion
 
         #region DB Methods
@@ -86,6 +90,7 @@ namespace ResilienceClasses
                 strValues[clsEntity.PhoneNumberColumn - 1] = this.strPhone;
                 strValues[clsEntity.ContactNameColumn - 1] = this.strContactName;
                 strValues[clsEntity.ContactEmailColumn - 1] = this.strEmail;
+                strValues[clsEntity.PathAbbreviationColumn - 1] = this.strPathAbbrev;
                 tbl.New(strValues);
                 return tbl.Save();
             }
@@ -101,6 +106,7 @@ namespace ResilienceClasses
                         tbl.Update(this.iEntityID, clsEntity.ZipCodeColumn, this.iZipCode.ToString()) &&
                         tbl.Update(this.iEntityID, clsEntity.PhoneNumberColumn, this.strPhone) &&
                         tbl.Update(this.iEntityID, clsEntity.ContactNameColumn, this.strContactName) &&
+                        tbl.Update(this.iEntityID, clsEntity.PathAbbreviationColumn, this.strPathAbbrev) &&
                         tbl.Update(this.iEntityID, clsEntity.ContactEmailColumn, this.strEmail))
                     {
                         return tbl.Save();
@@ -139,6 +145,7 @@ namespace ResilienceClasses
                 this.strPhone = tbl.Value(id, clsEntity.PhoneNumberColumn);
                 this.strContactName = tbl.Value(id, clsEntity.ContactNameColumn);
                 this.strEmail = tbl.Value(id, clsEntity.ContactEmailColumn);
+                this.strPathAbbrev = tbl.Value(id, clsEntity.PathAbbreviationColumn);
                 return true;
             }
             else

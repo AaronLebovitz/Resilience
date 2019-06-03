@@ -58,6 +58,9 @@ namespace UpdateAcquisition
 		AppKit.NSTextField LenderLabel { get; set; }
 
 		[Outlet]
+		AppKit.NSTextField PointsLabel { get; set; }
+
+		[Outlet]
 		AppKit.NSTextField PriceField { get; set; }
 
 		[Outlet]
@@ -95,6 +98,9 @@ namespace UpdateAcquisition
 
 		[Outlet]
 		AppKit.NSButton UpdateAcquisitionButton { get; set; }
+
+		[Outlet]
+		AppKit.NSTextField UpdatedPointsLabel { get; set; }
 
 		[Action ("AcqTaxUpdated:")]
 		partial void AcqTaxUpdated (AppKit.NSTextField sender);
@@ -278,6 +284,16 @@ namespace UpdateAcquisition
 			if (UpdateAcquisitionButton != null) {
 				UpdateAcquisitionButton.Dispose ();
 				UpdateAcquisitionButton = null;
+			}
+
+			if (PointsLabel != null) {
+				PointsLabel.Dispose ();
+				PointsLabel = null;
+			}
+
+			if (UpdatedPointsLabel != null) {
+				UpdatedPointsLabel.Dispose ();
+				UpdatedPointsLabel = null;
 			}
 		}
 	}

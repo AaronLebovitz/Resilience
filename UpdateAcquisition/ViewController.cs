@@ -41,6 +41,7 @@ namespace UpdateAcquisition
                 this.InitialDrawLabel.StringValue = "";
                 this.PropertyTaxLabel.StringValue = "";
                 this.TitlePolicyLabel.StringValue = "";
+                this.PointsLabel.StringValue = "";
 
                 //reload labels
                 foreach (clsCashflow cf in this.loanToUpdate.Cashflows())
@@ -75,8 +76,11 @@ namespace UpdateAcquisition
                                 this.InitialDrawLabel.StringValue = amount;
                                 break;
                             case clsCashflow.Type.PropertyTax:
-                                amount = (-cf.Amount()).ToString("#,##0.00");
+//                                amount = (-cf.Amount()).ToString("#,##0.00");
                                 this.PropertyTaxLabel.StringValue = amount;
+                                break;
+                            case clsCashflow.Type.Points:
+                                this.PointsLabel.StringValue = amount;
                                 break;
                             default:
                                 break;
@@ -93,10 +97,11 @@ namespace UpdateAcquisition
                 this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
                 this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
                 this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
-                this.LenderComboBox.SelectItem(this.loanToUpdate.LenderID());
+                this.LenderComboBox.SelectItem(this.loanToUpdate.LenderID);
                 this.BorrowerComboBox.SelectItem(this.loanToUpdate.TitleHolderID());
                 this.LenderLabel.StringValue = (NSString)this.LenderComboBox.SelectedValue;
                 this.BorrowerLabel.StringValue = (NSString)this.BorrowerComboBox.SelectedValue;
+                this.UpdatedPointsLabel.StringValue = this.PointsLabel.StringValue;
                 this.UpdateTotalCostLabel();
             }
         }
@@ -198,43 +203,71 @@ namespace UpdateAcquisition
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.PriceField.DoubleValue,
                                                                   false, clsCashflow.Type.AcquisitionPrice));
+                    if (this.ConcessionField.DoubleValue > 0)
                     this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), this.ConcessionField.DoubleValue,
                                                                   false, clsCashflow.Type.AcquisitionConcession));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.HOIField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.HOIField.DoubleValue,
                                                                   false, clsCashflow.Type.HomeownersInsurance));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.AcqTaxField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.AcqTaxField.DoubleValue,
                                                                   false, clsCashflow.Type.AcquisitionTaxes));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.RecordingField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.RecordingField.DoubleValue,
                                                                   false, clsCashflow.Type.AcquisitionRecording));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.ProcessingField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.ProcessingField.DoubleValue,
                                                                   false, clsCashflow.Type.AcquisitionProcessing));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.TitlePolicyField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.TitlePolicyField.DoubleValue,
                                                                   false, clsCashflow.Type.TitlePolicy));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.InitialDrawField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.InitialDrawField.DoubleValue,
                                                                   false, clsCashflow.Type.InitialExpenseDraw));
-                    this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                    if (this.PropertyTaxField.DoubleValue > 0)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
                                                                   System.DateTime.Now, System.DateTime.MaxValue,
                                                                   this.loanToUpdate.ID(), -this.PropertyTaxField.DoubleValue,
                                                                   false, clsCashflow.Type.PropertyTax));
-                    foreach (clsCashflow cf in newCashflows) { this.loanToUpdate.AddCashflow(cf); }
+                    if (loanToUpdate.Points() > 0)
+                    {
+                        if (this.loanToUpdate.PointsCapitalized()) // if points were capitalized, capitalize them on update
+                            this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                      DateTime.Now, DateTime.MaxValue,
+                                                                      this.loanToUpdate.ID(), -this.UpdatedPointsLabel.DoubleValue,
+                                                                      false, clsCashflow.Type.Points));
+                        // either way, add points paid at closing (to lender)
+                        this.loanToUpdate.AddCashflow(new clsCashflow((DateTime)this.ClosingDatePicker.DateValue,
+                                                                  DateTime.Now, DateTime.MaxValue,
+                                                                  this.loanToUpdate.ID(), this.UpdatedPointsLabel.DoubleValue,
+                                                                  false, clsCashflow.Type.Points));
+                    }
+                    foreach (clsCashflow cf in newCashflows)
+                    {
+                        if (cf.TypeID() == clsCashflow.Type.NetDispositionProj)
+                            this.loanToUpdate.AddCashflow(new clsCashflow (cf.PayDate(), cf.RecordDate(), cf.DeleteDate(), cf.LoanID(), 
+                                cf.Amount() + loanToUpdate.AcquisitionCost(false) - oldAcqCost, false, clsCashflow.Type.NetDispositionProj));
+                        else
+                            this.loanToUpdate.AddCashflow(cf);
+                    }
                     // Update origination Date and Save
                     this.loanToUpdate.SetNewOriginationDate((DateTime)this.ClosingDatePicker.DateValue);
-                    this.loanToUpdate.LenderId = (int)this.LenderComboBox.SelectedIndex;
-                    this.loanToUpdate.BorrowerId = (int)this.BorrowerComboBox.SelectedIndex;
+                    this.loanToUpdate.LenderID = (int)this.LenderComboBox.SelectedIndex;
+                    this.loanToUpdate.BorrowerID = (int)this.BorrowerComboBox.SelectedIndex;
                     if (this.loanToUpdate.Save())
                     {
                         this.SummaryMessageField.StringValue += "\nSave successful.  " + this.loanToUpdate.Property().Address();
@@ -318,6 +351,12 @@ namespace UpdateAcquisition
             total += this.InitialDrawField.DoubleValue;
             total += this.PropertyTaxField.DoubleValue;
             total += this.TitlePolicyField.DoubleValue;
+            if (this.loanToUpdate != null)
+            {
+                this.UpdatedPointsLabel.DoubleValue = total / (1D - this.loanToUpdate.Points() * 0.01) * this.loanToUpdate.Points() * 0.01;
+                if (this.loanToUpdate.PointsCapitalized())
+                    total += this.UpdatedPointsLabel.DoubleValue;
+            }
             this.TotalCostLabel.DoubleValue = total;
         }
 
@@ -332,57 +371,42 @@ namespace UpdateAcquisition
             string escrowPath = prefix + "Escrow Instructions ";
             string destEscrowPath = destPrefix + "EIL ";
             string stateAbbrev = this.loanToUpdate.Property().State();
-            string lenderAbbrev = "";
-            string borrowerAbrev = "";
-
-            if (this.loanToUpdate.LenderId == 1) lenderAbbrev = "R1";
-            else if (this.loanToUpdate.LenderId == 16) lenderAbbrev = "R2";
-
-            if (this.loanToUpdate.BorrowerId == 3) borrowerAbrev = "HCR";
-            else if (this.loanToUpdate.BorrowerId == 4) borrowerAbrev = "HH";
+            string lenderAbbrev = (new clsEntity(this.loanToUpdate.LenderID)).PathAbbreviation();
+            string borrowerAbrev = (new clsEntity(this.loanToUpdate.BorrowerID)).PathAbbreviation();
+            string titleAbrev = (new clsEntity(this.loanToUpdate.TitleCompanyID())).PathAbbreviation();
 
             // find and copy template(s) (Mortgage, Disclosure, Escrow Instruction Letter)
             destEscrowPath += this.loanToUpdate.Property().Address() + ".docx";
             switch (stateAbbrev)
             {
+                case "GA":
+                    mtgPath += "Security Deed (MTG) " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "Deed " + this.loanToUpdate.Property().Address() + ".docx";
+                    break;
                 case "MD":
                     mtgPath += "DOT " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "DOT " + this.loanToUpdate.Property().Address() + ".docx";
-                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " GS.docx";
-                    System.IO.File.Copy(mtgPath, destMtgPath, true);
-                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
                     break;
                 case "NJ":
                     mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
-                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " FTNJ.docx";
                     disclosurePath += lenderAbbrev + " " + borrowerAbrev + ".docx";
                     destDisclosurePath += this.loanToUpdate.Property().Address() + ".docx";
-                    System.IO.File.Copy(mtgPath, destMtgPath, true);
-                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
                     System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
                     break;
                 case "PA":
                     mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
-                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " VP.docx";
                     disclosurePath += lenderAbbrev + " " + borrowerAbrev + ".docx";
                     destDisclosurePath += this.loanToUpdate.Property().Address() + ".docx";
-                    System.IO.File.Copy(mtgPath, destMtgPath, true);
-                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
                     System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
-                    break;
-                case "GA":
-                    mtgPath += "Security Deed (MTG) " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
-                    destMtgPath += "Deed " + this.loanToUpdate.Property().Address() + ".docx";
-                    // CHECK THIS ONCE WE IDENTIFY THE TITLE COMPANY
-                    escrowPath += lenderAbbrev + " " + borrowerAbrev + " GA.docx";
-                    System.IO.File.Copy(mtgPath, destMtgPath, true);
-                    System.IO.File.Copy(escrowPath, destEscrowPath, true);
                     break;
                 default:
                     break;
             }
+            escrowPath += lenderAbbrev + " " + borrowerAbrev + " " + titleAbrev + ".docx";
+            System.IO.File.Copy(mtgPath, destMtgPath, true);
+            System.IO.File.Copy(escrowPath, destEscrowPath, true);
 
             // get replacement values
             // - EIL:  LETTERDATE, ACQUISITIONDATE, FILENUMBER, WIREAMOUNT, EXPIRATIONDATE (= ACQ + 3d), COUNTY
@@ -519,6 +543,7 @@ namespace UpdateAcquisition
             this.TitlePolicyLabel.StringValue = "0";
             this.LenderLabel.StringValue = "---";
             this.BorrowerLabel.StringValue = "---";
+            this.PointsLabel.StringValue = "0";
 
             this.HOIField.StringValue = this.HOILabel.StringValue;
             this.PriceField.StringValue = this.PriceLabel.StringValue;
@@ -530,6 +555,7 @@ namespace UpdateAcquisition
             this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
             this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
             this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
+            this.UpdatedPointsLabel.StringValue = this.PointsLabel.StringValue;
 
             clsCSVTable tblEntity = new clsCSVTable(clsEntity.strEntityPath);
             for (int i = 0; i < tblEntity.Length(); i++)

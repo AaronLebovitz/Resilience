@@ -33,7 +33,6 @@ namespace CashflowProjection
 
         #endregion
 
-
         #region Public Methods
 
         public ViewController(IntPtr handle) : base(handle)

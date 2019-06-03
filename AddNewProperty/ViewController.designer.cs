@@ -13,6 +13,9 @@ namespace AddNewProperty
 	partial class ViewController
 	{
 		[Outlet]
+		AppKit.NSButton AcquisitionOnlyCheckBox { get; set; }
+
+		[Outlet]
 		AppKit.NSTextField AddressBox { get; set; }
 
 		[Outlet]
@@ -28,6 +31,12 @@ namespace AddNewProperty
 		AppKit.NSTextField DefaultRateBox { get; set; }
 
 		[Outlet]
+		AppKit.NSButton FullAcquisitionCostCheckBox { get; set; }
+
+		[Outlet]
+		AppKit.NSTextField InitialLoanPercentBox { get; set; }
+
+		[Outlet]
 		AppKit.NSPopUpButton LenderPopUp { get; set; }
 
 		[Outlet]
@@ -41,6 +50,12 @@ namespace AddNewProperty
 
 		[Outlet]
 		AppKit.NSTextField PointsBox { get; set; }
+
+		[Outlet]
+		AppKit.NSButton ProfitSplit { get; set; }
+
+		[Outlet]
+		AppKit.NSTextField ProfitSplitBox { get; set; }
 
 		[Outlet]
 		AppKit.NSDatePicker PurchaseDatePicker { get; set; }
@@ -66,8 +81,14 @@ namespace AddNewProperty
 		[Outlet]
 		AppKit.NSTextField UpdateMessage { get; set; }
 
+		[Action ("AcquisitionOnlyToggled:")]
+		partial void AcquisitionOnlyToggled (AppKit.NSButton sender);
+
 		[Action ("AddButtonPushed:")]
 		partial void AddButtonPushed (AppKit.NSButton sender);
+
+		[Action ("FullAcquisitionCostToggled:")]
+		partial void FullAcquisitionCostToggled (AppKit.NSButton sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
@@ -91,9 +112,19 @@ namespace AddNewProperty
 				CountyBox = null;
 			}
 
+			if (DefaultRateBox != null) {
+				DefaultRateBox.Dispose ();
+				DefaultRateBox = null;
+			}
+
 			if (LenderPopUp != null) {
 				LenderPopUp.Dispose ();
 				LenderPopUp = null;
+			}
+
+			if (LoanRateBox != null) {
+				LoanRateBox.Dispose ();
+				LoanRateBox = null;
 			}
 
 			if (MonthsToCompletionBox != null) {
@@ -104,6 +135,11 @@ namespace AddNewProperty
 			if (PnLBox != null) {
 				PnLBox.Dispose ();
 				PnLBox = null;
+			}
+
+			if (PointsBox != null) {
+				PointsBox.Dispose ();
+				PointsBox = null;
 			}
 
 			if (PurchaseDatePicker != null) {
@@ -146,19 +182,29 @@ namespace AddNewProperty
 				UpdateMessage = null;
 			}
 
-			if (LoanRateBox != null) {
-				LoanRateBox.Dispose ();
-				LoanRateBox = null;
+			if (ProfitSplit != null) {
+				ProfitSplit.Dispose ();
+				ProfitSplit = null;
 			}
 
-			if (DefaultRateBox != null) {
-				DefaultRateBox.Dispose ();
-				DefaultRateBox = null;
+			if (ProfitSplitBox != null) {
+				ProfitSplitBox.Dispose ();
+				ProfitSplitBox = null;
 			}
 
-			if (PointsBox != null) {
-				PointsBox.Dispose ();
-				PointsBox = null;
+			if (AcquisitionOnlyCheckBox != null) {
+				AcquisitionOnlyCheckBox.Dispose ();
+				AcquisitionOnlyCheckBox = null;
+			}
+
+			if (InitialLoanPercentBox != null) {
+				InitialLoanPercentBox.Dispose ();
+				InitialLoanPercentBox = null;
+			}
+
+			if (FullAcquisitionCostCheckBox != null) {
+				FullAcquisitionCostCheckBox.Dispose ();
+				FullAcquisitionCostCheckBox = null;
 			}
 		}
 	}
