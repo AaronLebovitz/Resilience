@@ -362,8 +362,8 @@ namespace UpdateAcquisition
 
         public void GenerateDocs(string Field0Value, string Field1Value, string Field2Value, string Field3Value, string Field4Value)
         {
-            string prefix = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/";
-            string destPrefix = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/";
+            string prefix = "/Volumes/GoogleDrive/Shared Drives/Resilience/Document Templates/";
+            string destPrefix = "/Volumes/GoogleDrive/Shared Drives/Resilience/Documents/";
             string mtgPath = prefix;
             string destMtgPath = destPrefix;
             string disclosurePath = prefix + "Disclosure for Confession of Judgment ";

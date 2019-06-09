@@ -210,8 +210,8 @@ namespace ManageSales
         private void GeneratePayoffLetter()
         {
             // identify template
-            string destinationPath = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/Payoff Letter (" + this.AddressComboBox.StringValue + ") (" + this.loan.SaleDate().ToString("yyMMdd") + ").docx";
-            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/Payoff Letter " +
+            string destinationPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/Documents/Payoff Letter (" + this.AddressComboBox.StringValue + ") (" + this.loan.SaleDate().ToString("yyMMdd") + ").docx";
+            string templatePath = "/Volumes/GoogleDrive/Shared Drives/Resilience/Document Templates/Payoff Letter " +
                                   this.lender.PathAbbreviation() + " " + this.borrower.PathAbbreviation() + ".docx";
             // copy template to correct folder
             System.IO.File.Copy(templatePath, destinationPath, true);
@@ -241,8 +241,8 @@ namespace ManageSales
         private void GenerateDischargeLetter()
         {
             // identify template
-            string destinationPath = "/Volumes/GoogleDrive/Team Drives/Resilience/Documents/";
-            string templatePath = "/Volumes/GoogleDrive/Team Drives/Resilience/Document Templates/";
+            string destinationPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/Documents/";
+            string templatePath = "/Volumes/GoogleDrive/Shared Drives/Resilience/Document Templates/";
             switch (this.loan.Property().State())
             {
                 case "MD":
@@ -308,7 +308,7 @@ namespace ManageSales
             {
                 string instrument = ExpectedSalePriceTextField.IntValue.ToString("#");
                 if (instrument == "0") { instrument = "____________"; }
-                string parcel = RepaymentAmountTextField.IntValue.ToString("00-000-000");
+                string parcel = RepaymentAmountTextField.StringValue;
                 if (parcel == "0") { parcel = "____________"; }
 
                 newLetter.ReplaceText("[DATEDDATE]", datedDate.ToString("MMMM d, yyyy"));
@@ -322,7 +322,7 @@ namespace ManageSales
                 clsLoanRecording lr = new clsLoanRecording(address);
                 if (lr.ID() < 0)
                 {
-                    lr = new clsLoanRecording(this.loan.ID(), 0, 0, Int32.Parse(parcel), Int32.Parse(instrument), recordDate);
+                    lr = new clsLoanRecording(this.loan.ID(), 0, 0, Int32.Parse(instrument), Int32.Parse(parcel), recordDate);
                     lr.Save();
                 }
             }
@@ -332,7 +332,7 @@ namespace ManageSales
             }
             // save new file
             newLetter.Save();
-            string destinationPath2 = "/Volumes/GoogleDrive/Team Drives/";
+            string destinationPath2 = "/Volumes/GoogleDrive/Shared Drives/";
             destinationPath2 += this.lender.Name();
             destinationPath2 += "/Loans/" + this.loan.Property().State() + "/" + address + ", " + city;
             destinationPath2 += "/Sale/Satisfaction of Mortgage (" + address + ").docx";

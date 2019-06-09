@@ -5,7 +5,7 @@ namespace ResilienceClasses
     {
 
         #region Enums and Static Values
-        public static string strEntityPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblEntity.csv";
+        public static string strEntityPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblEntity.csv";
             // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblEntity.csv";
         public static int NameColumn = 1;
         public static int AddressColumn = 2;

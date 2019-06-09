@@ -13,7 +13,7 @@ namespace ResilienceClasses
             SaleStatement, ProfitStatement
         }
 
-        public static string strDocumentPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblDocument.csv";
+        public static string strDocumentPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblDocument.csv";
             // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocument.csv";
         public static int NameColumn = 1;
         public static int PropertyColumn = 2;

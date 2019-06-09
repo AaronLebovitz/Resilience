@@ -9,7 +9,8 @@ namespace ResilienceClasses
     {
         #region Enums and Static Values
         public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold}
-        public static string LoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
+        //public static string LoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
+        public static string LoanPath = "/Google Drive/Shared Drives/Resilience/tblLoan.csv";
 
         public static int IndexColumn = 0;
         public static int PropertyColumn = 1;
@@ -231,8 +232,9 @@ namespace ResilienceClasses
         #region Enums and Static Values
         public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
 
-        public static string strLoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
-            // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
+        public static string strLoanPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblLoan.csv";
+        //public static string strLoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
+        // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblLoan.csv";
         public static int IndexColumn = 0;
         public static int PropertyColumn = 1;
         public static int TitleHolderColumn = 2;

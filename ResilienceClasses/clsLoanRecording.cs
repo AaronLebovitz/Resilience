@@ -5,7 +5,7 @@ namespace ResilienceClasses
     public class clsLoanRecording
     {
         #region Enums and Static Values
-        public static string strLoanRecordingPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoanRecording.csv";
+        public static string strLoanRecordingPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblLoanRecording.csv";
         public static int IndexColumn = 0;
         public static int LoanIDColumn = 1;
         public static int RecordingDateColumn = 2;

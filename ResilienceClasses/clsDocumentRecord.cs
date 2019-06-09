@@ -12,7 +12,7 @@ namespace ResilienceClasses
         public enum TransmissionCode { U, E, F, P }
         public enum TransmissionColor { Red, Black, Purple, Blue }
 
-        public static string strDocumentRecordPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblDocumentRecord.csv";
+        public static string strDocumentRecordPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblDocumentRecord.csv";
             // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblDocumentRecord.csv";
         public static int DocumentColumn = 1;
         public static int ActionDateColumn = 2;
