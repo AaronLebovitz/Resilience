@@ -8,7 +8,7 @@ namespace ResilienceClasses
     public class Loan
     {
         #region Enums and Static Values
-        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold}
+        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
         //public static string LoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
         public static string LoanPath = "/Google Drive/Shared Drives/Resilience/tblLoan.csv";
 
@@ -327,7 +327,7 @@ namespace ResilienceClasses
         #endregion
 
         #region Public Methods
-        public clsLoan LoanAsOf(DateTime dt)
+        public clsLoan LoanAsOf(DateTime dt, Boolean markTrueIfOverdue = false)
         {
             clsLoan newLoan = new clsLoan(this.iPropertyID, this.iTitleHolderEntityID, this.iCoBorrowerEntityID,
                                           this.iAcquisitionTitleCompanyEntityID, this.iLenderEntityID, this.dtOrigination, this.dtMaturity,
@@ -345,9 +345,11 @@ namespace ResilienceClasses
                                 newLoan.AddCashflow(cf);
                             }
                             else if (cf.DeleteDate() > dt)
-                            {
-                                newLoan.AddCashflow(new clsCashflow(cf.PayDate(), cf.RecordDate(), DateTime.MaxValue, cf.LoanID(), cf.Amount(), true, cf.TypeID()));
-                            }
+                                if (markTrueIfOverdue)
+                                    newLoan.AddCashflow(new clsCashflow(cf.PayDate(), cf.RecordDate(), DateTime.MaxValue, cf.LoanID(), cf.Amount(), true, cf.TypeID()));
+                                else
+                                    newLoan.AddCashflow(new clsCashflow(dt.AddDays(1), cf.PayDate(), DateTime.MaxValue, cf.LoanID(), cf.Amount(), false, cf.TypeID()));
+                            // else if (it has been deleted as of ReportDate) then ignore it
                         }
                         else if ((cf.PayDate() > dt) && (cf.DeleteDate() > dt))
                         {
@@ -595,7 +597,7 @@ namespace ResilienceClasses
                 foreach (clsCashflow cf in this.cfCashflows)
                 {
                     dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).Days, (dt - cf.PayDate()).Days));
-                    if ((cf.PayDate() < dt) && (cf.Actual()))
+                    if ((cf.PayDate() < dt) && (cf.Actual()) && (cf.TypeID() != clsCashflow.Type.Points))
                     {
                         dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
                         dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
@@ -640,7 +642,7 @@ namespace ResilienceClasses
             if (dtProjDisp == DateTime.MinValue) { return 0; }
             else
             {
-                clsLoan l = this.LoanAsOf(dtProjDisp);
+                clsLoan l = this.LoanAsOf(dtProjDisp, true);
                 return l.DispositionAmount(true, true) - l.AccruedInterest(dtProjDisp) - l.Balance(dtProjDisp);
             }
         }
@@ -858,7 +860,7 @@ namespace ResilienceClasses
         { return this.HardInterestPaid(System.DateTime.Today); }
 
         public double PointsPaid(DateTime dt)
-        { return this._Paid(dt, clsCashflow.Type.Points) ; }
+        { return this._Paid(dt, clsCashflow.Type.Points); }
 
         public double PointsPaid()
         { return this.PointsPaid(DateTime.Today); }
@@ -1158,12 +1160,12 @@ namespace ResilienceClasses
                 // calculate return
                 if (bDisp)
                 {
-                    return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest() * (1-this.dProfitSplit)/this.dProfitSplit + l.PointsPaid(dtAsOf)) 
+                    return (l.DispositionAmount(false, true) + l.ImpliedAdditionalInterest() * (1 - this.dProfitSplit) / this.dProfitSplit + l.PointsPaid(dtAsOf))
                         / l.LoanAsOf(dtBalanceDate).TotalInvestment() - 1D;
                 }
                 else
                 {
-                    return (l.HardInterestPaid(dtAsOf) + l.AdditionalInterestPaid(dtAsOf) / this.dProfitSplit + l.PointsPaid(dtAsOf)) 
+                    return (l.HardInterestPaid(dtAsOf) + l.AdditionalInterestPaid(dtAsOf) / this.dProfitSplit + l.PointsPaid(dtAsOf))
                         / l.Balance(dtBalanceDate);
                 }
             }

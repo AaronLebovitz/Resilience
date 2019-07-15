@@ -57,7 +57,7 @@ namespace DocumentStatusReport
         partial void RunReportPressed(NSButton sender)
         {
             // open file
-            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/DocumentStatus";
+            string fileName = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/DocumentStatus";
             fileName += System.DateTime.Today.ToString("yyyyMMdd");
             fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".htm";

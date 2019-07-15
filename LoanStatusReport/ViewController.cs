@@ -91,6 +91,10 @@ namespace LoanStatusReport
             if (((DateTime)this.ReportDatePicker.DateValue).Date != dtStartDateChosen)
             {
                 dtStartDateChosen = ((DateTime)this.ReportDatePicker.DateValue).Date;
+                DateTime testDate = (DateTime)this.ReportDatePicker.DateValue;
+                testDate = testDate.Date.AddDays(1);
+                testDate = testDate.AddMonths(3);
+                testDate = testDate.AddDays(-1);
                 this.ReportDatePicker2.DateValue = (NSDate)(((DateTime)this.ReportDatePicker.DateValue).Date.AddDays(1).AddMonths(3).AddDays(-1).ToUniversalTime());
             }
         }
@@ -254,7 +258,7 @@ namespace LoanStatusReport
         private void RunAnnualLoanAuditReport(DateTime dtStart, DateTime dtEnd)
         {
             // create report file
-            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanAudit";
+            string fileName = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/LoanAudit";
             fileName += dtEnd.ToString("yyyyMMdd");
             fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".txt";
@@ -277,7 +281,7 @@ namespace LoanStatusReport
         private void RunLoanStatusReport(DateTime dtReport)
         {
             // create report file
-            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanStatus";
+            string fileName = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/LoanStatus";
             fileName += dtReport.ToString("yyyyMMdd");
             fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".txt";
@@ -392,7 +396,7 @@ namespace LoanStatusReport
             List<double> totals = new List<double>();
             for (int i = 0; i < 7; i++)
                 totals.Add(0D);
-            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanAudit";
+            string fileName = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/LoanAudit";
             fileName += dtEnd.ToString("yyyyMMdd");
             fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".htm";
@@ -443,7 +447,7 @@ namespace LoanStatusReport
             List<double> totals = new List<double>();
             for (int i = 0; i < 14; i++)
                 totals.Add(0D);
-            string fileName = "/Volumes/GoogleDrive/Team Drives/Resilience/Reports/LoanStatus";
+            string fileName = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/LoanStatus";
             fileName += dtReport.ToString("yyyyMMdd");
             fileName += "." + this.LenderPopUpButton.TitleOfSelectedItem;
             fileName += ".htm";
@@ -467,6 +471,7 @@ namespace LoanStatusReport
             WriteHTMLHeaderRow(sw);
             // loop through loans
             clsCSVTable tbl = new clsCSVTable(clsLoan.strLoanPath);
+            //            for (int i = 26; i < tbl.Length(); i++)
             for (int i = 0; i < tbl.Length(); i++)
             {
                 if (this.lenderLoanIDs.Contains(i))
@@ -586,7 +591,16 @@ namespace LoanStatusReport
                     totals[totalsIndex] += value;
                     totalsIndex++;
                     sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 2; i++)
+                    {
+                        sw.Write("<td></td>");
+                        totalsIndex++;
+                    }
+                    value = loan.PointsPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    for (int i = 0; i < 3; i++)
                     {
                         sw.Write("<td></td>");
                         totalsIndex++;
