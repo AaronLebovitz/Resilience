@@ -97,8 +97,10 @@ namespace UpdateAcquisition
                 this.InitialDrawField.StringValue = this.InitialDrawLabel.StringValue;
                 this.PropertyTaxField.StringValue = this.PropertyTaxLabel.StringValue;
                 this.TitlePolicyField.StringValue = this.TitlePolicyLabel.StringValue;
-                this.LenderComboBox.SelectItem(this.loanToUpdate.LenderID);
-                this.BorrowerComboBox.SelectItem(this.loanToUpdate.TitleHolderID());
+                clsEntity lender = new clsEntity(this.loanToUpdate.LenderID);
+                this.LenderComboBox.Select((NSString)lender.Name());
+                clsEntity borrower = new clsEntity(this.loanToUpdate.BorrowerID);
+                this.BorrowerComboBox.Select((NSString)borrower.Name()); 
                 this.LenderLabel.StringValue = (NSString)this.LenderComboBox.SelectedValue;
                 this.BorrowerLabel.StringValue = (NSString)this.BorrowerComboBox.SelectedValue;
                 this.UpdatedPointsLabel.StringValue = this.PointsLabel.StringValue;
@@ -266,8 +268,8 @@ namespace UpdateAcquisition
                     }
                     // Update origination Date and Save
                     this.loanToUpdate.SetNewOriginationDate((DateTime)this.ClosingDatePicker.DateValue);
-                    this.loanToUpdate.LenderID = (int)this.LenderComboBox.SelectedIndex;
-                    this.loanToUpdate.BorrowerID = (int)this.BorrowerComboBox.SelectedIndex;
+                    this.loanToUpdate.LenderID = clsEntity.EntityID((String)(NSString)this.LenderComboBox.SelectedValue);
+                    this.loanToUpdate.BorrowerID = clsEntity.EntityID((String)(NSString)this.BorrowerComboBox.SelectedValue);
                     if (this.loanToUpdate.Save())
                     {
                         this.SummaryMessageField.StringValue += "\nSave successful.  " + this.loanToUpdate.Property().Address();
@@ -387,6 +389,11 @@ namespace UpdateAcquisition
                     mtgPath += "DOT " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "DOT " + this.loanToUpdate.Property().Address() + ".docx";
                     break;
+                case "IL":
+                    mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
+                    destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
+                    System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
+                    break;
                 case "NJ":
                     mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
@@ -413,7 +420,7 @@ namespace UpdateAcquisition
             string LETTERDATE = System.DateTime.Today.Date.ToString("MMMM d, yyyy");
             string ACQUISITIONDATE = this.loanToUpdate.OriginationDate().Date.ToString("MMMM d, yyyy");
             string FILENUMBER = Field0Value; // from custom dialog
-            string WIREAMOUNT = this.loanToUpdate.AcquisitionCost(false).ToString("#,##0.00");
+            string WIREAMOUNT = this.loanToUpdate.AcquisitionCost(false,true).ToString("#,##0.00");
             string EXPIRATIONDATE = this.loanToUpdate.OriginationDate().Date.AddDays(5).ToString("MMMM d, yyyy");
             string COUNTY = this.loanToUpdate.Property().County();
             // - MTG:  DATEDDATE, DUEDATE, COUNTY, ADDRESS (full address with city, state, zip)
@@ -470,6 +477,7 @@ namespace UpdateAcquisition
             {
                 doc = DocX.Load(destDisclosurePath);
                 doc.ReplaceText("[ADDRESS]", ADDRESS);
+                doc.ReplaceText("[DATEDDATE]", DATEDDATE);
                 doc.Save();
                 SummaryMessageField.StringValue += "Updated " + destDisclosurePath;
             }
@@ -560,8 +568,10 @@ namespace UpdateAcquisition
             clsCSVTable tblEntity = new clsCSVTable(clsEntity.strEntityPath);
             for (int i = 0; i < tblEntity.Length(); i++)
             {
-                this.LenderComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
-                this.BorrowerComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+                if ((clsEntity.Type)Int32.Parse(tblEntity.Value(i, clsEntity.EntityTypeColumn)) == clsEntity.Type.Lender)
+                    this.LenderComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
+                else if ((clsEntity.Type)Int32.Parse(tblEntity.Value(i, clsEntity.EntityTypeColumn)) == clsEntity.Type.Borrower)
+                    this.BorrowerComboBox.Add((NSString)tblEntity.Value(i, clsEntity.NameColumn));
             }
         }
 

@@ -4,7 +4,23 @@ namespace ResilienceClasses
     public class clsEntity
     {
 
+        #region Static Methods
+        public static int EntityID(string lenderName)
+        {
+            int id = -1;
+            clsCSVTable tbl = new clsCSVTable(clsEntity.strEntityPath);
+            System.Collections.Generic.List<int> matches = tbl.Matches(clsEntity.NameColumn, lenderName);
+            if (matches.Count > 0)
+                id = matches[0];
+            return id;
+        }
+        #endregion
+
         #region Enums and Static Values
+        public enum Type
+        {
+            Borrower, Lender, Title, Manager, Vendor, Unknown
+        }
         public static string strEntityPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblEntity.csv";
             // "/Users/" + Environment.UserName + "/Documents/Professional/Resilience/tblEntity.csv";
         public static int NameColumn = 1;
@@ -16,6 +32,7 @@ namespace ResilienceClasses
         public static int ContactNameColumn = 7;
         public static int ContactEmailColumn = 8;
         public static int PathAbbreviationColumn = 9;
+        public static int EntityTypeColumn = 10;
         #endregion
 
         #region Properties
@@ -29,6 +46,7 @@ namespace ResilienceClasses
         private string strContactName;
         private string strEmail;
         private string strPathAbbrev;
+        private clsEntity.Type tType;
         #endregion
 
         #region Constructors
@@ -42,7 +60,7 @@ namespace ResilienceClasses
             this._Load(id, tbl);
         }
 
-        public clsEntity(string name, string address, string town, string state, int zip, string phone, string contact, string email, string path)
+        public clsEntity(string name, string address, string town, string state, int zip, string phone, string contact, string email, string path, clsEntity.Type type)
         {
             this.iEntityID = _NewEntityID();
             this.strName = name;
@@ -54,6 +72,7 @@ namespace ResilienceClasses
             this.strContactName = contact;
             this.strEmail = email;
             this.strPathAbbrev = path;
+            this.tType = type;
         }
         #endregion
 
@@ -68,6 +87,7 @@ namespace ResilienceClasses
         public string ContactName() { return this.strContactName; }
         public string ContactEmail() { return this.strEmail; }
         public string PathAbbreviation() { return this.strPathAbbrev; }
+        public string EntityType() { return this.tType.ToString(); }
         #endregion
 
         #region DB Methods
@@ -91,6 +111,7 @@ namespace ResilienceClasses
                 strValues[clsEntity.ContactNameColumn - 1] = this.strContactName;
                 strValues[clsEntity.ContactEmailColumn - 1] = this.strEmail;
                 strValues[clsEntity.PathAbbreviationColumn - 1] = this.strPathAbbrev;
+                strValues[clsEntity.EntityTypeColumn - 1] = ((int)this.tType).ToString();
                 tbl.New(strValues);
                 return tbl.Save();
             }
@@ -107,7 +128,8 @@ namespace ResilienceClasses
                         tbl.Update(this.iEntityID, clsEntity.PhoneNumberColumn, this.strPhone) &&
                         tbl.Update(this.iEntityID, clsEntity.ContactNameColumn, this.strContactName) &&
                         tbl.Update(this.iEntityID, clsEntity.PathAbbreviationColumn, this.strPathAbbrev) &&
-                        tbl.Update(this.iEntityID, clsEntity.ContactEmailColumn, this.strEmail))
+                        tbl.Update(this.iEntityID, clsEntity.ContactEmailColumn, this.strEmail) &&
+                        tbl.Update(this.iEntityID, clsEntity.EntityTypeColumn, ((int)this.tType).ToString()))
                     {
                         return tbl.Save();
                     }
@@ -146,6 +168,7 @@ namespace ResilienceClasses
                 this.strContactName = tbl.Value(id, clsEntity.ContactNameColumn);
                 this.strEmail = tbl.Value(id, clsEntity.ContactEmailColumn);
                 this.strPathAbbrev = tbl.Value(id, clsEntity.PathAbbreviationColumn);
+                this.tType = (clsEntity.Type)Int32.Parse(tbl.Value(id, clsEntity.EntityTypeColumn));
                 return true;
             }
             else

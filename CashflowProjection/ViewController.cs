@@ -55,10 +55,24 @@ namespace CashflowProjection
             clsCSVTable cfTable = new clsCSVTable(clsCashflow.strCashflowPath);
             for (int i = 0; i < cfTable.Length(); i++)
             {
+                DateTime pd = DateTime.Parse(cfTable.Value(i, clsCashflow.TransactionDateColumn));
+                DateTime rd = DateTime.Parse(cfTable.Value(i, clsCashflow.RecordDateColumn));
+                DateTime dd = DateTime.Parse(cfTable.Value(i, clsCashflow.DeleteDateColumn));
+                int id = Int32.Parse(cfTable.Value(i, clsCashflow.LoanColumn));
+                double a = Double.Parse(cfTable.Value(i, clsCashflow.AmountColumn));
+                bool b = Boolean.Parse(cfTable.Value(i, clsCashflow.ActualColumn));
+                clsCashflow.Type t = (clsCashflow.Type)Int32.Parse(cfTable.Value(i, clsCashflow.TransactionTypeColumn));
+                string c = cfTable.Value(i, clsCashflow.CommentColumn);
+                clsCashflow cf = new clsCashflow(pd, rd, dd, id, a, b, t, c);
                 if (DateTime.Parse(cfTable.Value(i, clsCashflow.DeleteDateColumn)) > System.DateTime.Today.AddYears(50))
-                    this.activeCashflows.Add(new clsCashflow(i));
+                {
+                    this.activeCashflows.Add(cf);
+                                        //this.activeCashflows.Add(new clsCashflow(i));
+                }
                 else
-                    this.expiredCashflows.Add(new clsCashflow(i));
+                {
+                    this.expiredCashflows.Add(cf);
+                }
             }
 
             this.DateFilterDatePicker.DateValue = (NSDate)System.DateTime.Today;

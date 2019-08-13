@@ -913,7 +913,7 @@ namespace ResilienceClasses
         public double AcquisitionCost(bool original, bool beforePoints = false)
         {
             DateTime dtAsOf = original ? this.FindDate(clsCashflow.Type.Acquisition, true, false) : this.dtOrigination;
-            clsLoan l = this.LoanAsOf(dtAsOf);
+            clsLoan l = this.LoanAsOf(dtAsOf, true);
             DateTime dtBalance = original ? l.FindDate(clsCashflow.Type.AcquisitionPrice, true, true) : this.dtOrigination;
             // returns the loan balance as of the origination date of the loan (projected or past)
             // if (original), uses the first record date found;  if (!original) uses the loan origination date
