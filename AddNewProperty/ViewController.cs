@@ -115,15 +115,24 @@ namespace AddNewProperty
             clsCSVTable EntityTable = new clsCSVTable(clsEntity.strEntityPath);
             for (int i = 0; i < EntityTable.Length(); i++)
             {
-                this.TitleHolderPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
-                this.CoBorrowerPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
-                this.TitlePopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
-                this.LenderPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
+                switch (Int32.Parse(EntityTable.Value(i, clsEntity.EntityTypeColumn)))
+                {
+                    case (Int32)clsEntity.Type.Borrower:
+                        this.TitleHolderPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
+                        this.CoBorrowerPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
+                        break;
+                    case (Int32)clsEntity.Type.Title:
+                        this.TitlePopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
+                        break;
+                    case (Int32)clsEntity.Type.Lender:
+                        this.LenderPopUp.AddItem(EntityTable.Value(i, clsEntity.NameColumn));
+                        break;
+                }
             }
             this.PurchaseDatePicker.DateValue = (NSDate)System.DateTime.Today.AddMonths(1);
-            this.TitleHolderPopUp.SelectItem(4);
+            this.TitleHolderPopUp.SelectItem(2);
             this.CoBorrowerPopUp.SelectItem(0);
-            this.LenderPopUp.SelectItem(17);
+            this.LenderPopUp.SelectItem(2);
             this.PointsBox.DoubleValue = 0D;
             this.DefaultRateBox.DoubleValue = 0.05;
             this.LoanRateBox.DoubleValue = 0.09;
@@ -189,10 +198,10 @@ namespace AddNewProperty
             string town = this.TownBox.StringValue;
             string county = this.CountyBox.StringValue;
             string state = this.StateBox.StringValue;
-            int titleHolderID = (int)this.TitleHolderPopUp.IndexOfSelectedItem-1;
-            int coID = (int)this.CoBorrowerPopUp.IndexOfSelectedItem-1;
-            int lenderID = (int)this.LenderPopUp.IndexOfSelectedItem-1;
-            int titleID = (int)this.TitlePopUp.IndexOfSelectedItem-1;
+            int titleHolderID = clsEntity.EntityID(this.TitleHolderPopUp.TitleOfSelectedItem);
+            int coID = clsEntity.EntityID(this.CoBorrowerPopUp.TitleOfSelectedItem);
+            int lenderID = clsEntity.EntityID(this.LenderPopUp.TitleOfSelectedItem);
+            int titleID = clsEntity.EntityID(this.TitlePopUp.TitleOfSelectedItem);
             DateTime acquisitionDate = (DateTime)this.PurchaseDatePicker.DateValue;
             double price = this.PurchasePriceBox.DoubleValue;
             double bpo = this.BPOBox.DoubleValue;
