@@ -220,7 +220,8 @@ namespace ManageSales
               // get/compute replacement values
             DateTime letterDate = DateTime.Today.Date;
             DateTime scheduledSale = this.loan.SaleDate().Date;
-            double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(1),true).PrincipalPaid(scheduledSale.AddDays(1));
+            double dPrincipalRepay = this.loan.LoanAsOf(scheduledSale.AddDays(1),true).PrincipalPaid(scheduledSale.AddDays(1)) - 
+                this.loan.PrincipalPaid();
             double dHardInterest = this.loan.LoanAsOf(scheduledSale).AccruedInterest(scheduledSale);
             double perdiem = dHardInterest - this.loan.LoanAsOf(scheduledSale.AddDays(-1)).AccruedInterest(scheduledSale.AddDays(-1));
               // find and replace
@@ -308,7 +309,7 @@ namespace ManageSales
             {
                 string instrument = ExpectedSalePriceTextField.IntValue.ToString("#");
                 if (instrument == "0") { instrument = "____________"; }
-                string parcel = RepaymentAmountTextField.StringValue;
+                string parcel = RepaymentAmountTextField.IntValue.ToString("#");
                 if (parcel == "0") { parcel = "____________"; }
 
                 newLetter.ReplaceText("[DATEDDATE]", datedDate.ToString("MMMM d, yyyy"));
@@ -322,7 +323,9 @@ namespace ManageSales
                 clsLoanRecording lr = new clsLoanRecording(address);
                 if (lr.ID() < 0)
                 {
-                    lr = new clsLoanRecording(this.loan.ID(), 0, 0, Int32.Parse(instrument), Int32.Parse(parcel), recordDate);
+                    int a = Int32.Parse(instrument);
+                    int b = Int32.Parse(parcel);
+                    lr = new clsLoanRecording(this.loan.ID(), 0, 0, a, b, recordDate);
                     lr.Save();
                 }
             }

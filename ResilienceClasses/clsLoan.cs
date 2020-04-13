@@ -587,8 +587,8 @@ namespace ResilienceClasses
             // TO look back and project forward use this.LoanAsOf(dtLookBack).LoanAsOf(dtLookAhead).AccruedInterest(dtLookAhead)
             double dAccrued = 0;
             double dExpiredDays;
-            bool bSold = false;
-            if (this.cfCashflows.Count == 0)
+            //bool bSold = false;
+            if ((this.cfCashflows.Count == 0) || (this.Status() == clsLoan.State.Sold))
             {
                 return 0;
             }
@@ -601,10 +601,11 @@ namespace ResilienceClasses
                     {
                         dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
                         dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
-                        if (cf.TypeID() == clsCashflow.Type.Principal) { bSold = true; }
+                        if (cf.TypeID() == clsCashflow.Type.InterestHard) {
+                            dAccrued += cf.Amount();
+                        }
                     }
                 }
-                if (bSold) { dAccrued = 0D; }
                 return -dAccrued;
             }
         }
@@ -774,6 +775,7 @@ namespace ResilienceClasses
                 else if ((!bRehabRemains) && (s != clsLoan.State.Sold) && (!this.bAcquisitionOnly)) s = clsLoan.State.Listed;
                 // if AcquisitionOnly, assume it's in rehab until its Listed
                 else if (s == clsLoan.State.Unknown) s = clsLoan.State.PendingAcquisition;
+                else if ((s == clsLoan.State.Sold) && (this.Balance() > 0)) s = State.Listed;
                 return s;
             }
             else return clsLoan.State.Cancelled;

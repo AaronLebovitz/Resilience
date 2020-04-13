@@ -261,8 +261,14 @@ namespace UpdateAcquisition
                     foreach (clsCashflow cf in newCashflows)
                     {
                         if (cf.TypeID() == clsCashflow.Type.NetDispositionProj)
-                            this.loanToUpdate.AddCashflow(new clsCashflow (cf.PayDate(), cf.RecordDate(), cf.DeleteDate(), cf.LoanID(), 
-                                cf.Amount() + loanToUpdate.AcquisitionCost(false) - oldAcqCost, false, clsCashflow.Type.NetDispositionProj));
+                        {
+                            DateTime newDate = (DateTime)this.ClosingDatePicker.DateValue;
+                            clsLoan l = loanToUpdate.LoanAsOf(newDate.AddDays(1), true);
+                            this.loanToUpdate.AddCashflow(new clsCashflow(cf.PayDate(), cf.RecordDate(), cf.DeleteDate(), cf.LoanID(),
+                                cf.Amount() + loanToUpdate.LoanAsOf(newDate.AddDays(1), true).Balance(newDate.AddDays(1)) - oldAcqCost,
+                                false, clsCashflow.Type.NetDispositionProj));
+                            //                                cf.Amount() + loanToUpdate.AcquisitionCost(false) - oldAcqCost, false, clsCashflow.Type.NetDispositionProj));
+                        }
                         else
                             this.loanToUpdate.AddCashflow(cf);
                     }
@@ -355,9 +361,14 @@ namespace UpdateAcquisition
             total += this.TitlePolicyField.DoubleValue;
             if (this.loanToUpdate != null)
             {
-                this.UpdatedPointsLabel.DoubleValue = total / (1D - this.loanToUpdate.Points() * 0.01) * this.loanToUpdate.Points() * 0.01;
                 if (this.loanToUpdate.PointsCapitalized())
+                {
                     total += this.UpdatedPointsLabel.DoubleValue;
+                    this.UpdatedPointsLabel.DoubleValue = total / (1D - this.loanToUpdate.Points() * 0.01) * this.loanToUpdate.Points() * 0.01;
+                }
+                else
+                    this.UpdatedPointsLabel.DoubleValue = total * this.loanToUpdate.Points() * 0.01;
+
             }
             this.TotalCostLabel.DoubleValue = total;
         }
@@ -392,7 +403,6 @@ namespace UpdateAcquisition
                 case "IL":
                     mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
                     destMtgPath += "Mortgage " + this.loanToUpdate.Property().Address() + ".docx";
-                    System.IO.File.Copy(disclosurePath, destDisclosurePath, true);
                     break;
                 case "NJ":
                     mtgPath += "MTG " + lenderAbbrev + " " + borrowerAbrev + " " + stateAbbrev + ".docx";
@@ -523,6 +533,8 @@ namespace UpdateAcquisition
             {
                 doc.ReplaceText("[PARCEL]", PARCEL);
             }
+            else if (stateAbbrev == "IL") // nothing to do
+            { }
             doc.Save();
             SummaryMessageField.StringValue = "\nUpdated " + destMtgPath;
             SummaryMessageField.StringValue = "\n*** REMEMBER TO UPDATE LEGAL ADDRESS MANUALLY ***";
