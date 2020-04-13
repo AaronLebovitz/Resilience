@@ -148,6 +148,7 @@ namespace LoanStatusReport
             double dAdditionalInterestPaidThisPeriod = 0D;
             double dAdditionalInterestAccruedThisPeriod = 0D;
             double dAdditionalInterestAccruedPreviousPeriod = 0D;
+            double dPointsPaidThisPeriod = 0D;
             double dAccruedFTD = 0D;
             double dAccruedNetAtStartDate = 0D;
 
@@ -176,7 +177,8 @@ namespace LoanStatusReport
                         dRepaidPeriod += loan.PrincipalPaid(endDate) - loan.PrincipalPaid(startDate);
                         dRepaidPreviously += loan.PrincipalPaid(startDate);
                         dHardInterestPaidPreviously += loan.HardInterestPaid(startDate);
-                        dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - loan.HardInterestPaid(startDate);
+                        dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - dHardInterestPaidPreviously;
+                        dPointsPaidThisPeriod += loan.PointsPaid(endDate) - loan.PointsPaid(startDate);
                         dAccruedThisPeriod += loan.AccruedInterest(endDate) - loan.AccruedInterest(startDate);
                         dAdditionalInterestPaidThisPeriod += loan.AdditionalInterestPaid(endDate) - loan.AdditionalInterestPaid(startDate);
                         dAdditionalInterestAccruedThisPeriod += loan.AccruedAdditionalInterest(endDate);  // needs fixing 
@@ -249,7 +251,10 @@ namespace LoanStatusReport
             this.ReportSummaryTextLabel.StringValue += "(+) Hard Paid :  \t" + dHardInterestPaidThisPeriod.ToString("000,000.00");
 
             this.ReportSummaryTextLabel.StringValue += "\n                    \t                   \t";
-            this.ReportSummaryTextLabel.StringValue += "Net Income Per:  \t" + (dAccruedFTD - dHardInterestPaidPreviously - dAccruedNetAtStartDate + dAdditionalInterestPaidThisPeriod + dAdditionalInterestAccruedThisPeriod - dAdditionalInterestAccruedPreviousPeriod).ToString("000,000.00");
+            this.ReportSummaryTextLabel.StringValue += "(+) Points Paid :\t" + dPointsPaidThisPeriod.ToString("000,000.00");
+
+            this.ReportSummaryTextLabel.StringValue += "\n                    \t                   \t";
+            this.ReportSummaryTextLabel.StringValue += "Net Income Per:  \t" + (dAccruedFTD - dHardInterestPaidPreviously - dAccruedNetAtStartDate + dAdditionalInterestPaidThisPeriod + dAdditionalInterestAccruedThisPeriod - dAdditionalInterestAccruedPreviousPeriod + dPointsPaidThisPeriod).ToString("000,000.00");
 
         }
 
