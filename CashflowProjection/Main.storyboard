@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -1048,11 +1048,11 @@
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="XJj-r4-1pF">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="XJj-r4-1pF">
                                     <rect key="frame" x="1" y="654" width="838" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="jVA-gE-YWn">
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="jVA-gE-YWn">
                                     <rect key="frame" x="224" y="17" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
@@ -1240,7 +1240,7 @@
                                 </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wML-0g-sPh">
-                                <rect key="frame" x="681" y="692" width="182" height="26"/>
+                                <rect key="frame" x="598" y="692" width="182" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Lender" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="XHt-Zs-o4n" id="5er-Wg-v2x">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1248,8 +1248,6 @@
                                     <menu key="menu" id="zze-f3-iwy">
                                         <items>
                                             <menuItem title="Lender" state="on" id="XHt-Zs-o4n"/>
-                                            <menuItem title="Item 2" id="0v8-zC-MDj"/>
-                                            <menuItem title="Item 3" id="253-R0-sjn"/>
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
@@ -1268,11 +1266,28 @@
                                     <action selector="ShowExpiredCheckBoxToggled:" target="XfG-lQ-9wD" id="lBm-r8-Nxi"/>
                                 </connections>
                             </button>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1e3-f9-ZaU" userLabel="Borrower Pop Up">
+                                <rect key="frame" x="796" y="695" width="177" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Borrower" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="qzB-Hc-DbP" id="CWw-sC-4RU">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="6go-oz-D4Q">
+                                        <items>
+                                            <menuItem title="Borrower" state="on" id="qzB-Hc-DbP"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="BorrowerSelected:" target="XfG-lQ-9wD" id="NBn-dZ-FPh"/>
+                                </connections>
+                            </popUpButton>
                         </subviews>
                     </view>
                     <connections>
                         <outlet property="ActualFilterComboxBox" destination="0eN-1c-hig" id="A6C-75-TFb"/>
                         <outlet property="AddressFilterComboBox" destination="k3D-pI-a4G" id="ZYJ-Q6-QuV"/>
+                        <outlet property="BorrowerPopUp" destination="1e3-f9-ZaU" id="Mdv-Su-olQ"/>
                         <outlet property="CashflowTable" destination="1B3-hI-0dw" id="cUd-wN-DhE"/>
                         <outlet property="CashflowTableView" destination="hSr-sf-WZ8" id="ABE-CK-f0N"/>
                         <outlet property="DateFilterDatePicker" destination="vpq-Dt-Ppy" id="RNv-4i-Iuj"/>

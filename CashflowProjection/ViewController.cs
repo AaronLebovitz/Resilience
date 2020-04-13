@@ -30,6 +30,9 @@ namespace CashflowProjection
         private int lenderID = -1;
         private List<int> lenderIndexToID = new List<int>();
         private List<int> lenderLoanIDs = new List<int>();
+        private int borrowerID = -1;
+        private List<int> borrowerIndexToID = new List<int>();
+        private List<int> borrowerLoanIDs = new List<int>();
 
         #endregion
 
@@ -105,8 +108,6 @@ namespace CashflowProjection
             this.CashflowTableView.DataSource = this.dataSource;
             this.CashflowTableView.Delegate = this.dataSourceDelegate;
 
-            this.LenderPopUp.RemoveItem("Item 2");
-            this.LenderPopUp.RemoveItem("Item 3");
             clsCSVTable tblLenders = new clsCSVTable(clsEntity.strEntityPath);
             clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
             for (int i = 0; i < tblLenders.Length(); i++)
@@ -119,6 +120,18 @@ namespace CashflowProjection
             }
             for (int i = 0; i < tblLoans.Length(); i++)
                 this.lenderLoanIDs.Add(i);
+
+            clsCSVTable tblBorrowers = new clsCSVTable(clsEntity.strEntityPath);
+            for (int i = 0; i < tblBorrowers.Length(); i++)
+            {
+                if (tblLoans.Matches(clsLoan.TitleHolderColumn, i.ToString()).Count > 0)
+                {
+                    this.BorrowerPopUp.AddItem(tblBorrowers.Value(i, clsEntity.NameColumn));
+                    this.borrowerIndexToID.Add(i);
+                }
+            }
+            for (int i = 0; i < tblLoans.Length(); i++)
+                this.borrowerLoanIDs.Add(i);
         }
 
         public override NSObject RepresentedObject
@@ -229,9 +242,12 @@ namespace CashflowProjection
             string filePath = "/Volumes/GoogleDrive/Shared Drives/Resilience/Reports/CashflowReportNAV";
             filePath += "_" + this.startDate.ToString("yyyyMMdd");
             filePath += "_" + this.endDate.ToString("yyyyMMdd");
+            filePath += "_" + this.LenderPopUp.TitleOfSelectedItem;
+            filePath += "_" + this.BorrowerPopUp.TitleOfSelectedItem;
             filePath += ".csv";
 
             this.showAll = true;
+            this.ActualFilterComboxBox.SelectItem(1);
             this.ScenarioButton.State = NSCellStateValue.On;
             this.OutflowsOnlyButton.State = NSCellStateValue.Off;
             this.ScheduledOnlyButton.State = NSCellStateValue.Off;
@@ -325,8 +341,9 @@ namespace CashflowProjection
             }
             foreach (clsCashflow cf in this.activeCashflows)
             {
-                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
-                if (bInclude && ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today)))
+                bool bIncludeLender = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                bool bIncludeBorrower = this.borrowerLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.borrowerID) || (this.borrowerID == -1);
+                if (bIncludeLender && bIncludeBorrower && ((!cf.Actual()) && (cf.PayDate() <= System.DateTime.Today)))
                     includedCashflows.Add(cf);
             }
             this.dataSource.Cashflows = includedCashflows;
@@ -397,6 +414,24 @@ namespace CashflowProjection
             this.RefreshTable();
         }
 
+        partial void BorrowerSelected(NSPopUpButton sender)
+        {
+            this.borrowerLoanIDs.Clear();
+            clsCSVTable tblLoans = new clsCSVTable(clsLoan.strLoanPath);
+            if (this.BorrowerPopUp.IndexOfSelectedItem > 0)
+            {
+                this.borrowerID = this.borrowerIndexToID[(int)this.BorrowerPopUp.IndexOfSelectedItem - 1];
+                this.borrowerLoanIDs = tblLoans.Matches(clsLoan.TitleHolderColumn, this.borrowerID.ToString());
+            }
+            else
+            {
+                this.borrowerID = -1;
+                for (int i = 0; i < tblLoans.Length(); i++)
+                    this.borrowerLoanIDs.Add(i);
+            }
+            this.RefreshTable();
+        }
+
         #endregion
 
         #region Private Methods
@@ -429,10 +464,11 @@ namespace CashflowProjection
             // compile included cashflows
             foreach (clsCashflow cf in this.activeCashflows)
             {
-                // cashflow must be part of a loan that belongs to the selected Lender
-                bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                bool bInclude;
+                bool bIncludeLender = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                bool bIncludeBorrower = this.borrowerLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.borrowerID) || (this.borrowerID == -1);
                 // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
-                bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
+                bInclude = bIncludeLender && bIncludeBorrower && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
                 // cashflow must belong to selected address OR no address must be selected ("All")
                 if (bInclude)
                     bInclude = ((this.addressFilter == "All") || (this.addressToLoanID[this.addressFilter] == cf.LoanID()));
@@ -478,9 +514,11 @@ namespace CashflowProjection
                 foreach (clsCashflow cf in this.expiredCashflows)
                 {
                     // cashflow must be part of a loan that belongs to the selected Lender
-                    bool bInclude = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                    bool bInclude;
+                    bool bIncludeLender = this.lenderLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.lenderID) || (this.lenderID == -1);
+                    bool bIncludeBorrower = this.borrowerLoanIDs.Contains(cf.LoanID()) || (cf.LoanID() == -this.borrowerID) || (this.borrowerID == -1);
                     // cashflow must either (be actual if user wants actual) OR (not be actual if user wants non actual);
-                    bInclude = bInclude && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
+                    bInclude = bIncludeLender && bIncludeBorrower && ((((includeActual) && (cf.Actual())) || ((includeNonActual) && (!cf.Actual()))));
                     // cashflow must belong to selected address OR no address must be selected ("All")
                     if (bInclude)
                         bInclude = ((this.addressFilter == "All") || (this.addressToLoanID[this.addressFilter] == cf.LoanID()));
