@@ -339,11 +339,18 @@ namespace ManageSales
             destinationPath2 += this.lender.Name();
             destinationPath2 += "/Loans/" + this.loan.Property().State() + "/" + address + ", " + city;
             destinationPath2 += "/Sale/Satisfaction of Mortgage (" + address + ").docx";
-            newLetter.SaveAs(destinationPath2);
+            try
+            {
+                newLetter.SaveAs(destinationPath2);
+            } 
+            catch
+            {
+                destinationPath2 = " FAILED";
+            }
             // notify
             this.StatusMessageTextField.StringValue = "Release Letter Created at:/n" + destinationPath;
             this.StatusMessageTextField.StringValue += "/n/nRelease Letter Copied to:/n" + destinationPath2;
-        }
+            }
 
         #endregion
 
@@ -355,7 +362,7 @@ namespace ManageSales
             //   cancel interest, calculate new accrued to new date
             //   cancel additional, move to new date, reduce by 1/2 (new accrued - old accrued)
             DateTime scheduledSale = (DateTime)this.SaleDatePicker.DateValue;
-            if (scheduledSale <= System.DateTime.Today.Date)
+            if (scheduledSale <= System.DateTime.MinValue)// Today.Date)
             {
                 this.StatusMessageTextField.StringValue = "Can't reschedule to a date in the past.";
             }

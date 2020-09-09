@@ -8,7 +8,7 @@ namespace ResilienceClasses
     public class Loan
     {
         #region Enums and Static Values
-        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
+        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold, PartiallySold }
         //public static string LoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
         public static string LoanPath = "/Google Drive/Shared Drives/Resilience/tblLoan.csv";
 
@@ -33,7 +33,6 @@ namespace ResilienceClasses
         {
             clsCSVTable tblLoans = new clsCSVTable(Loan.LoanPath);
             int loanID = -1;
-
             // Find PropertyID from Address First
             int propertyID = clsProperty.IDFromAddress(address);
             if (propertyID == -1) return -1;
@@ -230,7 +229,7 @@ namespace ResilienceClasses
     public class clsLoan
     {
         #region Enums and Static Values
-        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold }
+        public enum State { Unknown, Cancelled, PendingAcquisition, Rehab, Listed, PendingSale, Sold, PartiallySold }
 
         public static string strLoanPath = "/Volumes/GoogleDrive/Shared Drives/Resilience/tblLoan.csv";
         //public static string strLoanPath = "/Volumes/GoogleDrive/Team Drives/Resilience/tblLoan.csv";
@@ -599,14 +598,18 @@ namespace ResilienceClasses
                     dExpiredDays = Math.Max(0, Math.Min((dt - this.dtMaturity).Days, (dt - cf.PayDate()).Days));
                     if ((cf.PayDate() < dt) && (cf.Actual()) && (cf.TypeID() != clsCashflow.Type.Points))
                     {
-                        dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
-                        dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
-                        if (cf.TypeID() == clsCashflow.Type.InterestHard) {
+                        if (cf.TypeID() == clsCashflow.Type.InterestHard)
+                        {
                             dAccrued += cf.Amount();
+                        }
+                        else
+                        {
+                            dAccrued += cf.Amount() * this.dRate * (dt - cf.PayDate()).Days / 360D;
+                            dAccrued += cf.Amount() * this.dPenaltyRate * dExpiredDays / 360D;
                         }
                     }
                 }
-                return -dAccrued;
+                return -Math.Round(dAccrued, 2);
             }
         }
 
@@ -655,7 +658,7 @@ namespace ResilienceClasses
             // we only count it if it's booked within 14 days of the sale (see property 21 e.g. to filter out escrowed amounts)
             //  (or see property 40 for additional interest paid after Q3 was reported)
             double dReturnValue = 0;
-            if ((this.LoanAsOf(dt).Status() == State.Sold) && (this.dProfitSplit > 0D))
+            if (((this.LoanAsOf(dt).Status() == State.Sold) || (this.LoanAsOf(dt).Status() == State.PartiallySold)) && (this.dProfitSplit > 0D))
             {
                 DateTime dtSaleDate = this.SaleDate();
                 foreach (clsCashflow cf in this.cfCashflows)
@@ -751,11 +754,11 @@ namespace ResilienceClasses
                         }
                         else if (cf.TypeID() == clsCashflow.Type.InterestHard)
                         {
-                            s = clsLoan.State.Sold;
+                            //s = clsLoan.State.Sold;
                         }
                         else if (cf.TypeID() == clsCashflow.Type.InterestAdditional)
                         {
-                            s = clsLoan.State.Sold;
+                           //s = clsLoan.State.Sold;
                         }
                         else if (cf.TypeID() == clsCashflow.Type.NetDispositionProj)
                         {
@@ -770,12 +773,17 @@ namespace ResilienceClasses
                         else if (cf.TypeID() == clsCashflow.Type.Principal) bSaleScheduled = true;
                     }
                 }
-                if (bAllExpired) s = clsLoan.State.Cancelled;
-                else if (bSaleScheduled) s = clsLoan.State.PendingSale;
-                else if ((!bRehabRemains) && (s != clsLoan.State.Sold) && (!this.bAcquisitionOnly)) s = clsLoan.State.Listed;
+                if (bAllExpired) 
+                    s = clsLoan.State.Cancelled;
+                else if (bSaleScheduled) 
+                    s = clsLoan.State.PendingSale;
+                else if ((!bRehabRemains) && (s != clsLoan.State.Sold) && (!this.bAcquisitionOnly)) 
+                    s = clsLoan.State.Listed;
                 // if AcquisitionOnly, assume it's in rehab until its Listed
-                else if (s == clsLoan.State.Unknown) s = clsLoan.State.PendingAcquisition;
-                else if ((s == clsLoan.State.Sold) && (this.Balance() > 0)) s = State.Listed;
+                else if (s == clsLoan.State.Unknown) 
+                    s = clsLoan.State.PendingAcquisition;
+                else if ((s == clsLoan.State.Sold) && (Math.Round(this.Balance(), 0) > 0)) 
+                    s = State.PartiallySold;
                 return s;
             }
             else return clsLoan.State.Cancelled;

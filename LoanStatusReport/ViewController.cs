@@ -138,6 +138,7 @@ namespace LoanStatusReport
             double dSaleContracts = 0D;
             double dSaleListings = 0D;
             double dPendingAcq = 0D;
+            double dPartialBalance = 0D;
 
             // Accrued:   Total accrued FTD, less this period payments, less prior payments, (=accrued end of period), 
             //            less accrued end of prev period,  adding to net accrued this period
@@ -177,7 +178,7 @@ namespace LoanStatusReport
                         dRepaidPeriod += loan.PrincipalPaid(endDate) - loan.PrincipalPaid(startDate);
                         dRepaidPreviously += loan.PrincipalPaid(startDate);
                         dHardInterestPaidPreviously += loan.HardInterestPaid(startDate);
-                        dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - dHardInterestPaidPreviously;
+                        dHardInterestPaidThisPeriod += loan.HardInterestPaid(endDate) - loan.HardInterestPaid(startDate);
                         dPointsPaidThisPeriod += loan.PointsPaid(endDate) - loan.PointsPaid(startDate);
                         dAccruedThisPeriod += loan.AccruedInterest(endDate) - loan.AccruedInterest(startDate);
                         dAdditionalInterestPaidThisPeriod += loan.AdditionalInterestPaid(endDate) - loan.AdditionalInterestPaid(startDate);
@@ -188,6 +189,7 @@ namespace LoanStatusReport
                         if (loanAsOfEndDate.Status() == clsLoan.State.Listed) { dSaleListings += loan.Balance(endDate); }
                         if (loanAsOfEndDate.Status() == clsLoan.State.PendingSale) { dSaleContracts += loan.Balance(endDate); }
                         if (loanAsOfEndDate.Status() == clsLoan.State.PendingAcquisition) { dPendingAcq += loan.AcquisitionCost(false); }
+                        if (loanAsOfEndDate.Status() == clsLoan.State.PartiallySold) { dPartialBalance += loan.Balance(endDate); }
                     }
                 }
             }
@@ -200,6 +202,7 @@ namespace LoanStatusReport
                 iUncancelledCount[i] += iLoansByStatus[(int)clsLoan.State.PendingSale, i];
                 iUncancelledCount[i] += iLoansByStatus[(int)clsLoan.State.Rehab, i];
                 iUncancelledCount[i] += iLoansByStatus[(int)clsLoan.State.Sold, i];
+                iUncancelledCount[i] += iLoansByStatus[(int)clsLoan.State.PartiallySold, i];
             }
             int iRepaidCount = iLoansByStatus[(int)clsLoan.State.Sold, 1] - iLoansByStatus[(int)clsLoan.State.Sold, 0];
             int iOutstandingCount = iUncancelledCount[1] - iLoansByStatus[(int)clsLoan.State.Sold, 1];
@@ -331,6 +334,21 @@ namespace LoanStatusReport
                     sw.Write(",,,");
                     if (loan.AccruedAdditionalInterest(dtAsOf) > 0D) sw.Write(loan.AccruedAdditionalInterest(dtAsOf));
                     sw.Write(",,,");
+                    sw.Write(loan.PrincipalPaid(dtAsOf).ToString() + ",");
+                    sw.Write(loan.InterestPaid(dtAsOf).ToString() + ",");
+                    sw.Write(loan.AdditionalInterestPaid(dtAsOf).ToString() + ",");
+                    sw.Write(loan.Return(false).ToString() + ",");
+                    sw.Write(loan.IRR(false).ToString() + ",");
+                }
+                else if (loan.Status() == clsLoan.State.PartiallySold)
+                {
+                    sw.Write(loan.Balance(dtAsOf).ToString() + ",");
+                    sw.Write(loan.AccruedInterest(dtAsOf).ToString() + ",");
+                    sw.Write(loan.ProjectedHardInterest().ToString() + ",");
+                    if (loan.AccruedAdditionalInterest(dtAsOf) > 0D) sw.Write(loan.AccruedAdditionalInterest(dtAsOf));
+                    sw.Write(",");
+                    sw.Write(loan.Return(false).ToString() + ",");
+                    sw.Write(loan.IRR(false).ToString() + ",");
                     sw.Write(loan.PrincipalPaid(dtAsOf).ToString() + ",");
                     sw.Write(loan.InterestPaid(dtAsOf).ToString() + ",");
                     sw.Write(loan.AdditionalInterestPaid(dtAsOf).ToString() + ",");
@@ -545,6 +563,57 @@ namespace LoanStatusReport
                         sw.Write("<td></td>");
                         totalsIndex++;
                     }
+                    value = loan.PrincipalPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.InterestPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.PointsPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.AdditionalInterestPaid(dtAsOf);
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.Return(false);
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    value = loan.IRR(false);
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                }
+                else if (loan.Status() == clsLoan.State.PartiallySold)
+                {
+                    value = loan.Balance(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.AccruedInterest(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.ProjectedHardInterest();
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
+                    value = loan.AccruedAdditionalInterest(dtAsOf);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value + "</td>");
+                    value = loan.Return(false);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
+                    value = loan.IRR(false);
+                    totals[totalsIndex] += value;
+                    totalsIndex++;
+                    sw.Write("<td align=\"right\">" + value.ToString("#0.00%") + "</td>");
                     value = loan.PrincipalPaid(dtAsOf);
                     sw.Write("<td align=\"right\">" + value.ToString("#,##0.00") + "</td>");
                     totals[totalsIndex] += value;
